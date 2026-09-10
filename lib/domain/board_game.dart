@@ -24,6 +24,8 @@ abstract class BoardGame {
   /// Shown on setup, e.g. "First Edition".
   String? get editionLabel => null;
 
+  String get l10nPrefix => 'game.$id';
+
   String? get designer => null;
 
   String? get publisher => null;

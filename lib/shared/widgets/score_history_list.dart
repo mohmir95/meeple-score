@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n_scope.dart';
+
 class ScoreHistoryEntry {
   const ScoreHistoryEntry({
     required this.id,
@@ -20,16 +22,17 @@ class ScoreHistoryList extends StatelessWidget {
   const ScoreHistoryList({
     super.key,
     required this.entries,
-    this.emptyTitle = 'No scores yet',
-    this.emptyMessage = 'Add the first round to get started.',
+    this.emptyTitle,
+    this.emptyMessage,
   });
 
   final List<ScoreHistoryEntry> entries;
-  final String emptyTitle;
-  final String emptyMessage;
+  final String? emptyTitle;
+  final String? emptyMessage;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (entries.isEmpty) {
       return Card(
         child: Padding(
@@ -42,10 +45,13 @@ class ScoreHistoryList extends StatelessWidget {
                 color: Theme.of(context).colorScheme.outline,
               ),
               const SizedBox(height: 12),
-              Text(emptyTitle, style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                emptyTitle ?? l10n.t('score.historyEmptyTitle'),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 4),
               Text(
-                emptyMessage,
+                emptyMessage ?? l10n.t('score.historyEmptyMessage'),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
@@ -76,13 +82,13 @@ class ScoreHistoryList extends StatelessWidget {
                     children: [
                       if (entry.onEdit != null)
                         IconButton(
-                          tooltip: 'Edit',
+                          tooltip: l10n.t('common.edit'),
                           onPressed: entry.onEdit,
                           icon: const Icon(Icons.edit_outlined),
                         ),
                       if (entry.onDelete != null)
                         IconButton(
-                          tooltip: 'Delete',
+                          tooltip: l10n.t('common.delete'),
                           onPressed: entry.onDelete,
                           icon: const Icon(Icons.delete_outline),
                         ),

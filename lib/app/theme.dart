@@ -1,51 +1,50 @@
 import 'package:flutter/material.dart';
 
-/// Palette sampled from [assets/branding/app-icon.png]:
-/// forest green field, cream meeple, gold tally badge, terracotta corner.
+/// Brand color requested for the UI: #3498DB.
 class AppTheme {
-  static const forest = Color(0xFF0E593A);
-  static const forestDeep = Color(0xFF073D28);
-  static const cream = Color(0xFFFDF5E0);
-  static const gold = Color(0xFFDEA939);
-  static const terracotta = Color(0xFFD4683A);
+  static const brand = Color(0xFF3498DB);
+  static const brandDeep = Color(0xFF1F6FAD);
+  static const canvas = Color(0xFFF4F8FC);
+  static const gold = Color(0xFFF5B942);
+  static const terracotta = Color(0xFFE67E22);
 
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(
-      seedColor: forest,
+      seedColor: brand,
       brightness: Brightness.light,
     ).copyWith(
-      primary: forest,
+      primary: brand,
       onPrimary: Colors.white,
-      primaryContainer: const Color(0xFFD5EDE3),
-      onPrimaryContainer: forestDeep,
+      primaryContainer: const Color(0xFFD6EAF8),
+      onPrimaryContainer: brandDeep,
       secondary: terracotta,
       onSecondary: Colors.white,
-      secondaryContainer: const Color(0xFFF8DCCF),
-      onSecondaryContainer: const Color(0xFF6B2A14),
+      secondaryContainer: const Color(0xFFFDEBD0),
+      onSecondaryContainer: const Color(0xFF6E2C00),
       tertiary: gold,
       onTertiary: const Color(0xFF3D2A08),
-      tertiaryContainer: const Color(0xFFF6E2B3),
+      tertiaryContainer: const Color(0xFFF8E5B0),
       onTertiaryContainer: const Color(0xFF3D2A08),
-      surface: cream,
-      surfaceContainerLowest: const Color(0xFFFFFBF3),
-      surfaceContainerLow: const Color(0xFFF7ECD4),
-      outline: const Color(0xFF8A9A86),
+      surface: canvas,
+      surfaceContainerLowest: Colors.white,
+      surfaceContainerLow: const Color(0xFFEAF3FA),
+      outline: const Color(0xFF8AA4B5),
     );
     return _fromScheme(scheme);
   }
 
   static ThemeData dark() {
     final scheme = ColorScheme.fromSeed(
-      seedColor: forest,
+      seedColor: brand,
       brightness: Brightness.dark,
     ).copyWith(
-      primary: const Color(0xFF7DCEA0),
-      onPrimary: forestDeep,
-      secondary: const Color(0xFFE07A4A),
+      primary: const Color(0xFF5DADE2),
+      onPrimary: brandDeep,
+      secondary: terracotta,
       onSecondary: Colors.white,
       tertiary: gold,
       onTertiary: const Color(0xFF3D2A08),
-      surface: const Color(0xFF10241C),
+      surface: const Color(0xFF10212C),
     );
     return _fromScheme(scheme);
   }
@@ -57,24 +56,24 @@ class AppTheme {
       visualDensity: VisualDensity.standard,
       scaffoldBackgroundColor: scheme.surface,
       appBarTheme: const AppBarTheme(
-        backgroundColor: forest,
+        backgroundColor: brand,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
           color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
+          fontSize: 18,
+          fontWeight: FontWeight.w800,
         ),
         iconTheme: IconThemeData(color: Colors.white),
         actionsIconTheme: IconThemeData(color: Colors.white),
       ),
       cardTheme: CardThemeData(
-        elevation: 3,
-        shadowColor: forest.withValues(alpha: 0.18),
+        elevation: 2,
+        shadowColor: brand.withValues(alpha: 0.16),
         color: scheme.surfaceContainerLowest,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
       chipTheme: ChipThemeData(
@@ -86,6 +85,7 @@ class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
+          minimumSize: const Size(88, 48),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),

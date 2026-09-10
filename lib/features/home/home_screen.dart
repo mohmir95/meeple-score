@@ -4,6 +4,7 @@ import '../../data/game_session_repository.dart';
 import '../../domain/board_game.dart';
 import '../../domain/game_registry.dart';
 import '../../domain/models/game_session.dart';
+import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import '../play/play_screen.dart';
@@ -94,20 +95,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AppPage(
-      title: 'Board Game Score Sheet',
+      title: l10n.t('app.title'),
       leading: Padding(
         padding: const EdgeInsets.all(10),
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(10)),
           child: Image.asset(
             'assets/branding/app-icon.png',
-            semanticLabel: 'Meeple Score',
+            semanticLabel: l10n.t('app.iconLabel'),
           ),
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(value: 0))
           : ListView(
               padding: EdgeInsets.fromLTRB(
                 Breakpoints.isCompact(context) ? 12 : 20,

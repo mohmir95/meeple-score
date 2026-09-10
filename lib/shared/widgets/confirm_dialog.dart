@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n_scope.dart';
+
 Future<bool> showConfirmDialog(
   BuildContext context, {
   required String title,
   required String message,
-  String confirmLabel = 'Confirm',
-  String cancelLabel = 'Cancel',
+  String? confirmLabel,
+  String? cancelLabel,
   bool destructive = false,
 }) async {
+  final l10n = context.l10n;
+  final resolvedConfirm = confirmLabel ?? l10n.t('common.confirm');
+  final resolvedCancel = cancelLabel ?? l10n.t('common.cancel');
   final result = await showDialog<bool>(
     context: context,
     builder: (dialogContext) {
@@ -18,7 +23,7 @@ Future<bool> showConfirmDialog(
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(cancelLabel),
+            child: Text(resolvedCancel),
           ),
           FilledButton(
             style: destructive
@@ -28,7 +33,7 @@ Future<bool> showConfirmDialog(
                   )
                 : null,
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(confirmLabel),
+            child: Text(resolvedConfirm),
           ),
         ],
       );

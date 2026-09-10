@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/models/player.dart';
+import '../../l10n/l10n_scope.dart';
 import '../player_colors.dart';
 import 'primary_button.dart';
 
@@ -38,11 +39,20 @@ class PlayerEditor extends StatelessWidget {
     onChanged(next);
   }
 
-  void _add() {
+  void _add(BuildContext context) {
     if (players.length >= maxPlayers) {
       return;
     }
-    onChanged([...players, nextPlayer(players, colorOptions)]);
+    onChanged([
+      ...players,
+      nextPlayer(
+        players,
+        colorOptions,
+        name: context.l10n.t('players.numbered', {
+          'n': '${players.length + 1}',
+        }),
+      ),
+    ]);
   }
 
   void _setColor(int index, int colorValue) {
@@ -59,131 +69,156 @@ class PlayerEditor extends StatelessWidget {
     onChanged(next);
   }
 
+  String _colorName(BuildContext context, int colorValue) {
+    final l10n = context.l10n;
+    for (final option in colorOptions) {
+      if (option.value == colorValue) {
+        return l10n.colorLabel(option.name);
+      }
+    }
+    return l10n.t('players.color');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Players', style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.t('players.title'), style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         for (var i = 0; i < players.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: playerColor(players[i].colorValue),
-                      child: Text(
-                        '${i + 1}',
-                        style: TextStyle(
-                          color: onPlayerColor(players[i].colorValue),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextFormField(
-                        key: ValueKey(players[i].id),
-                        initialValue: players[i].name,
-                        enabled: !readOnly,
-                        textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(
-                          labelText: 'Player ${i + 1}',
-                          border: const OutlineInputBorder(),
-                        ),
-                        onChanged: (value) => _rename(i, value),
-                      ),
-                    ),
-                    if (!readOnly)
-                      IconButton(
-                        tooltip: 'Remove player',
-                        onPressed:
-                            players.length > minPlayers ? () => _remove(i) : null,
-                        icon: const Icon(Icons.remove_circle_outline),
-                      ),
-                  ],
+                _PlayerColorBadge(
+                  number: i + 1,
+                  colorValue: players[i].colorValue,
+                  colorName: _colorName(context, players[i].colorValue),
+                  options: colorOptions,
+                  enabled: !readOnly && colorOptions.isNotEmpty,
+                  onSelected: (value) => _setColor(i, value),
                 ),
-                if (colorOptions.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Wrap(
-                      spacing: 8,
-                      children: [
-                        for (final option in colorOptions)
-                          _ColorSwatch(
-                            option: option,
-                            selected: isPlayerColorSelected(
-                              players[i].colorValue,
-                              option,
-                            ),
-                            onTap: readOnly ? null : () => _setColor(i, option.value),
-                          ),
-                      ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextFormField(
+                    key: ValueKey(players[i].id),
+                    initialValue: players[i].name,
+                    enabled: !readOnly,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                      labelText: l10n.t('players.fieldLabel', {'n': '${i + 1}'}),
+                      border: const OutlineInputBorder(),
                     ),
+                    onChanged: (value) => _rename(i, value),
                   ),
-                ],
+                ),
+                if (!readOnly)
+                  IconButton(
+                    tooltip: l10n.t('players.remove'),
+                    onPressed:
+                        players.length > minPlayers ? () => _remove(i) : null,
+                    icon: const Icon(Icons.remove_circle_outline),
+                  ),
               ],
             ),
           ),
         if (!readOnly)
           PrimaryButton(
             label: players.length >= maxPlayers
-                ? 'Player limit reached'
-                : 'Add player',
+                ? l10n.t('players.limitReached')
+                : l10n.t('players.add'),
             icon: Icons.person_add_alt_1,
-            onPressed: players.length >= maxPlayers ? null : _add,
+            onPressed: players.length >= maxPlayers ? null : () => _add(context),
           ),
       ],
     );
   }
 }
 
-class _ColorSwatch extends StatelessWidget {
-  const _ColorSwatch({
-    required this.option,
-    required this.selected,
-    required this.onTap,
+class _PlayerColorBadge extends StatelessWidget {
+  const _PlayerColorBadge({
+    required this.number,
+    required this.colorValue,
+    required this.colorName,
+    required this.options,
+    required this.enabled,
+    required this.onSelected,
   });
 
-  final PlayerColorOption option;
-  final bool selected;
-  final VoidCallback? onTap;
+  final int number;
+  final int colorValue;
+  final String colorName;
+  final List<PlayerColorOption> options;
+  final bool enabled;
+  final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    final outline = Theme.of(context).colorScheme.outline;
-    return Tooltip(
-      message: option.name,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: option.color,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: selected
-                  ? Theme.of(context).colorScheme.primary
-                  : outline,
-              width: selected ? 3 : 1,
-            ),
-          ),
-          child: selected
-              ? Icon(
-                  Icons.check,
-                  size: 20,
-                  color: onPlayerColor(option.value),
-                )
-              : null,
+    final fill = playerColor(colorValue);
+    final badge = Container(
+      width: 44,
+      height: 44,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: fill,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: playerColorOutline(colorValue),
+          width: isLightPlayerColor(colorValue) ? 1.5 : 0,
         ),
       ),
+      child: Text(
+        '$number',
+        style: TextStyle(
+          color: onPlayerColor(colorValue),
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    if (!enabled) {
+      return Tooltip(message: colorName, child: badge);
+    }
+
+    return PopupMenuButton<int>(
+      tooltip: colorName,
+      position: PopupMenuPosition.under,
+      onSelected: onSelected,
+      itemBuilder: (context) => [
+        for (final option in options)
+          PopupMenuItem(
+            value: option.value,
+            child: Row(
+              children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: option.color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: playerColorOutline(option.value),
+                      width: isLightPlayerColor(option.value) ? 1.5 : 0,
+                    ),
+                  ),
+                  child: option.value == colorValue
+                      ? Icon(
+                          Icons.check,
+                          size: 16,
+                          color: onPlayerColor(option.value),
+                        )
+                      : null,
+                ),
+                const SizedBox(width: 12),
+                Text(context.l10n.colorLabel(option.name)),
+              ],
+            ),
+          ),
+      ],
+      child: badge,
     );
   }
 }

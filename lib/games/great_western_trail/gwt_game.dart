@@ -38,6 +38,9 @@ class GreatWesternTrailGame extends BoardGame {
   String? get editionLabel => 'First Edition';
 
   @override
+  String get l10nPrefix => 'game.gwt';
+
+  @override
   String? get designer => 'Alexander Pfister';
 
   @override

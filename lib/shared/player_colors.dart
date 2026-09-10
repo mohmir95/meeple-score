@@ -25,6 +25,16 @@ Color onPlayerColor(int colorValue) {
       : Colors.white;
 }
 
+bool isLightPlayerColor(int colorValue) {
+  return playerColor(colorValue).computeLuminance() > 0.7;
+}
+
+Color playerColorOutline(int colorValue) {
+  return isLightPlayerColor(colorValue)
+      ? const Color(0xFF6B7C8A)
+      : playerColor(colorValue);
+}
+
 bool isPlayerColorSelected(int colorValue, PlayerColorOption option) {
   return colorValue == option.value;
 }
@@ -59,10 +69,14 @@ List<Player> defaultPlayers({
   return players;
 }
 
-Player nextPlayer(List<Player> existing, List<PlayerColorOption> palette) {
+Player nextPlayer(
+  List<Player> existing,
+  List<PlayerColorOption> palette, {
+  String? name,
+}) {
   return Player(
     id: newId(),
-    name: 'Player ${existing.length + 1}',
+    name: name ?? 'Player ${existing.length + 1}',
     colorValue: nextColorValue(existing, palette),
   );
 }

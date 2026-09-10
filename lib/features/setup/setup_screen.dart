@@ -6,6 +6,7 @@ import '../../domain/models/game_config.dart';
 import '../../domain/models/game_session.dart';
 import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
+import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/player_colors.dart';
 import '../../shared/widgets/app_page.dart';
@@ -63,6 +64,14 @@ class _SetupScreenState extends State<SetupScreen> {
         _config = state.config;
       } else if (roster.isNotEmpty) {
         _players = roster;
+      } else {
+        final l10n = context.l10n;
+        _players = [
+          for (var i = 0; i < _players.length; i++)
+            _players[i].copyWith(
+              name: l10n.t('players.numbered', {'n': '${i + 1}'}),
+            ),
+        ];
       }
       _loading = false;
     });
@@ -76,9 +85,10 @@ class _SetupScreenState extends State<SetupScreen> {
       _players.every((player) => player.name.trim().isNotEmpty);
 
   Future<void> _startNewGame({required bool replacing}) async {
+    final l10n = context.l10n;
     if (!_namesValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Give every player a name first.')),
+        SnackBar(content: Text(l10n.t('setup.needNames'))),
       );
       return;
     }
@@ -86,9 +96,11 @@ class _SetupScreenState extends State<SetupScreen> {
     if (replacing && _hasSaved) {
       final confirmed = await showConfirmDialog(
         context,
-        title: 'Start a new game?',
-        message: 'This replaces the saved ${_game.name} session on this device.',
-        confirmLabel: 'Start new game',
+        title: l10n.t('setup.startNewTitle'),
+        message: l10n.t('setup.startNewMessage', {
+          'game': l10n.t('${_game.l10nPrefix}.name'),
+        }),
+        confirmLabel: l10n.t('setup.startNewGame'),
         destructive: true,
       );
       if (!confirmed) {
@@ -136,8 +148,12 @@ class _SetupScreenState extends State<SetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final startLabel = _hasSaved
+        ? l10n.t('setup.startNewGame')
+        : l10n.t('setup.startGame');
     return AppPage(
-      title: _game.name,
+      title: l10n.t('${_game.l10nPrefix}.name'),
       bottomNavigationBar: _loading
           ? null
           : Material(
@@ -152,21 +168,27 @@ class _SetupScreenState extends State<SetupScreen> {
                     Breakpoints.isCompact(context) ? 12 : 20,
                     12,
                   ),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: Breakpoints.contentMaxWidth,
-                    ),
-                    child: PrimaryButton(
-                      label: _hasSaved ? 'Start new game' : 'Start game',
-                      icon: Icons.play_arrow,
-                      onPressed: () => _startNewGame(replacing: _hasSaved),
-                    ),
-                  ),
+                  child: Breakpoints.isCompact(context)
+                      ? PrimaryButton(
+                          label: startLabel,
+                          icon: Icons.play_arrow,
+                          onPressed: () => _startNewGame(replacing: _hasSaved),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            PrimaryButton(
+                              label: startLabel,
+                              icon: Icons.play_arrow,
+                              onPressed: () => _startNewGame(replacing: _hasSaved),
+                            ),
+                          ],
+                        ),
                 ),
               ),
             ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(value: 0))
           : ListView(
               padding: EdgeInsets.all(Breakpoints.isCompact(context) ? 12 : 20),
               children: [
@@ -179,9 +201,11 @@ class _SetupScreenState extends State<SetupScreen> {
                         _canResume ? Icons.play_circle_outline : Icons.history,
                       ),
                       title: Text(
-                        _canResume ? 'Continue saved game' : 'Review last game',
+                        _canResume
+                            ? l10n.t('setup.continueSaved')
+                            : l10n.t('setup.reviewLast'),
                       ),
-                      subtitle: const Text('Stored on this device.'),
+                      subtitle: Text(l10n.t('setup.storedOnDevice')),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: _continueSaved,
                     ),
@@ -217,11 +241,15 @@ class _SetupIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final scheme = Theme.of(context).colorScheme;
+    final compact = Breakpoints.isCompact(context);
     final facts = <String>[
-      if (game.editionLabel != null) game.editionLabel!,
-      '${game.minPlayers}–${game.maxPlayers} players',
-      if (game.playTime != null) game.playTime!,
+      l10n.t('home.playersCount', {
+        'min': '${game.minPlayers}',
+        'max': '${game.maxPlayers}',
+      }),
+      if (game.playTime != null) l10n.t('${game.l10nPrefix}.playTime'),
       if (game.released != null) game.released!,
     ];
     final credit = [
@@ -231,13 +259,13 @@ class _SetupIntro extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: scheme.secondaryContainer,
+        color: scheme.primaryContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _CoverThumb(game: game),
             const SizedBox(width: 12),
@@ -280,13 +308,15 @@ class _SetupIntro extends StatelessWidget {
                       ),
                     ),
                   ],
-                  const SizedBox(height: 8),
-                  Text(
-                    game.description,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.35,
+                  if (!compact) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.t('${game.l10nPrefix}.description'),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        height: 1.35,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -314,7 +344,7 @@ class _CoverThumb extends StatelessWidget {
             height: size,
             fit: BoxFit.cover,
             alignment: const Alignment(0, -0.2),
-            semanticLabel: game.name,
+            semanticLabel: context.l10n.t('${game.l10nPrefix}.name'),
           );
 
     return ClipRRect(

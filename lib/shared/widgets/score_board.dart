@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
+import '../../l10n/l10n_scope.dart';
 import '../layout/breakpoints.dart';
 import '../player_colors.dart';
 
@@ -33,7 +34,7 @@ class ScoreBoard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Scores', style: Theme.of(context).textTheme.titleMedium),
+            Text(context.l10n.t('score.scores'), style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -84,8 +85,12 @@ class _ScoreChip extends StatelessWidget {
         ),
       ),
       side: score.isLeader
-          ? BorderSide(color: color, width: 1.5)
-          : BorderSide(color: color.withValues(alpha: 0.3)),
+          ? BorderSide(color: playerColorOutline(score.player.colorValue), width: 1.5)
+          : BorderSide(
+              color: isLightPlayerColor(score.player.colorValue)
+                  ? playerColorOutline(score.player.colorValue)
+                  : color.withValues(alpha: 0.3),
+            ),
     );
   }
 }

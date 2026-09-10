@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/board_game.dart';
 import '../../domain/models/game_session.dart';
 import '../../domain/models/game_status.dart';
+import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 
 class GameCard extends StatelessWidget {
@@ -62,9 +63,9 @@ class GameCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Positioned(
+                  PositionedDirectional(
                     top: 12,
-                    right: 12,
+                    end: 12,
                     child: _StatusPill(
                       inProgress: inProgress,
                       finished: finished,
@@ -78,7 +79,7 @@ class GameCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          game.name,
+                          context.l10n.t('${game.l10nPrefix}.name'),
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
@@ -90,9 +91,12 @@ class GameCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '${game.minPlayers}–${game.maxPlayers} players',
+                          context.l10n.t('home.playersCount', {
+                            'min': '${game.minPlayers}',
+                            'max': '${game.maxPlayers}',
+                          }),
                           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: const Color(0xFFFDF5E0),
+                            color: const Color(0xFFEAF3FA),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -126,7 +130,7 @@ class _Cover extends StatelessWidget {
       game.coverImageAsset!,
       fit: BoxFit.cover,
       alignment: const Alignment(0, -0.2),
-      semanticLabel: game.name,
+      semanticLabel: context.l10n.t('${game.l10nPrefix}.name'),
       errorBuilder: (context, error, stackTrace) {
         return ColoredBox(
           color: game.accentColor,
@@ -154,7 +158,8 @@ class _StatusPill extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final color = inProgress ? scheme.primary : scheme.tertiary;
     final foreground = inProgress ? scheme.onPrimary : scheme.onTertiary;
-    final label = inProgress ? 'Resume' : 'Last game';
+    final l10n = context.l10n;
+    final label = inProgress ? l10n.t('home.resume') : l10n.t('home.lastGame');
     final icon = inProgress ? Icons.play_arrow_rounded : Icons.emoji_events;
 
     return DecoratedBox(

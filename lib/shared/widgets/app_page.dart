@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../layout/breakpoints.dart';
+import 'language_toggle.dart';
 
 class AppPage extends StatelessWidget {
   const AppPage({
@@ -22,15 +23,19 @@ class AppPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rtl = Directionality.of(context) == TextDirection.rtl;
     return Scaffold(
       appBar: AppBar(
         leading: leading,
         title: FittedBox(
           fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
+          alignment: rtl ? Alignment.centerRight : Alignment.centerLeft,
           child: Text(title),
         ),
-        actions: actions,
+        actions: [
+          ...?actions,
+          const LanguageToggle(),
+        ],
       ),
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomNavigationBar,

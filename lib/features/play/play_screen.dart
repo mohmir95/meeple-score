@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
+import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import '../../shared/widgets/confirm_dialog.dart';
@@ -27,21 +28,30 @@ class _PlayScreenState extends State<PlayScreen> {
   @override
   void initState() {
     super.initState();
+    _session.addListener(_onSessionChanged);
     _session.repository.saveActiveGameId(_session.game.id);
+  }
+
+  void _onSessionChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   void dispose() {
+    _session.removeListener(_onSessionChanged);
     _session.dispose();
     super.dispose();
   }
 
   Future<void> _reset() async {
+    final l10n = context.l10n;
     final confirmed = await showConfirmDialog(
       context,
-      title: 'Reset scores?',
-      message: 'Player names stay. All scores are cleared.',
-      confirmLabel: 'Reset',
+      title: l10n.t('play.resetTitle'),
+      message: l10n.t('play.resetMessage'),
+      confirmLabel: l10n.t('play.reset'),
       destructive: true,
     );
     if (confirmed) {
@@ -50,11 +60,14 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   Future<void> _finish() async {
+    final l10n = context.l10n;
     final confirmed = await showConfirmDialog(
       context,
-      title: 'Finish game?',
-      message: _session.game.winnerMessage(_session.state),
-      confirmLabel: 'Finish',
+      title: l10n.t('play.finishTitle'),
+      message: l10n.winnerAnnouncement(
+        _session.game.winners(_session.state).map((player) => player.name),
+      ),
+      confirmLabel: l10n.t('play.finish'),
     );
     if (confirmed) {
       await _session.finish();
@@ -96,7 +109,7 @@ class _PlayScreenState extends State<PlayScreen> {
                     if (!_session.isFinished)
                       FilledButton(
                         onPressed: () => Navigator.of(sheetContext).pop(players),
-                        child: const Text('Save players'),
+                        child: Text(sheetContext.l10n.t('play.savePlayers')),
                       ),
                   ],
                 ),
@@ -114,6 +127,66 @@ class _PlayScreenState extends State<PlayScreen> {
   @override
   Widget build(BuildContext context) {
     final compact = Breakpoints.isCompact(context);
+    final l10n = context.l10n;
+    final state = _session.state;
+    final scores = _session.game.scores(state);
+    final reachedGoal = _session.game.hasReachedGoal(state);
+    const appBarForeground = Colors.white;
+    final actions = <Widget>[
+      if (!compact) ...[
+        TextButton.icon(
+          onPressed: _editPlayers,
+          style: TextButton.styleFrom(foregroundColor: appBarForeground),
+          icon: const Icon(Icons.group_outlined),
+          label: Text(l10n.t('play.players')),
+        ),
+        if (!_session.isFinished)
+          TextButton.icon(
+            onPressed: _reset,
+            style: TextButton.styleFrom(foregroundColor: appBarForeground),
+            icon: const Icon(Icons.restart_alt),
+            label: Text(l10n.t('play.reset')),
+          ),
+        if (!_session.isFinished)
+          TextButton.icon(
+            onPressed: _finish,
+            style: TextButton.styleFrom(foregroundColor: appBarForeground),
+            icon: const Icon(Icons.flag_outlined),
+            label: Text(l10n.t('play.finish')),
+          ),
+      ],
+      if (compact)
+        PopupMenuButton<_PlayAction>(
+          color: Theme.of(context).colorScheme.surface,
+          iconColor: appBarForeground,
+          onSelected: (action) {
+            switch (action) {
+              case _PlayAction.players:
+                _editPlayers();
+              case _PlayAction.reset:
+                _reset();
+              case _PlayAction.finish:
+                _finish();
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: _PlayAction.players,
+              child: Text(l10n.t('play.players')),
+            ),
+            if (!_session.isFinished)
+              PopupMenuItem(
+                value: _PlayAction.reset,
+                child: Text(l10n.t('play.resetGame')),
+              ),
+            if (!_session.isFinished)
+              PopupMenuItem(
+                value: _PlayAction.finish,
+                child: Text(l10n.t('play.finishGame')),
+              ),
+          ],
+        ),
+    ];
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {
@@ -121,120 +194,57 @@ class _PlayScreenState extends State<PlayScreen> {
           _session.repository.saveActiveGameId(null);
         }
       },
-      child: ListenableBuilder(
-      listenable: _session,
-      builder: (context, _) {
-        final state = _session.state;
-        final scores = _session.game.scores(state);
-        final reachedGoal = _session.game.hasReachedGoal(state);
-        const appBarForeground = Colors.white;
-        final actions = <Widget>[
-          if (!compact) ...[
-            TextButton.icon(
-              onPressed: _editPlayers,
-              style: TextButton.styleFrom(foregroundColor: appBarForeground),
-              icon: const Icon(Icons.group_outlined),
-              label: const Text('Players'),
-            ),
-            if (!_session.isFinished)
-              TextButton.icon(
-                onPressed: _reset,
-                style: TextButton.styleFrom(foregroundColor: appBarForeground),
-                icon: const Icon(Icons.restart_alt),
-                label: const Text('Reset'),
-              ),
-            if (!_session.isFinished)
-              TextButton.icon(
-                onPressed: _finish,
-                style: TextButton.styleFrom(foregroundColor: appBarForeground),
-                icon: const Icon(Icons.flag_outlined),
-                label: const Text('Finish'),
-              ),
-          ],
-          if (compact)
-            PopupMenuButton<_PlayAction>(
-              color: Theme.of(context).colorScheme.surface,
-              iconColor: appBarForeground,
-              onSelected: (action) {
-                switch (action) {
-                  case _PlayAction.players:
-                    _editPlayers();
-                  case _PlayAction.reset:
-                    _reset();
-                  case _PlayAction.finish:
-                    _finish();
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: _PlayAction.players,
-                  child: Text('Players'),
-                ),
-                if (!_session.isFinished)
-                  const PopupMenuItem(
-                    value: _PlayAction.reset,
-                    child: Text('Reset game'),
-                  ),
-                if (!_session.isFinished)
-                  const PopupMenuItem(
-                    value: _PlayAction.finish,
-                    child: Text('Finish game'),
-                  ),
-              ],
-            ),
-        ];
-
-        return AppPage(
-          title: _session.game.name,
-          actions: actions,
-          body: ListView(
-            padding: EdgeInsets.fromLTRB(
-              compact ? 12 : 20,
-              compact ? 12 : 20,
-              compact ? 12 : 20,
-              compact ? 24 : 20,
-            ),
-            children: [
-              if (_session.isFinished)
-                _StatusBanner(
-                  icon: Icons.emoji_events,
-                  color: Theme.of(context).colorScheme.primary,
-                  title: _session.game.winnerMessage(state),
-                  message: 'This game is finished. You can still review the sheet.',
-                )
-              else if (reachedGoal)
-                _StatusBanner(
-                  icon: Icons.celebration_outlined,
-                  color: Theme.of(context).colorScheme.tertiary,
-                  title: 'Target reached',
-                  message: 'You can keep playing or finish the game when you are ready.',
-                ),
-              if (scores.isNotEmpty) ...[
-                ScoreBoard(
-                  scores: scores,
-                  footnote: _session.game.scoreFootnote(state),
-                ),
-                const SizedBox(height: 16),
-              ],
-              _session.game.buildScoreSheet(
-                state: state,
-                onChanged: _session.update,
-                readOnly: _session.isFinished,
-              ),
-              if (_session.isFinished) ...[
-                const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  onPressed: () async {
-                    await _session.update(state.copyWithStatus(GameStatus.inProgress));
-                  },
-                  icon: const Icon(Icons.play_arrow),
-                  label: const Text('Reopen game'),
-                ),
-              ],
-            ],
+      child: AppPage(
+        title: l10n.t('${_session.game.l10nPrefix}.name'),
+        actions: actions,
+        body: ListView(
+          padding: EdgeInsets.fromLTRB(
+            compact ? 8 : 20,
+            compact ? 8 : 20,
+            compact ? 8 : 20,
+            compact ? 20 : 20,
           ),
-        );
-      },
+          children: [
+            if (_session.isFinished)
+              _StatusBanner(
+                icon: Icons.emoji_events,
+                color: Theme.of(context).colorScheme.primary,
+                title: l10n.winnerAnnouncement(
+                  _session.game.winners(state).map((player) => player.name),
+                ),
+                message: l10n.t('play.finishedMessage'),
+              )
+            else if (reachedGoal)
+              _StatusBanner(
+                icon: Icons.celebration_outlined,
+                color: Theme.of(context).colorScheme.tertiary,
+                title: l10n.t('play.targetReached'),
+                message: l10n.t('play.targetReachedMessage'),
+              ),
+            if (!compact && scores.isNotEmpty) ...[
+              ScoreBoard(
+                scores: scores,
+                footnote: l10n.t('${_session.game.l10nPrefix}.footnote'),
+              ),
+              const SizedBox(height: 16),
+            ],
+            _session.game.buildScoreSheet(
+              state: state,
+              onChanged: _session.update,
+              readOnly: _session.isFinished,
+            ),
+            if (_session.isFinished) ...[
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () async {
+                  await _session.update(state.copyWithStatus(GameStatus.inProgress));
+                },
+                icon: const Icon(Icons.play_arrow),
+                label: Text(l10n.t('play.reopen')),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

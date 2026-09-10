@@ -2,7 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../app/theme.dart';
 import '../../domain/models/player.dart';
+import '../../l10n/app_localizations.dart';
+import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/player_colors.dart';
 import '../../shared/widgets/score_stepper.dart';
@@ -24,12 +27,12 @@ class GwtSheet extends StatelessWidget {
   final ValueChanged<GwtState> onChanged;
   final bool readOnly;
 
-  static const _ink = Color(0xFF143528);
-  static const _muted = Color(0xFF3F5C4C);
-  static const _sage = Color(0xFFD7E6D4);
-  static const _dust = Color(0xFFD5DDE6);
-  static const _header = Color(0xFFF7F1E5);
-  static const _grid = Color(0xFFB7C4B5);
+  static const _ink = Color(0xFF1B3A4B);
+  static const _muted = Color(0xFF4A6B7C);
+  static const _sage = Color(0xFFD6EAF8);
+  static const _dust = Color(0xFFEAF3FA);
+  static const _header = Color(0xFFD4E6F1);
+  static const _grid = Color(0xFFB8D4E8);
 
   Future<void> _editNumber({
     required BuildContext context,
@@ -81,13 +84,19 @@ class GwtSheet extends StatelessWidget {
                           onChanged: (next) => setModalState(() => draft = next),
                         ),
                         const SizedBox(height: 20),
-                        FilledButton(
-                          onPressed: () => Navigator.of(dialogContext).pop(draft),
-                          child: const Text('Save'),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton(
+                            onPressed: () => Navigator.of(dialogContext).pop(draft),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Text(dialogContext.l10n.t('common.save')),
+                            ),
+                          ),
                         ),
                         TextButton(
                           onPressed: () => Navigator.of(dialogContext).pop(),
-                          child: const Text('Cancel'),
+                          child: Text(dialogContext.l10n.t('common.cancel')),
                         ),
                       ],
                     );
@@ -121,11 +130,11 @@ class GwtSheet extends StatelessWidget {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(dialogContext).pop(),
-                    child: const Text('Cancel'),
+                    child: Text(dialogContext.l10n.t('common.cancel')),
                   ),
                   FilledButton(
                     onPressed: () => Navigator.of(dialogContext).pop(draft),
-                    child: const Text('Save'),
+                    child: Text(dialogContext.l10n.t('common.save')),
                   ),
                 ],
               );
@@ -164,12 +173,11 @@ class GwtSheet extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final rows = <_GwtRow>[
+  List<_GwtRow> _rows(BuildContext context, AppLocalizations l10n) {
+    return [
       _GwtRow(
-        title: 'Coins',
-        hint: '5 dollars = 1 VP',
+        title: l10n.t('gwt.coins'),
+        hint: l10n.t('gwt.coinsHint'),
         icon: Icons.monetization_on_outlined,
         color: _sage,
         valueOf: (line) => line.dollars,
@@ -180,144 +188,142 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: 'Dollars',
-          helper:
-              'Enter cash. Every 5 dollars becomes 1 victory point. Leftover dollars do not score.',
+          title: l10n.t('gwt.coinsTitle'),
+          helper: l10n.t('gwt.coinsHelper'),
           value: line.dollars,
           min: 0,
           update: (current, value) => current.copyWith(dollars: value),
         ),
       ),
       _GwtRow(
-        title: 'Buildings',
-        hint: 'Private buildings',
+        title: l10n.t('gwt.buildings'),
+        hint: l10n.t('gwt.buildingsHint'),
         icon: Icons.home_work_outlined,
         color: _dust,
         valueOf: (line) => line.buildings,
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: 'Buildings',
-          helper: 'Sum the VP printed on your private building tiles on the board.',
+          title: l10n.t('gwt.buildings'),
+          helper: l10n.t('gwt.buildingsHelper'),
           value: line.buildings,
           min: 0,
           update: (current, value) => current.copyWith(buildings: value),
         ),
       ),
       _GwtRow(
-        title: 'Deliveries',
-        hint: 'Kansas City is −6',
+        title: l10n.t('gwt.deliveries'),
+        hint: l10n.t('gwt.deliveriesHint'),
         icon: Icons.flag_outlined,
         color: _sage,
         valueOf: (line) => line.deliveries,
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: 'Deliveries',
-          helper: 'VP unlocked by discs on city crests, including −6 per Kansas City disc.',
+          title: l10n.t('gwt.deliveries'),
+          helper: l10n.t('gwt.deliveriesHelper'),
           value: line.deliveries,
           update: (current, value) => current.copyWith(deliveries: value),
         ),
       ),
       _GwtRow(
-        title: 'Stations',
-        hint: 'Upgraded stations',
+        title: l10n.t('gwt.stations'),
+        hint: l10n.t('gwt.stationsHint'),
         icon: Icons.train_outlined,
         color: _dust,
         valueOf: (line) => line.stations,
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: 'Stations',
-          helper: 'Sum the VP printed next to each train station that has your disc.',
+          title: l10n.t('gwt.stations'),
+          helper: l10n.t('gwt.stationsHelper'),
           value: line.stations,
           min: 0,
           update: (current, value) => current.copyWith(stations: value),
         ),
       ),
       _GwtRow(
-        title: 'Hazards',
-        hint: 'Collected tiles',
+        title: l10n.t('gwt.hazards'),
+        hint: l10n.t('gwt.hazardsHint'),
         icon: Icons.landscape_outlined,
         color: _sage,
         valueOf: (line) => line.hazards,
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: 'Hazards',
-          helper: 'Sum the VP printed on hazard tiles in front of you.',
+          title: l10n.t('gwt.hazards'),
+          helper: l10n.t('gwt.hazardsHelper'),
           value: line.hazards,
           min: 0,
           update: (current, value) => current.copyWith(hazards: value),
         ),
       ),
       _GwtRow(
-        title: 'Cattle',
-        hint: 'Whole cattle deck',
+        title: l10n.t('gwt.cattle'),
+        hint: l10n.t('gwt.cattleHint'),
         icon: Icons.agriculture_outlined,
         color: _dust,
         valueOf: (line) => line.cattle,
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: 'Cattle',
-          helper: 'From draw stack, hand, and discard, sum VP printed on cattle cards.',
+          title: l10n.t('gwt.cattle'),
+          helper: l10n.t('gwt.cattleHelper'),
           value: line.cattle,
           min: 0,
           update: (current, value) => current.copyWith(cattle: value),
         ),
       ),
       _GwtRow(
-        title: 'Objectives',
-        hint: 'Unmet cards are negative',
+        title: l10n.t('gwt.objectives'),
+        hint: l10n.t('gwt.objectivesHint'),
         icon: Icons.task_alt_outlined,
         color: _sage,
         valueOf: (line) => line.objectives,
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: 'Objectives',
-          helper:
-              'Fulfilled cards score their positive VP. Incomplete cards subtract their negative VP.',
+          title: l10n.t('gwt.objectives'),
+          helper: l10n.t('gwt.objectivesHelper'),
           value: line.objectives,
           update: (current, value) => current.copyWith(objectives: value),
         ),
       ),
       _GwtRow(
-        title: 'Station masters',
-        hint: 'Tile tasks',
+        title: l10n.t('gwt.stationMasters'),
+        hint: l10n.t('gwt.stationMastersHint'),
         icon: Icons.badge_outlined,
         color: _dust,
         valueOf: (line) => line.stationMasters,
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: 'Station masters',
-          helper: 'Score the individual tasks on station master tiles in front of you.',
+          title: l10n.t('gwt.stationMasters'),
+          helper: l10n.t('gwt.stationMastersHelper'),
           value: line.stationMasters,
           min: 0,
           update: (current, value) => current.copyWith(stationMasters: value),
         ),
       ),
       _GwtRow(
-        title: 'Player board',
-        hint: '4 VP per worker in 5–6',
+        title: l10n.t('gwt.playerBoard'),
+        hint: l10n.t('gwt.playerBoardHint'),
         icon: Icons.person_outline,
         color: _sage,
         valueOf: (line) => line.playerBoard,
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: 'Player board',
-          helper: '4 VP for each worker on the 5th or 6th space of any worker row (max 24).',
+          title: l10n.t('gwt.playerBoard'),
+          helper: l10n.t('gwt.playerBoardHelper'),
           value: line.playerBoard,
           min: 0,
           update: (current, value) => current.copyWith(playerBoard: value),
         ),
       ),
       _GwtRow(
-        title: '3-VP disc',
-        hint: 'Tap 0 or 3',
+        title: l10n.t('gwt.threeVp'),
+        hint: l10n.t('gwt.threeVpHint'),
         icon: Icons.looks_3_outlined,
         color: _dust,
         valueOf: (line) => GwtScoring.threeVpPoints(line.clearedThreeVpSpace),
@@ -325,8 +331,8 @@ class GwtSheet extends StatelessWidget {
         onTap: _toggleThree,
       ),
       _GwtRow(
-        title: 'End-game token',
-        hint: 'Job market = 2 VP',
+        title: l10n.t('gwt.endGameToken'),
+        hint: l10n.t('gwt.endGameTokenHint'),
         icon: Icons.workspace_premium_outlined,
         color: _sage,
         valueOf: (line) => GwtScoring.jobMarketPoints(line.hasJobMarketToken),
@@ -334,31 +340,40 @@ class GwtSheet extends StatelessWidget {
         onTap: _toggleJobMarket,
       ),
     ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final rows = _rows(context, l10n);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < Breakpoints.compact;
+        if (compact) {
+          return _buildMobilePad(context, rows);
+        }
+
         final players = state.players.length;
-        final labelWidth = compact ? 128.0 : 168.0;
-        final minCol = compact ? 80.0 : 96.0;
+        const labelWidth = 168.0;
+        const minCol = 96.0;
         final openWidth = math.max(0.0, constraints.maxWidth - labelWidth);
         final columnWidth = players == 0
             ? minCol
-            : (openWidth / players).clamp(minCol, compact ? 140.0 : 160.0);
+            : (openWidth / players).clamp(minCol, 160.0);
         final tableWidth = labelWidth + columnWidth * players;
-        final rowHeight = compact ? 68.0 : 58.0;
         final metrics = _PadMetrics(
           labelWidth: labelWidth,
           columnWidth: columnWidth,
-          rowHeight: rowHeight,
-          compact: compact,
+          rowHeight: 58,
+          compact: false,
         );
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Score pad',
+              l10n.t('score.pad'),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
                 color: _ink,
@@ -366,9 +381,7 @@ class GwtSheet extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              compact
-                  ? 'Tap a cell to enter points.'
-                  : 'Tap a cell to enter points. The 3-VP disc row is on the official pad; leave it empty if you do not use it.',
+              l10n.t('score.padHint'),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: _muted),
             ),
             const SizedBox(height: 12),
@@ -395,6 +408,256 @@ class GwtSheet extends StatelessWidget {
     );
   }
 
+  Widget _buildMobilePad(BuildContext context, List<_GwtRow> rows) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.t('score.pad'),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: _ink,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          context.l10n.t('score.padHintMobile'),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: _muted),
+        ),
+        const SizedBox(height: 12),
+        _mobileTotals(context),
+        const SizedBox(height: 12),
+        for (final row in rows) ...[
+          _mobileCategory(context, row),
+          const SizedBox(height: 10),
+        ],
+      ],
+    );
+  }
+
+  Widget _mobileTotals(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppTheme.brand,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.l10n.t('score.totals'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                for (var i = 0; i < state.players.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 8),
+                  Expanded(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                        child: Column(
+                          children: [
+                            Text(
+                              state.players[i].name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${GwtScoring.totalFor(state.lineFor(state.players[i].id))}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 22,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _mobileCategory(BuildContext context, _GwtRow row) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _grid),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(row.icon, color: AppTheme.brand, size: 22),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        row.title,
+                        style: const TextStyle(
+                          color: _ink,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        row.hint,
+                        style: const TextStyle(
+                          color: _muted,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            _mobileScoreButtons(row),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _mobileScoreButtons(_GwtRow row) {
+    final twoCol = state.players.length >= 3;
+    final buttons = [
+      for (final player in state.players)
+        _mobileScoreButton(player, row),
+    ];
+    if (!twoCol) {
+      return Row(
+        children: [
+          for (var i = 0; i < buttons.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            Expanded(child: buttons[i]),
+          ],
+        ],
+      );
+    }
+    return Column(
+      children: [
+        for (var i = 0; i < buttons.length; i += 2) ...[
+          if (i > 0) const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(child: buttons[i]),
+              const SizedBox(width: 8),
+              Expanded(
+                child: i + 1 < buttons.length ? buttons[i + 1] : const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _mobileScoreButton(Player player, _GwtRow row) {
+    final line = state.lineFor(player.id);
+    final label = row.displayOf?.call(line) ?? '${row.valueOf(line)}';
+    return Material(
+      color: _dust,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: readOnly
+            ? null
+            : () {
+                if (row.onTap != null) {
+                  row.onTap!(player);
+                } else {
+                  row.onEdit?.call(player, line);
+                }
+              },
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 72),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: playerColor(player.colorValue), width: 2),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: playerColor(player.colorValue),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: playerColorOutline(player.colorValue),
+                        width: isLightPlayerColor(player.colorValue) ? 1 : 0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      player.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: _ink,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: _ink,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 24,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHeader(BuildContext context, _PadMetrics metrics) {
     return SizedBox(
       height: metrics.rowHeight,
@@ -404,8 +667,8 @@ class GwtSheet extends StatelessWidget {
             context,
             metrics: metrics,
             icon: Icons.shield_outlined,
-            title: 'Players',
-            hint: '1st Edition',
+            title: context.l10n.t('game.gwt.headerPlayers'),
+            hint: context.l10n.t('game.gwt.headerEdition'),
             color: _header,
             bold: true,
           ),
@@ -496,8 +759,8 @@ class GwtSheet extends StatelessWidget {
             context,
             metrics: metrics,
             icon: Icons.drag_handle,
-            title: 'Total',
-            hint: 'Sum of VP',
+            title: context.l10n.t('score.total'),
+            hint: context.l10n.t('score.totalHint'),
             color: _header,
             bold: true,
           ),

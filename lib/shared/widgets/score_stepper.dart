@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../l10n/l10n_scope.dart';
+
 class ScoreStepper extends StatelessWidget {
   const ScoreStepper({
     super.key,
@@ -33,12 +35,17 @@ class ScoreStepper extends StatelessWidget {
   }
 
   Future<void> _edit(BuildContext context) async {
+    final l10n = context.l10n;
     final controller = TextEditingController(text: '$value');
     final next = await showDialog<int>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text(label == null ? 'Enter score' : 'Score for $label'),
+          title: Text(
+            label == null
+                ? l10n.t('score.enter')
+                : l10n.t('score.enterFor', {'label': label!}),
+          ),
           content: TextField(
             controller: controller,
             autofocus: true,
@@ -46,9 +53,9 @@ class ScoreStepper extends StatelessWidget {
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'-?\d*')),
             ],
-            decoration: const InputDecoration(
-              labelText: 'Points',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.t('score.points'),
+              border: const OutlineInputBorder(),
             ),
             onSubmitted: (text) {
               Navigator.of(dialogContext).pop(int.tryParse(text) ?? value);
@@ -57,13 +64,13 @@ class ScoreStepper extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.t('common.cancel')),
             ),
             FilledButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop(int.tryParse(controller.text) ?? value);
               },
-              child: const Text('Save'),
+              child: Text(l10n.t('common.save')),
             ),
           ],
         );
@@ -77,8 +84,9 @@ class ScoreStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttonSize = large ? 56.0 : 40.0;
-    final iconSize = large ? 28.0 : 22.0;
+    final l10n = context.l10n;
+    final buttonSize = large ? 64.0 : 40.0;
+    final iconSize = large ? 32.0 : 22.0;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -91,7 +99,7 @@ class ScoreStepper extends StatelessWidget {
           ),
         ],
         IconButton.filledTonal(
-          tooltip: 'Decrease',
+          tooltip: l10n.t('score.decrease'),
           onPressed: () => onChanged(_clamp(value - step)),
           style: IconButton.styleFrom(
             minimumSize: Size(buttonSize, buttonSize),
@@ -116,7 +124,7 @@ class ScoreStepper extends StatelessWidget {
           ),
         ),
         IconButton.filledTonal(
-          tooltip: 'Increase',
+          tooltip: l10n.t('score.increase'),
           onPressed: () => onChanged(_clamp(value + step)),
           style: IconButton.styleFrom(
             minimumSize: Size(buttonSize, buttonSize),
