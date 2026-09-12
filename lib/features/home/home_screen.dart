@@ -7,9 +7,9 @@ import '../../domain/models/game_session.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
+import '../hub/game_hub_screen.dart';
 import '../play/play_screen.dart';
 import '../play/play_session.dart';
-import '../setup/setup_screen.dart';
 import 'game_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -84,10 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _openGame(BoardGame game) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (context) => SetupScreen(
-          game: game,
-          repository: widget.repository,
-        ),
+        builder: (context) =>
+            GameHubScreen(game: game, repository: widget.repository),
       ),
     );
     await _reload();

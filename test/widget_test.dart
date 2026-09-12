@@ -7,7 +7,9 @@ import 'helpers/app_harness.dart';
 import 'helpers/memory_session_repository.dart';
 
 void main() {
-  testWidgets('home lists Great Western Trail and can start a game', (tester) async {
+  testWidgets('home lists Great Western Trail and can start a game', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1200, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -23,9 +25,16 @@ void main() {
 
     await tester.tap(find.text('Great Western Trail'));
     await pumpFor(tester);
+    await pumpUntilFound(tester, find.text('Scoresheet'));
+    expect(find.text('Scoresheet'), findsOneWidget);
+    expect(find.text('Buildings Randomiser'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsWidgets);
+
+    await tester.tap(find.text('Scoresheet'));
+    await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Start game'));
 
-    expect(find.widgetWithText(AppBar, 'Great Western Trail'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Great Western Trail'), findsWidgets);
     expect(find.byTooltip('Red'), findsOneWidget);
     expect(find.byTooltip('Blue'), findsOneWidget);
     await tester.tap(find.text('Start game'));
@@ -43,13 +52,12 @@ void main() {
 
     final repository = MemorySessionRepository();
     await pumpScoreSheetApp(tester, repository: repository);
-    await pumpUntilFound(tester, find.text('Great Western Trail'));
-    await tester.tap(find.text('Great Western Trail'));
-    await pumpFor(tester);
-    await pumpUntilFound(tester, find.text('Start game'));
+    await openGwtSetup(tester);
     await tester.tap(find.text('Start game'));
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Score pad'));
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await pumpFor(tester);
     tester.state<NavigatorState>(find.byType(Navigator)).pop();
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Resume'));
@@ -70,9 +78,7 @@ void main() {
       localeController: localeController,
     );
     await pumpUntilFound(tester, find.text('Great Western Trail'));
-    await tester.tap(find.text('Great Western Trail'));
-    await pumpFor(tester);
-    await pumpUntilFound(tester, find.text('Start game'));
+    await openGwtSetup(tester);
     await tester.tap(find.text('Start game'));
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Score pad'));
@@ -101,15 +107,19 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
     expect(find.text('Great Western Trail'), findsOneWidget);
-    await tester.tap(find.text('Great Western Trail'));
-    await pumpFor(tester);
-    await pumpUntilFound(tester, find.text('Start game'));
+    await openGwtSetup(tester);
     await tester.tap(find.text('Start game'));
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Score pad'));
 
     expect(find.text('Score pad'), findsOneWidget);
     expect(find.text('Coins'), findsOneWidget);
+    expect(
+      find.image(
+        const AssetImage('assets/games/great_western_trail/icons/coins.png'),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 

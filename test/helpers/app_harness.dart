@@ -78,3 +78,13 @@ Future<void> pumpUntilFound(
   }
   fail('Timed out waiting for $finder');
 }
+
+Future<void> openGwtSetup(WidgetTester tester) async {
+  await pumpUntilFound(tester, find.text('Great Western Trail'));
+  await tester.tap(find.text('Great Western Trail'));
+  await pumpFor(tester);
+  await pumpUntilFound(tester, find.text('Scoresheet'));
+  await tester.tap(find.text('Scoresheet'));
+  await pumpFor(tester);
+  await pumpUntilFound(tester, find.text('Start game'));
+}

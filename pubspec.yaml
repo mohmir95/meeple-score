@@ -58,6 +58,7 @@ flutter:
   assets:
     - assets/branding/app-icon.png
     - assets/games/great_western_trail/cover.webp
+    - assets/games/great_western_trail/icons/
     - assets/i18n/en.json
     - assets/i18n/fa.json
 

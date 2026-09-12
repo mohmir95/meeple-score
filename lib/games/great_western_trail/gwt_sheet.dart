@@ -23,6 +23,28 @@ class GwtSheet extends StatelessWidget {
     required this.readOnly,
   });
 
+  static const _iconCoins = 'assets/games/great_western_trail/icons/coins.png';
+  static const _iconBuildings =
+      'assets/games/great_western_trail/icons/buildings.png';
+  static const _iconDeliveries =
+      'assets/games/great_western_trail/icons/deliveries.png';
+  static const _iconStations =
+      'assets/games/great_western_trail/icons/stations.png';
+  static const _iconThreeVp =
+      'assets/games/great_western_trail/icons/three-vp.png';
+  static const _iconHazards =
+      'assets/games/great_western_trail/icons/hazards.png';
+  static const _iconCattle =
+      'assets/games/great_western_trail/icons/cattle.png';
+  static const _iconObjectives =
+      'assets/games/great_western_trail/icons/objectives.png';
+  static const _iconStationMasters =
+      'assets/games/great_western_trail/icons/station-master.png';
+  static const _iconPlayerBoard =
+      'assets/games/great_western_trail/icons/player-board.png';
+  static const _iconJobMarket =
+      'assets/games/great_western_trail/icons/job-market.png';
+
   final GwtState state;
   final ValueChanged<GwtState> onChanged;
   final bool readOnly;
@@ -51,100 +73,102 @@ class GwtSheet extends StatelessWidget {
     final int? saved;
     if (compact) {
       saved = await showModalBottomSheet<int>(
-            context: context,
-            isScrollControlled: true,
-            showDragHandle: true,
-            builder: (dialogContext) {
-              return Padding(
-                padding: EdgeInsets.only(
-                  left: 20,
-                  right: 20,
-                  top: 4,
-                  bottom: MediaQuery.viewInsetsOf(dialogContext).bottom + 24,
-                ),
-                child: StatefulBuilder(
-                  builder: (context, setModalState) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          '${player.name} · $title',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (dialogContext) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 4,
+              bottom: MediaQuery.viewInsetsOf(dialogContext).bottom + 24,
+            ),
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      '${player.name} · $title',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(helper, style: Theme.of(context).textTheme.bodyMedium),
+                    const SizedBox(height: 20),
+                    ScoreStepper(
+                      value: draft,
+                      min: min,
+                      large: true,
+                      onChanged: (next) => setModalState(() => draft = next),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () => Navigator.of(dialogContext).pop(draft),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Text(dialogContext.l10n.t('common.save')),
                         ),
-                        const SizedBox(height: 8),
-                        Text(helper, style: Theme.of(context).textTheme.bodyMedium),
-                        const SizedBox(height: 20),
-                        ScoreStepper(
-                          value: draft,
-                          min: min,
-                          large: true,
-                          onChanged: (next) => setModalState(() => draft = next),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: FilledButton(
-                            onPressed: () => Navigator.of(dialogContext).pop(draft),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text(dialogContext.l10n.t('common.save')),
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.of(dialogContext).pop(),
-                          child: Text(dialogContext.l10n.t('common.cancel')),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              );
-            },
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      child: Text(dialogContext.l10n.t('common.cancel')),
+                    ),
+                  ],
+                );
+              },
+            ),
           );
+        },
+      );
     } else {
       saved = await showDialog<int>(
-            context: context,
-            builder: (dialogContext) {
-              return AlertDialog(
-                title: Text('${player.name} · $title'),
-                content: StatefulBuilder(
-                  builder: (context, setModalState) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(helper, style: Theme.of(context).textTheme.bodySmall),
-                        const SizedBox(height: 12),
-                        ScoreStepper(
-                          value: draft,
-                          min: min,
-                          onChanged: (next) => setModalState(() => draft = next),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(dialogContext).pop(),
-                    child: Text(dialogContext.l10n.t('common.cancel')),
-                  ),
-                  FilledButton(
-                    onPressed: () => Navigator.of(dialogContext).pop(draft),
-                    child: Text(dialogContext.l10n.t('common.save')),
-                  ),
-                ],
-              );
-            },
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: Text('${player.name} · $title'),
+            content: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(helper, style: Theme.of(context).textTheme.bodySmall),
+                    const SizedBox(height: 12),
+                    ScoreStepper(
+                      value: draft,
+                      min: min,
+                      onChanged: (next) => setModalState(() => draft = next),
+                    ),
+                  ],
+                );
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text(dialogContext.l10n.t('common.cancel')),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(dialogContext).pop(draft),
+                child: Text(dialogContext.l10n.t('common.save')),
+              ),
+            ],
           );
+        },
+      );
     }
     if (saved == null) {
       return;
     }
-    onChanged(state.updateLine(player.id, update(state.lineFor(player.id), saved)));
+    onChanged(
+      state.updateLine(player.id, update(state.lineFor(player.id), saved)),
+    );
   }
 
   void _toggleThree(Player player) {
@@ -179,6 +203,8 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.coins'),
         hint: l10n.t('gwt.coinsHint'),
         icon: Icons.monetization_on_outlined,
+        iconAsset: _iconCoins,
+        wideIcon: true,
         color: _sage,
         valueOf: (line) => line.dollars,
         displayOf: (line) {
@@ -199,6 +225,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.buildings'),
         hint: l10n.t('gwt.buildingsHint'),
         icon: Icons.home_work_outlined,
+        iconAsset: _iconBuildings,
         color: _dust,
         valueOf: (line) => line.buildings,
         onEdit: (player, line) => _editNumber(
@@ -215,6 +242,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.deliveries'),
         hint: l10n.t('gwt.deliveriesHint'),
         icon: Icons.flag_outlined,
+        iconAsset: _iconDeliveries,
         color: _sage,
         valueOf: (line) => line.deliveries,
         onEdit: (player, line) => _editNumber(
@@ -230,6 +258,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.stations'),
         hint: l10n.t('gwt.stationsHint'),
         icon: Icons.train_outlined,
+        iconAsset: _iconStations,
         color: _dust,
         valueOf: (line) => line.stations,
         onEdit: (player, line) => _editNumber(
@@ -246,6 +275,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.hazards'),
         hint: l10n.t('gwt.hazardsHint'),
         icon: Icons.landscape_outlined,
+        iconAsset: _iconHazards,
         color: _sage,
         valueOf: (line) => line.hazards,
         onEdit: (player, line) => _editNumber(
@@ -262,6 +292,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.cattle'),
         hint: l10n.t('gwt.cattleHint'),
         icon: Icons.agriculture_outlined,
+        iconAsset: _iconCattle,
         color: _dust,
         valueOf: (line) => line.cattle,
         onEdit: (player, line) => _editNumber(
@@ -278,6 +309,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.objectives'),
         hint: l10n.t('gwt.objectivesHint'),
         icon: Icons.task_alt_outlined,
+        iconAsset: _iconObjectives,
         color: _sage,
         valueOf: (line) => line.objectives,
         onEdit: (player, line) => _editNumber(
@@ -293,6 +325,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.stationMasters'),
         hint: l10n.t('gwt.stationMastersHint'),
         icon: Icons.badge_outlined,
+        iconAsset: _iconStationMasters,
         color: _dust,
         valueOf: (line) => line.stationMasters,
         onEdit: (player, line) => _editNumber(
@@ -309,6 +342,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.playerBoard'),
         hint: l10n.t('gwt.playerBoardHint'),
         icon: Icons.person_outline,
+        iconAsset: _iconPlayerBoard,
         color: _sage,
         valueOf: (line) => line.playerBoard,
         onEdit: (player, line) => _editNumber(
@@ -325,6 +359,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.threeVp'),
         hint: l10n.t('gwt.threeVpHint'),
         icon: Icons.looks_3_outlined,
+        iconAsset: _iconThreeVp,
         color: _dust,
         valueOf: (line) => GwtScoring.threeVpPoints(line.clearedThreeVpSpace),
         displayOf: (line) => line.clearedThreeVpSpace ? '3' : '—',
@@ -334,6 +369,7 @@ class GwtSheet extends StatelessWidget {
         title: l10n.t('gwt.endGameToken'),
         hint: l10n.t('gwt.endGameTokenHint'),
         icon: Icons.workspace_premium_outlined,
+        iconAsset: _iconJobMarket,
         color: _sage,
         valueOf: (line) => GwtScoring.jobMarketPoints(line.hasJobMarketToken),
         displayOf: (line) => line.hasJobMarketToken ? '2' : '—',
@@ -382,7 +418,9 @@ class GwtSheet extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               l10n.t('score.padHint'),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: _muted),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: _muted),
             ),
             const SizedBox(height: 12),
             Card(
@@ -422,7 +460,9 @@ class GwtSheet extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           context.l10n.t('score.padHintMobile'),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: _muted),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: _muted),
         ),
         const SizedBox(height: 12),
         _mobileTotals(context),
@@ -466,7 +506,10 @@ class GwtSheet extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 8,
+                        ),
                         child: Column(
                           children: [
                             Text(
@@ -516,7 +559,7 @@ class GwtSheet extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(row.icon, color: AppTheme.brand, size: 22),
+                _sheetIcon(row, size: 32, color: AppTheme.brand),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -554,8 +597,7 @@ class GwtSheet extends StatelessWidget {
   Widget _mobileScoreButtons(_GwtRow row) {
     final twoCol = state.players.length >= 3;
     final buttons = [
-      for (final player in state.players)
-        _mobileScoreButton(player, row),
+      for (final player in state.players) _mobileScoreButton(player, row),
     ];
     if (!twoCol) {
       return Row(
@@ -576,7 +618,9 @@ class GwtSheet extends StatelessWidget {
               Expanded(child: buttons[i]),
               const SizedBox(width: 8),
               Expanded(
-                child: i + 1 < buttons.length ? buttons[i + 1] : const SizedBox.shrink(),
+                child: i + 1 < buttons.length
+                    ? buttons[i + 1]
+                    : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -716,6 +760,8 @@ class GwtSheet extends StatelessWidget {
             context,
             metrics: metrics,
             icon: row.icon,
+            iconAsset: row.iconAsset,
+            wideIcon: row.wideIcon,
             title: row.title,
             hint: row.hint,
             color: row.color,
@@ -783,10 +829,45 @@ class GwtSheet extends StatelessWidget {
     );
   }
 
+  Widget _sheetIcon(_GwtRow row, {required double size, Color? color}) {
+    return _padIcon(
+      icon: row.icon,
+      iconAsset: row.iconAsset,
+      size: size,
+      wide: row.wideIcon,
+      color: color ?? _ink,
+    );
+  }
+
+  Widget _padIcon({
+    required IconData icon,
+    String? iconAsset,
+    required double size,
+    required Color color,
+    bool wide = false,
+  }) {
+    if (iconAsset == null) {
+      return Icon(icon, size: size, color: color);
+    }
+    final height = wide ? size - 6 : size;
+    final width = wide ? height * 2.1 : size;
+    return Image.asset(
+      iconAsset,
+      width: width,
+      height: height,
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.medium,
+      errorBuilder: (context, error, stackTrace) =>
+          Icon(icon, size: size, color: color),
+    );
+  }
+
   Widget _labelCell(
     BuildContext context, {
     required _PadMetrics metrics,
     required IconData icon,
+    String? iconAsset,
+    bool wideIcon = false,
     required String title,
     required String hint,
     required Color color,
@@ -802,7 +883,13 @@ class GwtSheet extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: metrics.compact ? 22 : 20, color: _ink),
+          _padIcon(
+            icon: icon,
+            iconAsset: iconAsset,
+            size: metrics.compact ? 32 : 30,
+            wide: wideIcon,
+            color: _ink,
+          ),
           SizedBox(width: metrics.compact ? 6 : 8),
           Expanded(
             child: Column(
@@ -854,9 +941,7 @@ class GwtSheet extends StatelessWidget {
           width: metrics.columnWidth,
           height: metrics.rowHeight,
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            border: Border.all(color: _grid),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: _grid)),
           child: child,
         ),
       ),
@@ -883,6 +968,8 @@ class _GwtRow {
     required this.title,
     required this.hint,
     required this.icon,
+    this.iconAsset,
+    this.wideIcon = false,
     required this.color,
     required this.valueOf,
     this.displayOf,
@@ -893,6 +980,8 @@ class _GwtRow {
   final String title;
   final String hint;
   final IconData icon;
+  final String? iconAsset;
+  final bool wideIcon;
   final Color color;
   final int Function(GwtPlayerLine line) valueOf;
   final String Function(GwtPlayerLine line)? displayOf;
