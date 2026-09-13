@@ -18,11 +18,7 @@ import '../play/play_screen.dart';
 import '../play/play_session.dart';
 
 class SetupScreen extends StatefulWidget {
-  const SetupScreen({
-    super.key,
-    required this.game,
-    required this.repository,
-  });
+  const SetupScreen({super.key, required this.game, required this.repository});
 
   final BoardGame game;
   final GameSessionRepository repository;
@@ -87,9 +83,9 @@ class _SetupScreenState extends State<SetupScreen> {
   Future<void> _startNewGame({required bool replacing}) async {
     final l10n = context.l10n;
     if (!_namesValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.t('setup.needNames'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.t('setup.needNames'))));
       return;
     }
 
@@ -180,7 +176,8 @@ class _SetupScreenState extends State<SetupScreen> {
                             PrimaryButton(
                               label: startLabel,
                               icon: Icons.play_arrow,
-                              onPressed: () => _startNewGame(replacing: _hasSaved),
+                              onPressed: () =>
+                                  _startNewGame(replacing: _hasSaved),
                             ),
                           ],
                         ),
@@ -223,7 +220,6 @@ class _SetupScreenState extends State<SetupScreen> {
                     widget.repository.saveRoster(_game.id, players);
                   },
                 ),
-                const SizedBox(height: 24),
                 _game.buildConfigEditor(
                   config: _config,
                   onChanged: (config) => setState(() => _config = config),
@@ -257,6 +253,57 @@ class _SetupIntro extends StatelessWidget {
       if (game.publisher != null) game.publisher!,
     ].join(' · ');
 
+    final description = l10n.t('${game.l10nPrefix}.description');
+    final details = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final fact in facts)
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: scheme.surface.withValues(alpha: 0.72),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  child: Text(
+                    fact,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        if (credit.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(
+            credit,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: scheme.onSecondaryContainer,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+        if (!compact) ...[
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(height: 1.35),
+          ),
+        ],
+      ],
+    );
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.primaryContainer,
@@ -264,65 +311,71 @@ class _SetupIntro extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _CoverThumb(game: game),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: [
-                      for (final fact in facts)
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: scheme.surface.withValues(alpha: 0.72),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: Text(
-                              fact,
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  if (credit.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      credit,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: scheme.onSecondaryContainer,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                  if (!compact) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.t('${game.l10nPrefix}.description'),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _CoverThumb(game: game),
+                const SizedBox(width: 12),
+                Expanded(child: details),
+              ],
             ),
+            if (compact) ...[
+              const SizedBox(height: 10),
+              _ExpandableDescription(text: description),
+            ],
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ExpandableDescription extends StatefulWidget {
+  const _ExpandableDescription({required this.text});
+
+  final String text;
+
+  static const collapsedLines = 3;
+
+  @override
+  State<_ExpandableDescription> createState() => _ExpandableDescriptionState();
+}
+
+class _ExpandableDescriptionState extends State<_ExpandableDescription> {
+  var _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(
+      context,
+    ).textTheme.bodyMedium?.copyWith(height: 1.35);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final painter = TextPainter(
+          text: TextSpan(text: widget.text, style: style),
+          maxLines: _ExpandableDescription.collapsedLines,
+          textDirection: Directionality.of(context),
+        )..layout(maxWidth: constraints.maxWidth);
+        final overflows = painter.didExceedMaxLines;
+        painter.dispose();
+
+        final text = Text(
+          widget.text,
+          style: style,
+          maxLines: _expanded ? null : _ExpandableDescription.collapsedLines,
+          overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+        );
+        if (!overflows && !_expanded) {
+          return text;
+        }
+        return GestureDetector(
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: text,
+        );
+      },
     );
   }
 }

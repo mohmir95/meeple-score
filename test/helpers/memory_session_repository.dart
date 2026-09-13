@@ -4,7 +4,7 @@ import 'package:board_game_score_sheet/domain/models/player.dart';
 
 class MemorySessionRepository implements GameSessionRepository {
   MemorySessionRepository([Map<String, GameSession>? seed])
-      : _sessions = {...?seed};
+    : _sessions = {...?seed};
 
   final Map<String, GameSession> _sessions;
   final Map<String, List<Player>> _rosters = {};

@@ -10,9 +10,6 @@ class Breakpoints {
   }
 
   static int gameGridCount(double width) {
-    if (width < compact) {
-      return 1;
-    }
     if (width < medium) {
       return 2;
     }

@@ -51,6 +51,8 @@ class AppLocalizations {
 
   bool get isRtl => language.rtl;
 
+  bool has(String key) => _strings.containsKey(key);
+
   String t(String key, [Map<String, String>? args]) {
     var value = _strings[key] ?? key;
     if (args != null) {
@@ -59,6 +61,10 @@ class AppLocalizations {
       }
     }
     return value;
+  }
+
+  String tOr(String preferred, String fallback, [Map<String, String>? args]) {
+    return t(has(preferred) ? preferred : fallback, args);
   }
 
   String colorLabel(String optionName) => t('color.$optionName');

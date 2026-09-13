@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../data/game_session_repository.dart';
@@ -20,34 +22,61 @@ class GameHubScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final compact = Breakpoints.isCompact(context);
     return AppPage(
       title: l10n.t('${game.l10nPrefix}.name'),
-      body: ListView(
-        padding: EdgeInsets.all(compact ? 12 : 20),
-        children: [
-          _HubBanner(
-            title: l10n.t('hub.scoresheet'),
-            icon: Icons.grid_on_rounded,
-            color: game.accentColor,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) =>
-                      SetupScreen(game: game, repository: repository),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < Breakpoints.compact;
+          final gap = compact ? 12.0 : 16.0;
+          final padding = compact ? 12.0 : 20.0;
+          final tiles = Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _HubBanner(
+                  title: l10n.t('hub.scoresheet'),
+                  icon: Icons.grid_on_rounded,
+                  color: game.accentColor,
+                  compact: compact,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (context) =>
+                            SetupScreen(game: game, repository: repository),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          _HubBanner(
-            title: l10n.t('hub.buildingsRandomiser'),
-            icon: Icons.home_work_outlined,
-            color: game.accentColor,
-            enabled: false,
-            badge: l10n.t('hub.comingSoon'),
-          ),
-        ],
+              ),
+              SizedBox(width: gap),
+              Expanded(
+                child: _HubBanner(
+                  title: l10n.t('hub.buildingsRandomizer'),
+                  icon: Icons.home_work_outlined,
+                  color: game.accentColor,
+                  compact: compact,
+                  enabled: false,
+                  badge: l10n.t('hub.comingSoon'),
+                ),
+              ),
+            ],
+          );
+
+          return ListView(
+            padding: EdgeInsets.all(padding),
+            children: [
+              if (constraints.maxWidth >= Breakpoints.medium)
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 696),
+                    child: tiles,
+                  ),
+                )
+              else
+                tiles,
+            ],
+          );
+        },
       ),
     );
   }
@@ -58,6 +87,7 @@ class _HubBanner extends StatelessWidget {
     required this.title,
     required this.icon,
     required this.color,
+    required this.compact,
     this.onTap,
     this.enabled = true,
     this.badge,
@@ -66,6 +96,7 @@ class _HubBanner extends StatelessWidget {
   final String title;
   final IconData icon;
   final Color color;
+  final bool compact;
   final VoidCallback? onTap;
   final bool enabled;
   final String? badge;
@@ -73,10 +104,10 @@ class _HubBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final compact = Breakpoints.isCompact(context);
     final foreground = enabled
         ? scheme.onSurface
         : scheme.onSurface.withValues(alpha: 0.55);
+    final iconSize = compact ? 48.0 : 72.0;
 
     return Opacity(
       opacity: enabled ? 1 : 0.78,
@@ -95,68 +126,84 @@ class _HubBanner extends StatelessWidget {
                     : scheme.outline.withValues(alpha: 0.35),
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              child: Row(
-                children: [
-                  Container(
-                    width: compact ? 56 : 64,
-                    height: compact ? 56 : 64,
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: enabled ? 0.16 : 0.1),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: color.withValues(alpha: enabled ? 1 : 0.7),
-                      size: compact ? 28 : 32,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(
-                                color: foreground,
-                                fontWeight: FontWeight.w800,
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final pad = compact ? 12.0 : 20.0;
+                  return Padding(
+                    padding: EdgeInsets.all(pad),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: SizedBox(
+                        width: math.max(0, constraints.maxWidth - pad * 2),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: iconSize,
+                              height: iconSize,
+                              decoration: BoxDecoration(
+                                color: color.withValues(
+                                  alpha: enabled ? 0.16 : 0.1,
+                                ),
+                                borderRadius: BorderRadius.circular(18),
                               ),
+                              child: Icon(
+                                icon,
+                                color: color.withValues(
+                                  alpha: enabled ? 1 : 0.7,
+                                ),
+                                size: compact ? 26 : 36,
+                              ),
+                            ),
+                            SizedBox(height: compact ? 10 : 16),
+                            Text(
+                              title,
+                              textAlign: TextAlign.center,
+                              style:
+                                  (compact
+                                          ? Theme.of(
+                                              context,
+                                            ).textTheme.titleSmall
+                                          : Theme.of(
+                                              context,
+                                            ).textTheme.titleLarge)
+                                      ?.copyWith(
+                                        color: foreground,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1.2,
+                                      ),
+                            ),
+                            if (badge != null) ...[
+                              const SizedBox(height: 8),
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: scheme.tertiaryContainer,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  child: Text(
+                                    badge!,
+                                    style: TextStyle(
+                                      color: scheme.onTertiaryContainer,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  if (badge != null)
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: scheme.tertiaryContainer,
-                        borderRadius: BorderRadius.circular(999),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        child: Text(
-                          badge!,
-                          style: TextStyle(
-                            color: scheme.onTertiaryContainer,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    )
-                  else
-                    Icon(
-                      Icons.chevron_right,
-                      color: foreground.withValues(alpha: 0.55),
                     ),
-                ],
+                  );
+                },
               ),
             ),
           ),

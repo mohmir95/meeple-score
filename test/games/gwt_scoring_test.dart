@@ -43,7 +43,10 @@ void main() {
       hasJobMarketToken: true,
     );
 
-    expect(GwtScoring.totalFor(line), 4 + 10 - 6 + 5 + 3 + 8 - 2 + 4 + 8 + 3 + 2);
+    expect(
+      GwtScoring.totalFor(line),
+      4 + 10 - 6 + 5 + 3 + 8 - 2 + 4 + 8 + 3 + 2,
+    );
   });
 
   test('only one player can hold the job market token', () {

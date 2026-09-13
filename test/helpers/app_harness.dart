@@ -80,10 +80,13 @@ Future<void> pumpUntilFound(
 }
 
 Future<void> openGwtSetup(WidgetTester tester) async {
-  await pumpUntilFound(tester, find.text('Great Western Trail'));
-  await tester.tap(find.text('Great Western Trail'));
+  await pumpUntilFound(tester, find.text('First Edition'));
+  await tester.tap(find.text('First Edition'));
   await pumpFor(tester);
   await pumpUntilFound(tester, find.text('Scoresheet'));
+  final sheet = tester.getRect(find.text('Scoresheet'));
+  final randomizer = tester.getRect(find.text('Buildings Randomizer'));
+  expect(sheet.right, lessThanOrEqualTo(randomizer.left + 1));
   await tester.tap(find.text('Scoresheet'));
   await pumpFor(tester);
   await pumpUntilFound(tester, find.text('Start game'));

@@ -20,10 +20,17 @@ class GameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final inProgress = session != null &&
+    final compact = Breakpoints.isCompact(context);
+    final inProgress =
+        session != null &&
         session!.stateJson['status'] != GameStatus.finished.name;
-    final finished = session != null &&
+    final finished =
+        session != null &&
         session!.stateJson['status'] == GameStatus.finished.name;
+    final titleStyle = compact
+        ? Theme.of(context).textTheme.titleSmall
+        : Theme.of(context).textTheme.headlineSmall;
+    final inset = compact ? 10.0 : 16.0;
 
     return Material(
       color: Colors.transparent,
@@ -36,8 +43,8 @@ class GameCard extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: game.accentColor.withValues(alpha: 0.28),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
+                blurRadius: compact ? 16 : 24,
+                offset: Offset(0, compact ? 8 : 12),
               ),
             ],
           ),
@@ -64,23 +71,23 @@ class GameCard extends StatelessWidget {
                     ),
                   ),
                   PositionedDirectional(
-                    top: 12,
-                    end: 12,
+                    top: compact ? 8 : 12,
+                    end: compact ? 8 : 12,
                     child: _StatusPill(
                       inProgress: inProgress,
                       finished: finished,
                     ),
                   ),
                   Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
+                    left: inset,
+                    right: inset,
+                    bottom: inset,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           context.l10n.t('${game.l10nPrefix}.name'),
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: titleStyle?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
                             height: 1.15,
@@ -89,16 +96,32 @@ class GameCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: compact ? 2 : 6),
+                        Text(
+                          context.l10n.t('${game.l10nPrefix}.edition'),
+                          style:
+                              (compact
+                                      ? Theme.of(context).textTheme.labelMedium
+                                      : Theme.of(context).textTheme.labelLarge)
+                                  ?.copyWith(
+                                    color: const Color(0xFFF8E5B0),
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                        SizedBox(height: compact ? 2 : 4),
                         Text(
                           context.l10n.t('home.playersCount', {
                             'min': '${game.minPlayers}',
                             'max': '${game.maxPlayers}',
                           }),
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: const Color(0xFFEAF3FA),
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style:
+                              (compact
+                                      ? Theme.of(context).textTheme.labelMedium
+                                      : Theme.of(context).textTheme.labelLarge)
+                                  ?.copyWith(
+                                    color: const Color(0xFFEAF3FA),
+                                    fontWeight: FontWeight.w600,
+                                  ),
                         ),
                       ],
                     ),
@@ -129,7 +152,7 @@ class _Cover extends StatelessWidget {
     return Image.asset(
       game.coverImageAsset!,
       fit: BoxFit.cover,
-      alignment: const Alignment(0, -0.2),
+      alignment: Alignment.center,
       semanticLabel: context.l10n.t('${game.l10nPrefix}.name'),
       errorBuilder: (context, error, stackTrace) {
         return ColoredBox(
@@ -142,10 +165,7 @@ class _Cover extends StatelessWidget {
 }
 
 class _StatusPill extends StatelessWidget {
-  const _StatusPill({
-    required this.inProgress,
-    required this.finished,
-  });
+  const _StatusPill({required this.inProgress, required this.finished});
 
   final bool inProgress;
   final bool finished;
@@ -155,6 +175,7 @@ class _StatusPill extends StatelessWidget {
     if (!inProgress && !finished) {
       return const SizedBox.shrink();
     }
+    final compact = Breakpoints.isCompact(context);
     final scheme = Theme.of(context).colorScheme;
     final color = inProgress ? scheme.primary : scheme.tertiary;
     final foreground = inProgress ? scheme.onPrimary : scheme.onTertiary;
@@ -171,7 +192,10 @@ class _StatusPill extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 8 : 10,
+          vertical: compact ? 4 : 6,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -193,10 +217,7 @@ class _StatusPill extends StatelessWidget {
 }
 
 class GameGrid extends StatelessWidget {
-  const GameGrid({
-    super.key,
-    required this.children,
-  });
+  const GameGrid({super.key, required this.children});
 
   final List<Widget> children;
 
@@ -204,12 +225,24 @@ class GameGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = Breakpoints.gameGridCount(constraints.maxWidth);
-        const gap = 16.0;
+        final width = constraints.maxWidth;
+        final gap = width < Breakpoints.compact ? 12.0 : 16.0;
+
+        if (width < Breakpoints.medium) {
+          return GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: gap,
+            crossAxisSpacing: gap,
+            childAspectRatio: 1,
+            children: children,
+          );
+        }
+
         const maxCardWidth = 340.0;
-        final rawWidth = columns == 1
-            ? constraints.maxWidth
-            : (constraints.maxWidth - gap * (columns - 1)) / columns;
+        final columns = Breakpoints.gameGridCount(width);
+        final rawWidth = (width - gap * (columns - 1)) / columns;
         final cardWidth = rawWidth.clamp(0, maxCardWidth).toDouble();
 
         return Wrap(
