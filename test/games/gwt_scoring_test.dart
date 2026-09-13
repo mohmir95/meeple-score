@@ -70,4 +70,27 @@ void main() {
     expect(restored.lineFor('ada').deliveries, -6);
     expect(GwtScoring.totalFor(restored.lineFor('ada')), 3 - 6);
   });
+
+  test('Argentina pad uses ships, city maps, farmers, and a 2-VP disc', () {
+    const line = GwtPlayerLine(
+      dollars: 23,
+      buildings: 10,
+      ships: -4,
+      cityMaps: 6,
+      stations: 5,
+      farmers: 8,
+      cattle: -2,
+      objectives: 3,
+      stationMasters: 4,
+      playerBoard: 8,
+      clearedThreeVpSpace: true,
+      hasJobMarketToken: true,
+    );
+
+    expect(
+      GwtScoring.totalFor(line, pad: GwtPadKind.argentina),
+      4 + 10 - 4 + 6 + 5 + 8 - 2 + 3 + 4 + 8 + 2 + 2,
+    );
+    expect(GwtScoring.totalFor(line), 4 + 10 + 5 - 2 + 3 + 4 + 8 + 3 + 2);
+  });
 }

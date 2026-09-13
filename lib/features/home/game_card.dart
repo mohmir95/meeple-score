@@ -27,9 +27,13 @@ class GameCard extends StatelessWidget {
     final finished =
         session != null &&
         session!.stateJson['status'] == GameStatus.finished.name;
-    final titleStyle = compact
-        ? Theme.of(context).textTheme.titleSmall
-        : Theme.of(context).textTheme.headlineSmall;
+    final seriesStyle = compact
+        ? Theme.of(context).textTheme.labelLarge
+        : Theme.of(context).textTheme.titleMedium;
+    final editionStyle = compact
+        ? Theme.of(context).textTheme.titleMedium
+        : Theme.of(context).textTheme.titleLarge;
+    final showEdition = context.l10n.has('${game.l10nPrefix}.edition');
     final inset = compact ? 10.0 : 16.0;
 
     return Material(
@@ -85,44 +89,48 @@ class GameCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          context.l10n.t('${game.l10nPrefix}.name'),
-                          style: titleStyle?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            height: 1.15,
-                            shadows: const [
-                              Shadow(blurRadius: 12, color: Colors.black54),
-                            ],
+                        if (showEdition) ...[
+                          Text(
+                            context.l10n.tOr(
+                              '${game.l10nPrefix}.series',
+                              '${game.l10nPrefix}.name',
+                            ),
+                            style: seriesStyle?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              height: 1.15,
+                              shadows: const [
+                                Shadow(blurRadius: 12, color: Colors.black54),
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: compact ? 2 : 6),
-                        Text(
-                          context.l10n.t('${game.l10nPrefix}.edition'),
-                          style:
-                              (compact
-                                      ? Theme.of(context).textTheme.labelMedium
-                                      : Theme.of(context).textTheme.labelLarge)
-                                  ?.copyWith(
-                                    color: const Color(0xFFF8E5B0),
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                        ),
-                        SizedBox(height: compact ? 2 : 4),
-                        Text(
-                          context.l10n.t('home.playersCount', {
-                            'min': '${game.minPlayers}',
-                            'max': '${game.maxPlayers}',
-                          }),
-                          style:
-                              (compact
-                                      ? Theme.of(context).textTheme.labelMedium
-                                      : Theme.of(context).textTheme.labelLarge)
-                                  ?.copyWith(
-                                    color: const Color(0xFFEAF3FA),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                        ),
+                          SizedBox(height: compact ? 2 : 4),
+                          Text(
+                            context.l10n.t('${game.l10nPrefix}.edition'),
+                            style: editionStyle?.copyWith(
+                              color: const Color(0xFFF8E5B0),
+                              fontWeight: FontWeight.w800,
+                              height: 1.15,
+                              shadows: const [
+                                Shadow(blurRadius: 12, color: Colors.black54),
+                              ],
+                            ),
+                          ),
+                        ] else
+                          Text(
+                            context.l10n.tOr(
+                              '${game.l10nPrefix}.series',
+                              '${game.l10nPrefix}.name',
+                            ),
+                            style: editionStyle?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              height: 1.15,
+                              shadows: const [
+                                Shadow(blurRadius: 12, color: Colors.black54),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),

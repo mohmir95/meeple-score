@@ -22,6 +22,7 @@ class GwtSheet extends StatelessWidget {
     required this.onChanged,
     required this.readOnly,
     this.l10nPrefix = 'game.gwt',
+    this.pad = GwtPadKind.classic,
   });
 
   static const _iconCoins = 'assets/games/great_western_trail/icons/coins.png';
@@ -45,11 +46,20 @@ class GwtSheet extends StatelessWidget {
       'assets/games/great_western_trail/icons/player-board.png';
   static const _iconJobMarket =
       'assets/games/great_western_trail/icons/job-market.png';
+  static const _iconShips =
+      'assets/games/great_western_trail_argentina/icons/ships.png';
+  static const _iconCityMaps =
+      'assets/games/great_western_trail_argentina/icons/city-maps.png';
+  static const _iconFarmers =
+      'assets/games/great_western_trail_argentina/icons/farmers.png';
+  static const _iconTwoVp =
+      'assets/games/great_western_trail_argentina/icons/two-vp.png';
 
   final GwtState state;
   final ValueChanged<GwtState> onChanged;
   final bool readOnly;
   final String l10nPrefix;
+  final GwtPadKind pad;
 
   String _pad(AppLocalizations l10n, String name) {
     return l10n.tOr('$l10nPrefix.$name', 'gwt.$name');
@@ -204,6 +214,13 @@ class GwtSheet extends StatelessWidget {
   }
 
   List<_GwtRow> _rows(BuildContext context, AppLocalizations l10n) {
+    if (pad == GwtPadKind.argentina) {
+      return _argentinaRows(context, l10n);
+    }
+    return _classicRows(context, l10n);
+  }
+
+  List<_GwtRow> _classicRows(BuildContext context, AppLocalizations l10n) {
     return [
       _GwtRow(
         title: _pad(l10n, 'coins'),
@@ -367,8 +384,10 @@ class GwtSheet extends StatelessWidget {
         icon: Icons.looks_3_outlined,
         iconAsset: _iconThreeVp,
         color: _dust,
-        valueOf: (line) => GwtScoring.threeVpPoints(line.clearedThreeVpSpace),
-        displayOf: (line) => line.clearedThreeVpSpace ? '3' : '—',
+        valueOf: (line) => GwtScoring.discPoints(line.clearedThreeVpSpace, pad),
+        displayOf: (line) => line.clearedThreeVpSpace
+            ? '${GwtScoring.discPoints(true, pad)}'
+            : '—',
         onTap: _toggleThree,
       ),
       _GwtRow(
@@ -377,6 +396,205 @@ class GwtSheet extends StatelessWidget {
         icon: Icons.workspace_premium_outlined,
         iconAsset: _iconJobMarket,
         color: _sage,
+        valueOf: (line) => GwtScoring.jobMarketPoints(line.hasJobMarketToken),
+        displayOf: (line) => line.hasJobMarketToken ? '2' : '—',
+        onTap: _toggleJobMarket,
+      ),
+    ];
+  }
+
+  List<_GwtRow> _argentinaRows(BuildContext context, AppLocalizations l10n) {
+    return [
+      _GwtRow(
+        title: _pad(l10n, 'coins'),
+        hint: _pad(l10n, 'coinsHint'),
+        icon: Icons.monetization_on_outlined,
+        iconAsset: _iconCoins,
+        wideIcon: true,
+        color: _sage,
+        valueOf: (line) => line.dollars,
+        displayOf: (line) {
+          final vp = GwtScoring.coinPoints(line.dollars);
+          return line.dollars == 0 ? '0' : '${line.dollars}→$vp';
+        },
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'coinsTitle'),
+          helper: _pad(l10n, 'coinsHelper'),
+          value: line.dollars,
+          min: 0,
+          update: (current, value) => current.copyWith(dollars: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'buildings'),
+        hint: _pad(l10n, 'buildingsHint'),
+        icon: Icons.home_work_outlined,
+        iconAsset: _iconBuildings,
+        color: _dust,
+        valueOf: (line) => line.buildings,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'buildings'),
+          helper: _pad(l10n, 'buildingsHelper'),
+          value: line.buildings,
+          min: 0,
+          update: (current, value) => current.copyWith(buildings: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'ships'),
+        hint: _pad(l10n, 'shipsHint'),
+        icon: Icons.directions_boat_outlined,
+        iconAsset: _iconShips,
+        color: _sage,
+        valueOf: (line) => line.ships,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'ships'),
+          helper: _pad(l10n, 'shipsHelper'),
+          value: line.ships,
+          update: (current, value) => current.copyWith(ships: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'cityMaps'),
+        hint: _pad(l10n, 'cityMapsHint'),
+        icon: Icons.map_outlined,
+        iconAsset: _iconCityMaps,
+        wideIcon: true,
+        color: _dust,
+        valueOf: (line) => line.cityMaps,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'cityMaps'),
+          helper: _pad(l10n, 'cityMapsHelper'),
+          value: line.cityMaps,
+          update: (current, value) => current.copyWith(cityMaps: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'stations'),
+        hint: _pad(l10n, 'stationsHint'),
+        icon: Icons.train_outlined,
+        iconAsset: _iconStations,
+        color: _sage,
+        valueOf: (line) => line.stations,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'stations'),
+          helper: _pad(l10n, 'stationsHelper'),
+          value: line.stations,
+          min: 0,
+          update: (current, value) => current.copyWith(stations: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'farmers'),
+        hint: _pad(l10n, 'farmersHint'),
+        icon: Icons.agriculture_outlined,
+        iconAsset: _iconFarmers,
+        color: _dust,
+        valueOf: (line) => line.farmers,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'farmers'),
+          helper: _pad(l10n, 'farmersHelper'),
+          value: line.farmers,
+          min: 0,
+          update: (current, value) => current.copyWith(farmers: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'cattle'),
+        hint: _pad(l10n, 'cattleHint'),
+        icon: Icons.style_outlined,
+        iconAsset: _iconCattle,
+        color: _sage,
+        valueOf: (line) => line.cattle,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'cattle'),
+          helper: _pad(l10n, 'cattleHelper'),
+          value: line.cattle,
+          update: (current, value) => current.copyWith(cattle: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'objectives'),
+        hint: _pad(l10n, 'objectivesHint'),
+        icon: Icons.task_alt_outlined,
+        iconAsset: _iconObjectives,
+        color: _dust,
+        valueOf: (line) => line.objectives,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'objectives'),
+          helper: _pad(l10n, 'objectivesHelper'),
+          value: line.objectives,
+          update: (current, value) => current.copyWith(objectives: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'stationMasters'),
+        hint: _pad(l10n, 'stationMastersHint'),
+        icon: Icons.badge_outlined,
+        iconAsset: _iconStationMasters,
+        color: _sage,
+        valueOf: (line) => line.stationMasters,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'stationMasters'),
+          helper: _pad(l10n, 'stationMastersHelper'),
+          value: line.stationMasters,
+          min: 0,
+          update: (current, value) => current.copyWith(stationMasters: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'playerBoard'),
+        hint: _pad(l10n, 'playerBoardHint'),
+        icon: Icons.person_outline,
+        iconAsset: _iconPlayerBoard,
+        color: _dust,
+        valueOf: (line) => line.playerBoard,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'playerBoard'),
+          helper: _pad(l10n, 'playerBoardHelper'),
+          value: line.playerBoard,
+          min: 0,
+          update: (current, value) => current.copyWith(playerBoard: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'twoVp'),
+        hint: _pad(l10n, 'twoVpHint'),
+        icon: Icons.looks_two_outlined,
+        iconAsset: _iconTwoVp,
+        color: _sage,
+        valueOf: (line) => GwtScoring.discPoints(line.clearedThreeVpSpace, pad),
+        displayOf: (line) => line.clearedThreeVpSpace
+            ? '${GwtScoring.discPoints(true, pad)}'
+            : '—',
+        onTap: _toggleThree,
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'endGameToken'),
+        hint: _pad(l10n, 'endGameTokenHint'),
+        icon: Icons.workspace_premium_outlined,
+        iconAsset: _iconJobMarket,
+        color: _dust,
         valueOf: (line) => GwtScoring.jobMarketPoints(line.hasJobMarketToken),
         displayOf: (line) => line.hasJobMarketToken ? '2' : '—',
         onTap: _toggleJobMarket,
@@ -423,7 +641,7 @@ class GwtSheet extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              l10n.t('score.padHint'),
+              _pad(l10n, 'padHint'),
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: _muted),
@@ -530,7 +748,7 @@ class GwtSheet extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${GwtScoring.totalFor(state.lineFor(state.players[i].id))}',
+                              '${GwtScoring.totalFor(state.lineFor(state.players[i].id), pad: pad)}',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w900,
@@ -718,7 +936,9 @@ class GwtSheet extends StatelessWidget {
             metrics: metrics,
             icon: Icons.shield_outlined,
             title: context.l10n.t('$l10nPrefix.headerPlayers'),
-            hint: context.l10n.t('$l10nPrefix.headerEdition'),
+            hint: context.l10n.has('$l10nPrefix.headerEdition')
+                ? context.l10n.t('$l10nPrefix.headerEdition')
+                : '',
             color: _header,
             bold: true,
           ),
@@ -822,7 +1042,7 @@ class GwtSheet extends StatelessWidget {
               metrics: metrics,
               color: _header,
               child: Text(
-                '${GwtScoring.totalFor(state.lineFor(player.id))}',
+                '${GwtScoring.totalFor(state.lineFor(player.id), pad: pad)}',
                 style: TextStyle(
                   color: _ink,
                   fontWeight: FontWeight.w900,
@@ -862,7 +1082,7 @@ class GwtSheet extends StatelessWidget {
       width: width,
       height: height,
       fit: BoxFit.contain,
-      filterQuality: FilterQuality.medium,
+      filterQuality: FilterQuality.high,
       errorBuilder: (context, error, stackTrace) =>
           Icon(icon, size: size, color: color),
     );
@@ -913,17 +1133,18 @@ class GwtSheet extends StatelessWidget {
                     height: 1.15,
                   ),
                 ),
-                Text(
-                  hint,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: _muted,
-                    fontSize: metrics.compact ? 11 : 11,
-                    height: 1.15,
-                    fontWeight: FontWeight.w500,
+                if (hint.isNotEmpty)
+                  Text(
+                    hint,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: _muted,
+                      fontSize: metrics.compact ? 11 : 11,
+                      height: 1.15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
               ],
             ),
           ),

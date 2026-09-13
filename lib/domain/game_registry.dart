@@ -1,5 +1,6 @@
 import 'board_game.dart';
 import '../games/great_western_trail/gwt_2e_game.dart';
+import '../games/great_western_trail/gwt_argentina_game.dart';
 import '../games/great_western_trail/gwt_game.dart';
 
 /// Single registration point for available board games.
@@ -10,6 +11,7 @@ class GameRegistry {
             const [
               GreatWesternTrailGame(),
               GreatWesternTrailSecondEditionGame(),
+              GreatWesternTrailArgentinaGame(),
             ],
       );
 

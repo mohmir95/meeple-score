@@ -1,5 +1,6 @@
 import 'package:board_game_score_sheet/app/app.dart';
 import 'package:board_game_score_sheet/domain/game_registry.dart';
+import 'package:board_game_score_sheet/features/home/game_card.dart';
 import 'package:board_game_score_sheet/l10n/app_localizations.dart';
 import 'package:board_game_score_sheet/l10n/l10n_scope.dart';
 import 'package:board_game_score_sheet/l10n/locale_controller.dart';
@@ -80,8 +81,8 @@ Future<void> pumpUntilFound(
 }
 
 Future<void> openGwtSetup(WidgetTester tester) async {
-  await pumpUntilFound(tester, find.text('First Edition'));
-  await tester.tap(find.text('First Edition'));
+  await pumpUntilFound(tester, find.byType(GameCard));
+  await tester.tap(find.byType(GameCard).first);
   await pumpFor(tester);
   await pumpUntilFound(tester, find.text('Scoresheet'));
   final sheet = tester.getRect(find.text('Scoresheet'));

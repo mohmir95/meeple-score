@@ -41,7 +41,7 @@ void main() {
   test('loads Persian strings from JSON', () async {
     final l10n = await AppLocalizations.load('fa');
     expect(l10n.t('setup.startGame'), 'شروع بازی');
-    expect(l10n.t('game.gwt.name'), 'Great Western Trail First Edition');
+    expect(l10n.t('game.gwt.name'), 'Great Western Trail');
     expect(l10n.isRtl, isTrue);
   });
 }

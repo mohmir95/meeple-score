@@ -5,8 +5,11 @@ class GwtPlayerLine {
     this.dollars = 0,
     this.buildings = 0,
     this.deliveries = 0,
+    this.ships = 0,
+    this.cityMaps = 0,
     this.stations = 0,
     this.hazards = 0,
+    this.farmers = 0,
     this.cattle = 0,
     this.objectives = 0,
     this.stationMasters = 0,
@@ -19,8 +22,11 @@ class GwtPlayerLine {
   final int dollars;
   final int buildings;
   final int deliveries;
+  final int ships;
+  final int cityMaps;
   final int stations;
   final int hazards;
+  final int farmers;
   final int cattle;
   final int objectives;
   final int stationMasters;
@@ -34,8 +40,11 @@ class GwtPlayerLine {
     int? dollars,
     int? buildings,
     int? deliveries,
+    int? ships,
+    int? cityMaps,
     int? stations,
     int? hazards,
+    int? farmers,
     int? cattle,
     int? objectives,
     int? stationMasters,
@@ -47,8 +56,11 @@ class GwtPlayerLine {
       dollars: dollars ?? this.dollars,
       buildings: buildings ?? this.buildings,
       deliveries: deliveries ?? this.deliveries,
+      ships: ships ?? this.ships,
+      cityMaps: cityMaps ?? this.cityMaps,
       stations: stations ?? this.stations,
       hazards: hazards ?? this.hazards,
+      farmers: farmers ?? this.farmers,
       cattle: cattle ?? this.cattle,
       objectives: objectives ?? this.objectives,
       stationMasters: stationMasters ?? this.stationMasters,
@@ -63,8 +75,11 @@ class GwtPlayerLine {
       'dollars': dollars,
       'buildings': buildings,
       'deliveries': deliveries,
+      'ships': ships,
+      'cityMaps': cityMaps,
       'stations': stations,
       'hazards': hazards,
+      'farmers': farmers,
       'cattle': cattle,
       'objectives': objectives,
       'stationMasters': stationMasters,
@@ -79,8 +94,11 @@ class GwtPlayerLine {
       dollars: readInt(json['dollars']),
       buildings: readInt(json['buildings']),
       deliveries: readInt(json['deliveries']),
+      ships: readInt(json['ships']),
+      cityMaps: readInt(json['cityMaps']),
       stations: readInt(json['stations']),
       hazards: readInt(json['hazards']),
+      farmers: readInt(json['farmers']),
       cattle: readInt(json['cattle']),
       objectives: readInt(json['objectives']),
       stationMasters: readInt(json['stationMasters']),

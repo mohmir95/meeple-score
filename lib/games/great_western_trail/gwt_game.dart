@@ -10,10 +10,7 @@ class GreatWesternTrailGame extends GwtEditionGame {
   String get id => idValue;
 
   @override
-  String get name => 'Great Western Trail First Edition';
-
-  @override
-  String? get editionLabel => 'First Edition';
+  String get name => 'Great Western Trail';
 
   @override
   String get l10nPrefix => 'game.gwt';
