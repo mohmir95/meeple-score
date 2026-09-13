@@ -21,6 +21,7 @@ class GwtSheet extends StatelessWidget {
     required this.state,
     required this.onChanged,
     required this.readOnly,
+    this.l10nPrefix = 'game.gwt',
   });
 
   static const _iconCoins = 'assets/games/great_western_trail/icons/coins.png';
@@ -48,6 +49,11 @@ class GwtSheet extends StatelessWidget {
   final GwtState state;
   final ValueChanged<GwtState> onChanged;
   final bool readOnly;
+  final String l10nPrefix;
+
+  String _pad(AppLocalizations l10n, String name) {
+    return l10n.tOr('$l10nPrefix.$name', 'gwt.$name');
+  }
 
   static const _ink = Color(0xFF1B3A4B);
   static const _muted = Color(0xFF4A6B7C);
@@ -200,8 +206,8 @@ class GwtSheet extends StatelessWidget {
   List<_GwtRow> _rows(BuildContext context, AppLocalizations l10n) {
     return [
       _GwtRow(
-        title: l10n.t('gwt.coins'),
-        hint: l10n.t('gwt.coinsHint'),
+        title: _pad(l10n, 'coins'),
+        hint: _pad(l10n, 'coinsHint'),
         icon: Icons.monetization_on_outlined,
         iconAsset: _iconCoins,
         wideIcon: true,
@@ -214,16 +220,16 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: l10n.t('gwt.coinsTitle'),
-          helper: l10n.t('gwt.coinsHelper'),
+          title: _pad(l10n, 'coinsTitle'),
+          helper: _pad(l10n, 'coinsHelper'),
           value: line.dollars,
           min: 0,
           update: (current, value) => current.copyWith(dollars: value),
         ),
       ),
       _GwtRow(
-        title: l10n.t('gwt.buildings'),
-        hint: l10n.t('gwt.buildingsHint'),
+        title: _pad(l10n, 'buildings'),
+        hint: _pad(l10n, 'buildingsHint'),
         icon: Icons.home_work_outlined,
         iconAsset: _iconBuildings,
         color: _dust,
@@ -231,16 +237,16 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: l10n.t('gwt.buildings'),
-          helper: l10n.t('gwt.buildingsHelper'),
+          title: _pad(l10n, 'buildings'),
+          helper: _pad(l10n, 'buildingsHelper'),
           value: line.buildings,
           min: 0,
           update: (current, value) => current.copyWith(buildings: value),
         ),
       ),
       _GwtRow(
-        title: l10n.t('gwt.deliveries'),
-        hint: l10n.t('gwt.deliveriesHint'),
+        title: _pad(l10n, 'deliveries'),
+        hint: _pad(l10n, 'deliveriesHint'),
         icon: Icons.flag_outlined,
         iconAsset: _iconDeliveries,
         color: _sage,
@@ -248,15 +254,15 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: l10n.t('gwt.deliveries'),
-          helper: l10n.t('gwt.deliveriesHelper'),
+          title: _pad(l10n, 'deliveries'),
+          helper: _pad(l10n, 'deliveriesHelper'),
           value: line.deliveries,
           update: (current, value) => current.copyWith(deliveries: value),
         ),
       ),
       _GwtRow(
-        title: l10n.t('gwt.stations'),
-        hint: l10n.t('gwt.stationsHint'),
+        title: _pad(l10n, 'stations'),
+        hint: _pad(l10n, 'stationsHint'),
         icon: Icons.train_outlined,
         iconAsset: _iconStations,
         color: _dust,
@@ -264,16 +270,16 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: l10n.t('gwt.stations'),
-          helper: l10n.t('gwt.stationsHelper'),
+          title: _pad(l10n, 'stations'),
+          helper: _pad(l10n, 'stationsHelper'),
           value: line.stations,
           min: 0,
           update: (current, value) => current.copyWith(stations: value),
         ),
       ),
       _GwtRow(
-        title: l10n.t('gwt.hazards'),
-        hint: l10n.t('gwt.hazardsHint'),
+        title: _pad(l10n, 'hazards'),
+        hint: _pad(l10n, 'hazardsHint'),
         icon: Icons.landscape_outlined,
         iconAsset: _iconHazards,
         color: _sage,
@@ -281,16 +287,16 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: l10n.t('gwt.hazards'),
-          helper: l10n.t('gwt.hazardsHelper'),
+          title: _pad(l10n, 'hazards'),
+          helper: _pad(l10n, 'hazardsHelper'),
           value: line.hazards,
           min: 0,
           update: (current, value) => current.copyWith(hazards: value),
         ),
       ),
       _GwtRow(
-        title: l10n.t('gwt.cattle'),
-        hint: l10n.t('gwt.cattleHint'),
+        title: _pad(l10n, 'cattle'),
+        hint: _pad(l10n, 'cattleHint'),
         icon: Icons.agriculture_outlined,
         iconAsset: _iconCattle,
         color: _dust,
@@ -298,16 +304,16 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: l10n.t('gwt.cattle'),
-          helper: l10n.t('gwt.cattleHelper'),
+          title: _pad(l10n, 'cattle'),
+          helper: _pad(l10n, 'cattleHelper'),
           value: line.cattle,
           min: 0,
           update: (current, value) => current.copyWith(cattle: value),
         ),
       ),
       _GwtRow(
-        title: l10n.t('gwt.objectives'),
-        hint: l10n.t('gwt.objectivesHint'),
+        title: _pad(l10n, 'objectives'),
+        hint: _pad(l10n, 'objectivesHint'),
         icon: Icons.task_alt_outlined,
         iconAsset: _iconObjectives,
         color: _sage,
@@ -315,15 +321,15 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: l10n.t('gwt.objectives'),
-          helper: l10n.t('gwt.objectivesHelper'),
+          title: _pad(l10n, 'objectives'),
+          helper: _pad(l10n, 'objectivesHelper'),
           value: line.objectives,
           update: (current, value) => current.copyWith(objectives: value),
         ),
       ),
       _GwtRow(
-        title: l10n.t('gwt.stationMasters'),
-        hint: l10n.t('gwt.stationMastersHint'),
+        title: _pad(l10n, 'stationMasters'),
+        hint: _pad(l10n, 'stationMastersHint'),
         icon: Icons.badge_outlined,
         iconAsset: _iconStationMasters,
         color: _dust,
@@ -331,16 +337,16 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: l10n.t('gwt.stationMasters'),
-          helper: l10n.t('gwt.stationMastersHelper'),
+          title: _pad(l10n, 'stationMasters'),
+          helper: _pad(l10n, 'stationMastersHelper'),
           value: line.stationMasters,
           min: 0,
           update: (current, value) => current.copyWith(stationMasters: value),
         ),
       ),
       _GwtRow(
-        title: l10n.t('gwt.playerBoard'),
-        hint: l10n.t('gwt.playerBoardHint'),
+        title: _pad(l10n, 'playerBoard'),
+        hint: _pad(l10n, 'playerBoardHint'),
         icon: Icons.person_outline,
         iconAsset: _iconPlayerBoard,
         color: _sage,
@@ -348,16 +354,16 @@ class GwtSheet extends StatelessWidget {
         onEdit: (player, line) => _editNumber(
           context: context,
           player: player,
-          title: l10n.t('gwt.playerBoard'),
-          helper: l10n.t('gwt.playerBoardHelper'),
+          title: _pad(l10n, 'playerBoard'),
+          helper: _pad(l10n, 'playerBoardHelper'),
           value: line.playerBoard,
           min: 0,
           update: (current, value) => current.copyWith(playerBoard: value),
         ),
       ),
       _GwtRow(
-        title: l10n.t('gwt.threeVp'),
-        hint: l10n.t('gwt.threeVpHint'),
+        title: _pad(l10n, 'threeVp'),
+        hint: _pad(l10n, 'threeVpHint'),
         icon: Icons.looks_3_outlined,
         iconAsset: _iconThreeVp,
         color: _dust,
@@ -366,8 +372,8 @@ class GwtSheet extends StatelessWidget {
         onTap: _toggleThree,
       ),
       _GwtRow(
-        title: l10n.t('gwt.endGameToken'),
-        hint: l10n.t('gwt.endGameTokenHint'),
+        title: _pad(l10n, 'endGameToken'),
+        hint: _pad(l10n, 'endGameTokenHint'),
         icon: Icons.workspace_premium_outlined,
         iconAsset: _iconJobMarket,
         color: _sage,
@@ -711,8 +717,8 @@ class GwtSheet extends StatelessWidget {
             context,
             metrics: metrics,
             icon: Icons.shield_outlined,
-            title: context.l10n.t('game.gwt.headerPlayers'),
-            hint: context.l10n.t('game.gwt.headerEdition'),
+            title: context.l10n.t('$l10nPrefix.headerPlayers'),
+            hint: context.l10n.t('$l10nPrefix.headerEdition'),
             color: _header,
             bold: true,
           ),

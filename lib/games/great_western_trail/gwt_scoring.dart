@@ -45,7 +45,8 @@ class GwtScoring {
 
   static List<PlayerScore> scores(GwtState state) {
     final totals = {
-      for (final player in state.players) player.id: totalFor(state.lineFor(player.id)),
+      for (final player in state.players)
+        player.id: totalFor(state.lineFor(player.id)),
     };
     final best = totals.values.reduce((a, b) => a > b ? a : b);
     final started = hasAnyEntry(state);

@@ -1,10 +1,17 @@
 import 'board_game.dart';
+import '../games/great_western_trail/gwt_2e_game.dart';
 import '../games/great_western_trail/gwt_game.dart';
 
 /// Single registration point for available board games.
 class GameRegistry {
   GameRegistry({List<BoardGame>? games})
-      : games = List.unmodifiable(games ?? const [GreatWesternTrailGame()]);
+    : games = List.unmodifiable(
+        games ??
+            const [
+              GreatWesternTrailGame(),
+              GreatWesternTrailSecondEditionGame(),
+            ],
+      );
 
   final List<BoardGame> games;
 

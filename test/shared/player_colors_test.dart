@@ -13,7 +13,12 @@ void main() {
     final players = defaultPlayers(count: 2, palette: palette);
     expect(players[0].colorValue, palette[0].value);
     expect(players[1].colorValue, palette[1].value);
-    expect(palette.map((option) => option.name), ['Red', 'Blue', 'Yellow', 'White']);
+    expect(palette.map((option) => option.name), [
+      'Red',
+      'Blue',
+      'Yellow',
+      'White',
+    ]);
   });
 
   test('next GWT player takes the first unused color', () {
@@ -22,7 +27,9 @@ void main() {
     expect(third.colorValue, palette[2].value);
   });
 
-  testWidgets('tapping a color swatch changes the player color', (tester) async {
+  testWidgets('tapping a color swatch changes the player color', (
+    tester,
+  ) async {
     var players = defaultPlayers(count: 2, palette: palette);
     await pumpWithL10n(
       tester,
@@ -51,7 +58,9 @@ void main() {
     expect(players[1].colorValue, palette[1].value);
   });
 
-  testWidgets('choosing a taken GWT color swaps with the other player', (tester) async {
+  testWidgets('choosing a taken GWT color swaps with the other player', (
+    tester,
+  ) async {
     var players = defaultPlayers(count: 2, palette: palette);
     await pumpWithL10n(
       tester,

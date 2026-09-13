@@ -11,10 +11,7 @@ import '../../shared/widgets/score_board.dart';
 import 'play_session.dart';
 
 class PlayScreen extends StatefulWidget {
-  const PlayScreen({
-    super.key,
-    required this.session,
-  });
+  const PlayScreen({super.key, required this.session});
 
   final PlaySession session;
 
@@ -108,7 +105,8 @@ class _PlayScreenState extends State<PlayScreen> {
                     const SizedBox(height: 12),
                     if (!_session.isFinished)
                       FilledButton(
-                        onPressed: () => Navigator.of(sheetContext).pop(players),
+                        onPressed: () =>
+                            Navigator.of(sheetContext).pop(players),
                         child: Text(sheetContext.l10n.t('play.savePlayers')),
                       ),
                   ],
@@ -196,6 +194,7 @@ class _PlayScreenState extends State<PlayScreen> {
       },
       child: AppPage(
         title: l10n.t('${_session.game.l10nPrefix}.name'),
+        coverImageAsset: _session.game.coverImageAsset,
         actions: actions,
         body: ListView(
           padding: EdgeInsets.fromLTRB(
@@ -237,7 +236,9 @@ class _PlayScreenState extends State<PlayScreen> {
               const SizedBox(height: 16),
               OutlinedButton.icon(
                 onPressed: () async {
-                  await _session.update(state.copyWithStatus(GameStatus.inProgress));
+                  await _session.update(
+                    state.copyWithStatus(GameStatus.inProgress),
+                  );
                 },
                 icon: const Icon(Icons.play_arrow),
                 label: Text(l10n.t('play.reopen')),
