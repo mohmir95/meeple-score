@@ -5,13 +5,14 @@ import 'package:board_game_score_sheet/domain/models/player.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_argentina_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_game.dart';
+import 'package:board_game_score_sheet/games/lost_ruins_of_arnak/arnak_game.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   test('registry exposes Great Western Trail editions', () {
     final registry = GameRegistry();
-    expect(registry.games, hasLength(3));
+    expect(registry.games, hasLength(4));
     expect(
       registry.lookup(GreatWesternTrailGame.idValue),
       isA<GreatWesternTrailGame>(),
@@ -23,6 +24,10 @@ void main() {
     expect(
       registry.lookup(GreatWesternTrailArgentinaGame.idValue),
       isA<GreatWesternTrailArgentinaGame>(),
+    );
+    expect(
+      registry.lookup(LostRuinsOfArnakGame.idValue),
+      isA<LostRuinsOfArnakGame>(),
     );
     expect(registry.tryLookup('simple_tally'), isNull);
   });

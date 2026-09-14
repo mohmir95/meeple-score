@@ -30,35 +30,38 @@ class GameHubScreen extends StatelessWidget {
           final compact = constraints.maxWidth < Breakpoints.compact;
           final gap = compact ? 12.0 : 16.0;
           final padding = compact ? 12.0 : 20.0;
+          final scoresheet = _HubBanner(
+            key: const ValueKey('hub-scoresheet'),
+            title: l10n.t('hub.scoresheet'),
+            icon: Icons.grid_on_rounded,
+            color: game.accentColor,
+            compact: compact,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) =>
+                      SetupScreen(game: game, repository: repository),
+                ),
+              );
+            },
+          );
           final tiles = Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _HubBanner(
-                  title: l10n.t('hub.scoresheet'),
-                  icon: Icons.grid_on_rounded,
-                  color: game.accentColor,
-                  compact: compact,
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (context) =>
-                            SetupScreen(game: game, repository: repository),
-                      ),
-                    );
-                  },
-                ),
-              ),
+              Expanded(child: scoresheet),
               SizedBox(width: gap),
               Expanded(
-                child: _HubBanner(
-                  title: l10n.t('hub.buildingsRandomizer'),
-                  icon: Icons.home_work_outlined,
-                  color: game.accentColor,
-                  compact: compact,
-                  enabled: false,
-                  badge: l10n.t('hub.comingSoon'),
-                ),
+                child: game.showBuildingsRandomizer
+                    ? _HubBanner(
+                        key: const ValueKey('hub-buildings-randomizer'),
+                        title: l10n.t('hub.buildingsRandomizer'),
+                        icon: Icons.home_work_outlined,
+                        color: game.accentColor,
+                        compact: compact,
+                        enabled: false,
+                        badge: l10n.t('hub.comingSoon'),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           );
@@ -85,6 +88,7 @@ class GameHubScreen extends StatelessWidget {
 
 class _HubBanner extends StatelessWidget {
   const _HubBanner({
+    super.key,
     required this.title,
     required this.icon,
     required this.color,

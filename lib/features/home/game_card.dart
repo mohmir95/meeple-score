@@ -12,11 +12,13 @@ class GameCard extends StatelessWidget {
     required this.game,
     required this.session,
     required this.onOpen,
+    this.onOpenSaved,
   });
 
   final BoardGame game;
   final GameSession? session;
   final VoidCallback onOpen;
+  final VoidCallback? onOpenSaved;
 
   @override
   Widget build(BuildContext context) {
@@ -38,104 +40,124 @@ class GameCard extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onOpen,
-        borderRadius: BorderRadius.circular(24),
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: game.accentColor.withValues(alpha: 0.28),
-                blurRadius: compact ? 16 : 24,
-                offset: Offset(0, compact ? 8 : 12),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  _Cover(game: game),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0x33000000),
-                          Color(0x00000000),
-                          Color(0xCC1A0F08),
+      child: Ink(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: game.accentColor.withValues(alpha: 0.28),
+              blurRadius: compact ? 16 : 24,
+              offset: Offset(0, compact ? 8 : 12),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: onOpen,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          _Cover(game: game),
+                          const DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0x33000000),
+                                  Color(0x00000000),
+                                  Color(0xCC1A0F08),
+                                ],
+                                stops: [0, 0.4, 1],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: inset,
+                            right: inset,
+                            bottom: inset,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (showEdition) ...[
+                                  Text(
+                                    context.l10n.tOr(
+                                      '${game.l10nPrefix}.series',
+                                      '${game.l10nPrefix}.name',
+                                    ),
+                                    style: seriesStyle?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.15,
+                                      shadows: const [
+                                        Shadow(
+                                          blurRadius: 12,
+                                          color: Colors.black54,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: compact ? 2 : 4),
+                                  Text(
+                                    context.l10n.t('${game.l10nPrefix}.edition'),
+                                    style: editionStyle?.copyWith(
+                                      color: const Color(0xFFF8E5B0),
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.15,
+                                      shadows: const [
+                                        Shadow(
+                                          blurRadius: 12,
+                                          color: Colors.black54,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ] else
+                                  Text(
+                                    context.l10n.tOr(
+                                      '${game.l10nPrefix}.series',
+                                      '${game.l10nPrefix}.name',
+                                    ),
+                                    style: editionStyle?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.15,
+                                      shadows: const [
+                                        Shadow(
+                                          blurRadius: 12,
+                                          color: Colors.black54,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ],
-                        stops: [0, 0.4, 1],
                       ),
                     ),
                   ),
-                  PositionedDirectional(
-                    top: compact ? 8 : 12,
-                    end: compact ? 8 : 12,
-                    child: _StatusPill(
-                      inProgress: inProgress,
-                      finished: finished,
-                    ),
+                ),
+                PositionedDirectional(
+                  top: compact ? 8 : 12,
+                  end: compact ? 8 : 12,
+                  child: _StatusPill(
+                    key: ValueKey('home-saved-${game.id}'),
+                    inProgress: inProgress,
+                    finished: finished,
+                    onTap: onOpenSaved,
                   ),
-                  Positioned(
-                    left: inset,
-                    right: inset,
-                    bottom: inset,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (showEdition) ...[
-                          Text(
-                            context.l10n.tOr(
-                              '${game.l10nPrefix}.series',
-                              '${game.l10nPrefix}.name',
-                            ),
-                            style: seriesStyle?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800,
-                              height: 1.15,
-                              shadows: const [
-                                Shadow(blurRadius: 12, color: Colors.black54),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: compact ? 2 : 4),
-                          Text(
-                            context.l10n.t('${game.l10nPrefix}.edition'),
-                            style: editionStyle?.copyWith(
-                              color: const Color(0xFFF8E5B0),
-                              fontWeight: FontWeight.w800,
-                              height: 1.15,
-                              shadows: const [
-                                Shadow(blurRadius: 12, color: Colors.black54),
-                              ],
-                            ),
-                          ),
-                        ] else
-                          Text(
-                            context.l10n.tOr(
-                              '${game.l10nPrefix}.series',
-                              '${game.l10nPrefix}.name',
-                            ),
-                            style: editionStyle?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800,
-                              height: 1.15,
-                              shadows: const [
-                                Shadow(blurRadius: 12, color: Colors.black54),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -173,10 +195,16 @@ class _Cover extends StatelessWidget {
 }
 
 class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.inProgress, required this.finished});
+  const _StatusPill({
+    super.key,
+    required this.inProgress,
+    required this.finished,
+    this.onTap,
+  });
 
   final bool inProgress;
   final bool finished;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -191,33 +219,44 @@ class _StatusPill extends StatelessWidget {
     final label = inProgress ? l10n.t('home.resume') : l10n.t('home.lastGame');
     final icon = inProgress ? Icons.play_arrow_rounded : Icons.emoji_events;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(999),
-        boxShadow: const [
-          BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: compact ? 8 : 10,
-          vertical: compact ? 4 : 6,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16, color: foreground),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: foreground,
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                offset: Offset(0, 2),
               ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 8 : 10,
+              vertical: compact ? 4 : 6,
             ),
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 16, color: foreground),
+                const SizedBox(width: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: foreground,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

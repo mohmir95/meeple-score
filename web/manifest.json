@@ -1,6 +1,6 @@
 {
-    "name": "Board Game Score Sheet",
-    "short_name": "Score Sheet",
+    "name": "Meeple Score",
+    "short_name": "Meeple Score",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#F4F8FC",

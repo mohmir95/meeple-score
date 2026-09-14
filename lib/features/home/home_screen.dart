@@ -65,6 +65,23 @@ class _HomeScreenState extends State<HomeScreen> {
     if (session == null || game == null || !mounted) {
       return;
     }
+    await _openSaved(game, session);
+  }
+
+  Future<void> _openGame(BoardGame game) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) =>
+            GameHubScreen(game: game, repository: widget.repository),
+      ),
+    );
+    await _reload();
+  }
+
+  Future<void> _openSaved(BoardGame game, GameSession session) async {
+    if (!mounted) {
+      return;
+    }
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) => PlayScreen(
@@ -81,14 +98,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _openGame(BoardGame game) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) =>
-            GameHubScreen(game: game, repository: widget.repository),
-      ),
+  Widget _cardFor(BoardGame game) {
+    final session = _sessions[game.id];
+    return GameCard(
+      game: game,
+      session: session,
+      onOpen: () => _openGame(game),
+      onOpenSaved: session == null ? null : () => _openSaved(game, session),
     );
-    await _reload();
   }
 
   @override
@@ -118,12 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 GameGrid(
                   children: [
-                    for (final game in widget.registry.games)
-                      GameCard(
-                        game: game,
-                        session: _sessions[game.id],
-                        onOpen: () => _openGame(game),
-                      ),
+                    for (final game in widget.registry.games) _cardFor(game),
                   ],
                 ),
               ],

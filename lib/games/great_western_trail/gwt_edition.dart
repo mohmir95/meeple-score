@@ -50,6 +50,9 @@ abstract class GwtEditionGame extends BoardGame {
   int get maxPlayers => 4;
 
   @override
+  bool get showBuildingsRandomizer => true;
+
+  @override
   List<PlayerColorOption> get playerColors => const [
     PlayerColorOption(name: 'Red', color: Color(0xFFC62828)),
     PlayerColorOption(name: 'Blue', color: Color(0xFF1565C0)),

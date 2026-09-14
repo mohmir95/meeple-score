@@ -66,6 +66,7 @@ lib/
     play/                      # Shared play chrome around a game sheet
   games/
     great_western_trail/       # Great Western Trail First Edition
+    lost_ruins_of_arnak/       # Lost Ruins of Arnak
 ```
 
 ## Shared components
@@ -109,7 +110,7 @@ GameRegistry({List<BoardGame>? games})
 
 Do not put game-specific `if (game.id == ...)` checks in `HomeScreen`, `SetupScreen`, or `PlayScreen`. If the shared screens need a new hook, add a method to `BoardGame` instead.
 
-Player count, colors, and scoring stay on the game class. Great Western Trail is 2–4 players with Red, Blue, Yellow, and White.
+Player count, colors, and scoring stay on the game class. Great Western Trail is 2–4 players with Red, Blue, Yellow, and White. Lost Ruins of Arnak is 1–4 players with Red, Blue, Yellow, and Green.
 
 ### Great Western Trail (First Edition)
 
@@ -131,6 +132,21 @@ The score pad follows the official 1st-edition notepad (11 scoring rows plus tot
 
 Only one player can hold the end-game token. Highest total wins; ties are shared.
 
+### Lost Ruins of Arnak
+
+The score pad follows the official scoring sheet (6 scoring rows plus total):
+
+| Pad row | What to enter | Rule |
+| --- | --- | --- |
+| Research | VP | Both research tokens. Magnifying glasses in the Lost Temple score by arrival order. |
+| Temple tiles | VP | Amount printed on each temple tile |
+| Idols | VP | 3 VP per idol, even in a slot, plus empty idol-slot VP |
+| Guardians | VP | 5 VP per guardian overcome |
+| Cards | VP | Points on item and artifact cards |
+| Fear | VP (negative) | −1 per Fear card; −2 per fear tile |
+
+Highest total wins. If two or more players are tied when you finish, the app asks who reached the Lost Temple first. If no one did, the highest Research score among those players wins. If Research is tied too, they share the win.
+
 ## Tests
 
 ```bash
@@ -140,6 +156,7 @@ flutter test
 That runs:
 
 - Great Western Trail scoring tests
+- Lost Ruins of Arnak scoring tests
 - Persistence tests (local storage)
 - Widget tests for the home → setup → play path, including resume after a restart of the widget tree
 

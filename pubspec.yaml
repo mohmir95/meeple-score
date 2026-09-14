@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.5.3
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -60,8 +61,10 @@ flutter:
     - assets/games/great_western_trail/cover.webp
     - assets/games/great_western_trail_2e/cover.webp
     - assets/games/great_western_trail_argentina/cover.webp
+    - assets/games/lost_ruins_of_arnak/cover.webp
     - assets/games/great_western_trail/icons/
     - assets/games/great_western_trail_argentina/icons/
+    - assets/games/lost_ruins_of_arnak/icons/
     - assets/i18n/en.json
     - assets/i18n/fa.json
 

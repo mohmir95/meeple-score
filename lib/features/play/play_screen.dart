@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../l10n/l10n_scope.dart';
+import '../../shared/export/png_save.dart';
+import '../../shared/export/widget_png.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import '../../shared/widgets/confirm_dialog.dart';
 import '../../shared/widgets/player_editor.dart';
+import '../../shared/widgets/primary_button.dart';
 import '../../shared/widgets/score_board.dart';
 import 'play_session.dart';
 
@@ -21,6 +24,8 @@ class PlayScreen extends StatefulWidget {
 
 class _PlayScreenState extends State<PlayScreen> {
   PlaySession get _session => widget.session;
+  final _exportKey = GlobalKey();
+  var _savingImage = false;
 
   @override
   void initState() {
@@ -58,6 +63,19 @@ class _PlayScreenState extends State<PlayScreen> {
 
   Future<void> _finish() async {
     final l10n = context.l10n;
+    final prepared = await _session.game.prepareFinish(
+      context: context,
+      state: _session.state,
+    );
+    if (!mounted || prepared == null) {
+      return;
+    }
+    if (prepared != _session.state) {
+      await _session.update(prepared);
+    }
+    if (!mounted) {
+      return;
+    }
     final confirmed = await showConfirmDialog(
       context,
       title: l10n.t('play.finishTitle'),
@@ -68,6 +86,43 @@ class _PlayScreenState extends State<PlayScreen> {
     );
     if (confirmed) {
       await _session.finish();
+    }
+  }
+
+  Future<void> _saveImage() async {
+    if (_savingImage) {
+      return;
+    }
+    final l10n = context.l10n;
+    setState(() => _savingImage = true);
+    try {
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) {
+        return;
+      }
+      final pixelRatio = MediaQuery.devicePixelRatioOf(context).clamp(2.0, 3.0);
+      final bytes = await capturePng(_exportKey, pixelRatio: pixelRatio);
+      await savePng(
+        bytes,
+        scoreSheetPngName(gameId: _session.game.id, now: DateTime.now()),
+      );
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.t('play.saveImageSaved'))),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.t('play.saveImageFailed'))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _savingImage = false);
+      }
     }
   }
 
@@ -138,6 +193,13 @@ class _PlayScreenState extends State<PlayScreen> {
           icon: const Icon(Icons.group_outlined),
           label: Text(l10n.t('play.players')),
         ),
+        if (_session.isFinished)
+          TextButton.icon(
+            onPressed: _savingImage ? null : _saveImage,
+            style: TextButton.styleFrom(foregroundColor: appBarForeground),
+            icon: const Icon(Icons.photo_library_outlined),
+            label: Text(l10n.t('play.saveImage')),
+          ),
         if (!_session.isFinished)
           TextButton.icon(
             onPressed: _reset,
@@ -161,6 +223,8 @@ class _PlayScreenState extends State<PlayScreen> {
             switch (action) {
               case _PlayAction.players:
                 _editPlayers();
+              case _PlayAction.saveImage:
+                _saveImage();
               case _PlayAction.reset:
                 _reset();
               case _PlayAction.finish:
@@ -172,6 +236,12 @@ class _PlayScreenState extends State<PlayScreen> {
               value: _PlayAction.players,
               child: Text(l10n.t('play.players')),
             ),
+            if (_session.isFinished)
+              PopupMenuItem(
+                value: _PlayAction.saveImage,
+                enabled: !_savingImage,
+                child: Text(l10n.t('play.saveImage')),
+              ),
             if (!_session.isFinished)
               PopupMenuItem(
                 value: _PlayAction.reset,
@@ -204,44 +274,75 @@ class _PlayScreenState extends State<PlayScreen> {
             compact ? 20 : 20,
           ),
           children: [
-            if (_session.isFinished)
-              _StatusBanner(
-                icon: Icons.emoji_events,
-                color: Theme.of(context).colorScheme.primary,
-                title: l10n.winnerAnnouncement(
-                  _session.game.winners(state).map((player) => player.name),
+            RepaintBoundary(
+              key: _exportKey,
+              child: ColoredBox(
+                color: Theme.of(context).colorScheme.surface,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (_session.isFinished)
+                        _StatusBanner(
+                          icon: Icons.emoji_events,
+                          color: Theme.of(context).colorScheme.primary,
+                          title: l10n.winnerAnnouncement(
+                            _session.game
+                                .winners(state)
+                                .map((player) => player.name),
+                          ),
+                          message: l10n.t('play.finishedMessage'),
+                        )
+                      else if (reachedGoal)
+                        _StatusBanner(
+                          icon: Icons.celebration_outlined,
+                          color: Theme.of(context).colorScheme.tertiary,
+                          title: l10n.t('play.targetReached'),
+                          message: l10n.t('play.targetReachedMessage'),
+                        ),
+                      if ((!compact || _session.isFinished) &&
+                          scores.isNotEmpty) ...[
+                        ScoreBoard(
+                          scores: scores,
+                          footnote: l10n.t(
+                            '${_session.game.l10nPrefix}.footnote',
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                      _session.game.buildScoreSheet(
+                        state: state,
+                        onChanged: _session.update,
+                        readOnly: _session.isFinished,
+                      ),
+                    ],
+                  ),
                 ),
-                message: l10n.t('play.finishedMessage'),
-              )
-            else if (reachedGoal)
-              _StatusBanner(
-                icon: Icons.celebration_outlined,
-                color: Theme.of(context).colorScheme.tertiary,
-                title: l10n.t('play.targetReached'),
-                message: l10n.t('play.targetReachedMessage'),
               ),
-            if (!compact && scores.isNotEmpty) ...[
-              ScoreBoard(
-                scores: scores,
-                footnote: l10n.t('${_session.game.l10nPrefix}.footnote'),
-              ),
-              const SizedBox(height: 16),
-            ],
-            _session.game.buildScoreSheet(
-              state: state,
-              onChanged: _session.update,
-              readOnly: _session.isFinished,
             ),
             if (_session.isFinished) ...[
               const SizedBox(height: 16),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  await _session.update(
-                    state.copyWithStatus(GameStatus.inProgress),
-                  );
-                },
-                icon: const Icon(Icons.play_arrow),
-                label: Text(l10n.t('play.reopen')),
+              PrimaryButton(
+                label: l10n.t('play.saveImage'),
+                icon: Icons.photo_library_outlined,
+                onPressed: _savingImage ? null : _saveImage,
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: SizedBox(
+                  width: compact ? double.infinity : null,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      await _session.update(
+                        state.copyWithStatus(GameStatus.inProgress),
+                      );
+                    },
+                    icon: const Icon(Icons.play_arrow),
+                    label: Text(l10n.t('play.reopen')),
+                  ),
+                ),
               ),
             ],
           ],
@@ -251,7 +352,7 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 }
 
-enum _PlayAction { players, reset, finish }
+enum _PlayAction { players, saveImage, reset, finish }
 
 class _StatusBanner extends StatelessWidget {
   const _StatusBanner({

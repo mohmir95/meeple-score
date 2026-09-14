@@ -45,6 +45,9 @@ abstract class BoardGame {
   /// Optional box art shown on the home screen.
   String? get coverImageAsset => null;
 
+  /// Hub tile for the Great Western Trail buildings randomizer.
+  bool get showBuildingsRandomizer => false;
+
   GameConfig createDefaultConfig();
 
   GameConfig configFromJson(Map<String, dynamic> json);
@@ -78,6 +81,14 @@ abstract class BoardGame {
   bool hasReachedGoal(GameState state) => false;
 
   String? scoreFootnote(GameState state) => null;
+
+  /// Extra step before the shared finish confirmation. Return `null` to cancel.
+  Future<GameState?> prepareFinish({
+    required BuildContext context,
+    required GameState state,
+  }) async {
+    return state;
+  }
 
   String winnerMessage(GameState state) {
     final winningPlayers = winners(state);

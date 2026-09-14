@@ -80,6 +80,20 @@ Future<void> pumpUntilFound(
   fail('Timed out waiting for $finder');
 }
 
+Future<void> pumpUntilGone(
+  WidgetTester tester,
+  Finder finder, {
+  int attempts = 20,
+}) async {
+  for (var i = 0; i < attempts; i++) {
+    if (finder.evaluate().isEmpty) {
+      return;
+    }
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  fail('Timed out waiting for $finder to disappear');
+}
+
 Future<void> openGwtSetup(WidgetTester tester) async {
   await pumpUntilFound(tester, find.byType(GameCard));
   await tester.tap(find.byType(GameCard).first);
