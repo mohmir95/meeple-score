@@ -45,6 +45,7 @@ class GameHubScreen extends StatelessWidget {
               );
             },
           );
+          final randomizer = game.buildBuildingsRandomizer();
           final tiles = Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -58,8 +59,20 @@ class GameHubScreen extends StatelessWidget {
                         icon: Icons.home_work_outlined,
                         color: game.accentColor,
                         compact: compact,
-                        enabled: false,
-                        badge: l10n.t('hub.comingSoon'),
+                        enabled: randomizer != null,
+                        badge: randomizer == null
+                            ? l10n.t('hub.comingSoon')
+                            : null,
+                        onTap: randomizer == null
+                            ? null
+                            : () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (context) =>
+                                        game.buildBuildingsRandomizer()!,
+                                  ),
+                                );
+                              },
                       )
                     : const SizedBox.shrink(),
               ),

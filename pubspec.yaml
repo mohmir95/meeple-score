@@ -63,6 +63,8 @@ flutter:
     - assets/games/great_western_trail_argentina/cover.webp
     - assets/games/lost_ruins_of_arnak/cover.webp
     - assets/games/great_western_trail/icons/
+    - assets/games/great_western_trail/buildings/private/
+    - assets/games/great_western_trail/buildings/public/
     - assets/games/great_western_trail_argentina/icons/
     - assets/games/lost_ruins_of_arnak/icons/
     - assets/i18n/en.json

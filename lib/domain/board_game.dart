@@ -48,6 +48,9 @@ abstract class BoardGame {
   /// Hub tile for the Great Western Trail buildings randomizer.
   bool get showBuildingsRandomizer => false;
 
+  /// Ready randomizer UI. Null keeps the hub tile disabled as Coming Soon.
+  Widget? buildBuildingsRandomizer() => null;
+
   GameConfig createDefaultConfig();
 
   GameConfig configFromJson(Map<String, dynamic> json);

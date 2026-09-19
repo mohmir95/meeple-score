@@ -6,14 +6,18 @@ import 'package:board_game_score_sheet/domain/models/player.dart';
 import 'package:board_game_score_sheet/features/home/game_card.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_argentina_game.dart';
+import 'package:board_game_score_sheet/games/great_western_trail/gwt_buildings_layout.dart';
+import 'package:board_game_score_sheet/games/great_western_trail/gwt_buildings_randomizer_screen.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_config.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_game.dart';
+import 'package:board_game_score_sheet/games/great_western_trail/gwt_public_buildings_layout.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_player_line.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_state.dart';
 import 'package:board_game_score_sheet/games/lost_ruins_of_arnak/arnak_config.dart';
 import 'package:board_game_score_sheet/games/lost_ruins_of_arnak/arnak_game.dart';
 import 'package:board_game_score_sheet/games/lost_ruins_of_arnak/arnak_player_line.dart';
 import 'package:board_game_score_sheet/games/lost_ruins_of_arnak/arnak_state.dart';
+import 'package:board_game_score_sheet/l10n/l10n_scope.dart';
 import 'package:board_game_score_sheet/shared/export/png_save.dart';
 import 'package:board_game_score_sheet/shared/export/widget_png.dart';
 import 'package:board_game_score_sheet/shared/widgets/language_toggle.dart';
@@ -22,6 +26,19 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'helpers/app_harness.dart';
 import 'helpers/memory_session_repository.dart';
+
+String _imageAssetName(WidgetTester tester, Key key) {
+  final image = tester.widget<Image>(find.byKey(key));
+  return (image.image as AssetImage).assetName;
+}
+
+String _publicTileOn(WidgetTester tester, String location) {
+  final name = _imageAssetName(
+    tester,
+    ValueKey('gwt-public-tile-$location'),
+  );
+  return name.split('/').last.replaceAll('.jpg', '').toUpperCase();
+}
 
 void main() {
   testWidgets('home lists Great Western Trail and can start a game', (
@@ -51,7 +68,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Scoresheet'), findsOneWidget);
     expect(find.text('Buildings Randomizer'), findsOneWidget);
-    expect(find.text('Coming Soon'), findsWidgets);
+    expect(find.text('Coming Soon'), findsNothing);
 
     await tester.tap(find.text('Scoresheet'));
     await pumpFor(tester);
@@ -233,6 +250,220 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('GWT first edition randomizes ten building sides', (tester) async {
+    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await pumpScoreSheetApp(tester, localeController: await createTestLocale());
+    await pumpUntilFound(tester, find.text('Great Western Trail'));
+    await tester.tap(find.byType(GameCard).first);
+    await pumpFor(tester);
+    await pumpUntilFound(tester, find.text('Buildings Randomizer'));
+    expect(find.text('Coming Soon'), findsNothing);
+
+    await tester.tap(find.text('Buildings Randomizer'));
+    await pumpFor(tester);
+    await pumpUntilFound(tester, find.text('Private Buildings'));
+    expect(find.text('Public Buildings'), findsOneWidget);
+    await pumpUntilFound(
+      tester,
+      find.byKey(const ValueKey('gwt-buildings-randomize')),
+    );
+
+    for (var n = 1; n <= 10; n++) {
+      expect(find.byKey(ValueKey('gwt-building-$n')), findsOneWidget);
+    }
+    expect(find.byKey(const ValueKey('gwt-building-11')), findsNothing);
+    expect(find.byKey(const ValueKey('gwt-building-12')), findsNothing);
+    expect(find.byKey(const ValueKey('gwt-building-13')), findsNothing);
+    expect(
+      find.text('"Rails to the North" Expansion'),
+      findsOneWidget,
+    );
+    expect(find.text('"13th Building" Expansion'), findsOneWidget);
+
+    final randomize = tester.getRect(
+      find.byKey(const ValueKey('gwt-buildings-randomize')),
+    );
+    expect(randomize.width, lessThan(220));
+
+    const allA = GwtBuildingsLayout([
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+    ]);
+    const publicOrder = GwtPublicBuildingsLayout([
+      'C',
+      'A',
+      'G',
+      'B',
+      'F',
+      'D',
+      'E',
+    ]);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    await pumpWithL10n(
+      tester,
+      GwtBuildingsRandomizerScreen(
+        game: const GreatWesternTrailGame(),
+        initialLayout: allA,
+        initialPublicLayout: publicOrder,
+      ),
+    );
+    await pumpUntilFound(
+      tester,
+      find.byKey(const ValueKey('gwt-buildings-randomize')),
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-building-1')),
+        matching: find.image(
+          const AssetImage(
+            'assets/games/great_western_trail/buildings/private/1a.jpg',
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-building-1')),
+        matching: find.text('A'),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('gwt-buildings-randomize')));
+    await pumpFor(tester);
+    for (var n = 1; n <= 10; n++) {
+      expect(find.byKey(ValueKey('gwt-building-$n')), findsOneWidget);
+    }
+
+    await tester.tap(find.byKey(const ValueKey('gwt-rails-to-the-north')));
+    await pumpFor(tester);
+    expect(find.byKey(const ValueKey('gwt-building-11')), findsOneWidget);
+    expect(find.byKey(const ValueKey('gwt-building-12')), findsOneWidget);
+    expect(find.byKey(const ValueKey('gwt-building-13')), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('gwt-thirteenth-building')));
+    await pumpFor(tester);
+    expect(find.byKey(const ValueKey('gwt-building-13')), findsOneWidget);
+    for (final n in [11, 12, 13]) {
+      expect(
+        find.descendant(
+          of: find.byKey(ValueKey('gwt-building-$n')),
+          matching: find.byType(Image),
+        ),
+        findsOneWidget,
+      );
+    }
+
+    await tester.tap(find.byKey(const ValueKey('gwt-rails-to-the-north')));
+    await pumpFor(tester);
+    expect(find.byKey(const ValueKey('gwt-building-11')), findsNothing);
+    expect(find.byKey(const ValueKey('gwt-building-12')), findsNothing);
+    expect(find.byKey(const ValueKey('gwt-building-13')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('gwt-thirteenth-building')));
+    await pumpFor(tester);
+    expect(find.byKey(const ValueKey('gwt-building-13')), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('gwt-tab-public')));
+    await pumpFor(tester);
+    await pumpUntilFound(
+      tester,
+      find.byKey(const ValueKey('gwt-public-location-A')),
+    );
+    for (final location in GwtPublicBuildingsLayout.locations) {
+      expect(
+        find.byKey(ValueKey('gwt-public-location-$location')),
+        findsOneWidget,
+      );
+    }
+    expect(_publicTileOn(tester, 'A'), 'C');
+    expect(_publicTileOn(tester, 'G'), 'E');
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-public-location-A')),
+        matching: find.text('A'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-public-location-A')),
+        matching: find.text('C'),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('gwt-public-buildings-randomize')),
+    );
+    await pumpFor(tester);
+    final placed = [
+      for (final location in GwtPublicBuildingsLayout.locations)
+        _publicTileOn(tester, location),
+    ];
+    expect(placed.toSet(), GwtPublicBuildingsLayout.locations.toSet());
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('GWT building tiles stay left-to-right in Persian', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    const layout = GwtBuildingsLayout([
+      GwtBuildingSide.a,
+      GwtBuildingSide.b,
+      GwtBuildingSide.a,
+      GwtBuildingSide.b,
+      GwtBuildingSide.a,
+      GwtBuildingSide.b,
+      GwtBuildingSide.a,
+      GwtBuildingSide.b,
+      GwtBuildingSide.a,
+      GwtBuildingSide.b,
+    ]);
+    await tester.pumpWidget(
+      L10nScope(
+        controller: await createTestLocale(),
+        child: MaterialApp(
+          builder: (context, child) {
+            return Directionality(
+              textDirection: TextDirection.rtl,
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
+          home: const GwtBuildingsRandomizerScreen(
+            game: GreatWesternTrailGame(),
+            initialLayout: layout,
+          ),
+        ),
+      ),
+    );
+    await pumpFor(tester);
+    await pumpUntilFound(tester, find.byKey(const ValueKey('gwt-building-1')));
+
+    final first = tester.getRect(find.byKey(const ValueKey('gwt-building-1')));
+    final second = tester.getRect(find.byKey(const ValueKey('gwt-building-2')));
+    expect(first.left, lessThan(second.left));
+  });
+
   testWidgets('Arnak pad uses research, idols, guardians, and fear', (
     tester,
   ) async {
@@ -303,6 +534,7 @@ void main() {
       find.byKey(const ValueKey('hub-buildings-randomizer')),
       findsOneWidget,
     );
+    expect(find.text('Coming Soon'), findsOneWidget);
     expect(gwt.width, lessThan(220));
     expect(gwt.width, closeTo(gwt.height, 2));
 
