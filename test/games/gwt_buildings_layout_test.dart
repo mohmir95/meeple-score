@@ -51,4 +51,35 @@ void main() {
     expect(both.sideOf(13), thirteenth.sideOf(13));
     expect(both.withRailsToTheNorth(false).visibleNumbers, thirteenth.visibleNumbers);
   });
+
+  test('Second Edition Rails to the North adds building 13', () {
+    final base = GwtBuildingsLayout.random(
+      random: Random(7),
+      baseCount: 12,
+    );
+    expect(base.sides, hasLength(12));
+    expect(base.visibleNumbers, [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+    ]);
+
+    final expanded = base.withRailsToTheNorth(true, Random(8));
+    expect(expanded.includesRailsToTheNorth, isTrue);
+    expect(expanded.includesThirteenthBuilding, isFalse);
+    expect(expanded.sides, hasLength(13));
+    expect(expanded.visibleNumbers, [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+    ]);
+    expect(expanded.sides.sublist(0, 12), base.sides);
+    expect(expanded.withRailsToTheNorth(false).visibleNumbers, base.visibleNumbers);
+    expect(
+      GwtBuildingsLayout.random(
+        random: Random(9),
+        baseCount: 12,
+        railsToTheNorth: true,
+      ).visibleNumbers,
+      [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+      ],
+    );
+  });
 }

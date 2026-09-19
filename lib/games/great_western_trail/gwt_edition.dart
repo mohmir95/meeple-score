@@ -7,6 +7,7 @@ import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
 import '../../shared/player_colors.dart';
+import 'gwt_building_art.dart';
 import 'gwt_config.dart';
 import 'gwt_player_line.dart';
 import 'gwt_scoring.dart';
@@ -51,6 +52,18 @@ abstract class GwtEditionGame extends BoardGame {
 
   @override
   bool get showBuildingsRandomizer => true;
+
+  /// First Edition has a 13th-building mini expansion; later editions do not.
+  bool get includeThirteenthBuildingExpansion => false;
+
+  /// First Edition adds buildings 11–12 via Rails to the North.
+  /// Second Edition adds building 13 with the same expansion.
+  bool get includeRailsToTheNorthExpansion => true;
+
+  /// First Edition has 10 private buildings; Second Edition has 12.
+  int get privateBuildingBaseCount => 10;
+
+  GwtBuildingArtSet get buildingArtSet => GwtBuildingArtSet.firstEdition;
 
   @override
   List<PlayerColorOption> get playerColors => const [

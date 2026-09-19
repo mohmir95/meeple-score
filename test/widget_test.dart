@@ -6,6 +6,7 @@ import 'package:board_game_score_sheet/domain/models/player.dart';
 import 'package:board_game_score_sheet/features/home/game_card.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_argentina_game.dart';
+import 'package:board_game_score_sheet/games/great_western_trail/gwt_building_art.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_buildings_layout.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_buildings_randomizer_screen.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_config.dart';
@@ -405,6 +406,13 @@ void main() {
       ),
       findsOneWidget,
     );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-public-location-A')),
+        matching: find.byIcon(Icons.arrow_forward_rounded),
+      ),
+      findsOneWidget,
+    );
 
     await tester.tap(
       find.byKey(const ValueKey('gwt-public-buildings-randomize')),
@@ -462,6 +470,108 @@ void main() {
     final first = tester.getRect(find.byKey(const ValueKey('gwt-building-1')));
     final second = tester.getRect(find.byKey(const ValueKey('gwt-building-2')));
     expect(first.left, lessThan(second.left));
+  });
+
+  testWidgets(
+    'GWT second edition has twelve private buildings and Rails adds 13',
+    (tester) async {
+    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    const allA = GwtBuildingsLayout([
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+    ], baseCount: 12);
+    await pumpWithL10n(
+      tester,
+      const GwtBuildingsRandomizerScreen(
+        game: GreatWesternTrailSecondEditionGame(),
+        initialLayout: allA,
+        initialPublicLayout: GwtPublicBuildingsLayout([
+          'C',
+          'A',
+          'G',
+          'B',
+          'F',
+          'D',
+          'E',
+        ]),
+      ),
+    );
+    await pumpUntilFound(
+      tester,
+      find.byKey(const ValueKey('gwt-buildings-randomize')),
+    );
+    expect(find.text('"Rails to the North" Expansion'), findsOneWidget);
+    expect(find.text('"13th Building" Expansion'), findsNothing);
+    expect(find.byKey(const ValueKey('gwt-thirteenth-building')), findsNothing);
+    expect(find.byKey(const ValueKey('gwt-rails-to-the-north')), findsOneWidget);
+    for (var n = 1; n <= 12; n++) {
+      expect(find.byKey(ValueKey('gwt-building-$n')), findsOneWidget);
+    }
+    expect(find.byKey(const ValueKey('gwt-building-13')), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-building-1')),
+        matching: find.image(
+          const AssetImage(
+            'assets/games/great_western_trail_2e/buildings/private/1a.jpg',
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-building-12')),
+        matching: find.image(
+          const AssetImage(
+            'assets/games/great_western_trail_2e/buildings/private/12a.jpg',
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('gwt-rails-to-the-north')));
+    await pumpFor(tester);
+    expect(find.byKey(const ValueKey('gwt-building-13')), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-building-13')),
+        matching: find.byType(Image),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('gwt-tab-public')));
+    await pumpFor(tester);
+    await pumpUntilFound(
+      tester,
+      find.byKey(const ValueKey('gwt-public-location-A')),
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-public-location-A')),
+        matching: find.image(
+          const AssetImage(
+            'assets/games/great_western_trail_2e/buildings/public/c.jpg',
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('Arnak pad uses research, idols, guardians, and fear', (
@@ -534,7 +644,7 @@ void main() {
       find.byKey(const ValueKey('hub-buildings-randomizer')),
       findsOneWidget,
     );
-    expect(find.text('Coming Soon'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsNothing);
     expect(gwt.width, lessThan(220));
     expect(gwt.width, closeTo(gwt.height, 2));
 

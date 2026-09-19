@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'gwt_building_art.dart';
 import 'gwt_buildings_randomizer_screen.dart';
 import 'gwt_edition.dart';
 
@@ -23,6 +24,12 @@ class GreatWesternTrailGame extends GwtEditionGame {
 
   @override
   String? get coverImageAsset => coverAsset;
+
+  @override
+  bool get includeThirteenthBuildingExpansion => true;
+
+  @override
+  GwtBuildingArtSet get buildingArtSet => GwtBuildingArtSet.firstEdition;
 
   @override
   Widget? buildBuildingsRandomizer() {

@@ -8,6 +8,7 @@ import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import 'gwt_building_art.dart';
 import 'gwt_buildings_layout.dart';
+import 'gwt_edition.dart';
 import 'gwt_public_buildings_layout.dart';
 
 class GwtBuildingsRandomizerScreen extends StatefulWidget {
@@ -45,11 +46,47 @@ class _GwtBuildingsRandomizerScreenState
   var _privateBusy = false;
   var _publicBusy = false;
 
+  bool get _includeThirteenthBuilding {
+    final game = widget.game;
+    return game is GwtEditionGame && game.includeThirteenthBuildingExpansion;
+  }
+
+  bool get _includeRailsToTheNorth {
+    final game = widget.game;
+    return game is GwtEditionGame && game.includeRailsToTheNorthExpansion;
+  }
+
+  int get _baseCount {
+    final game = widget.game;
+    if (game is GwtEditionGame) {
+      return game.privateBuildingBaseCount;
+    }
+    return 10;
+  }
+
+  GwtBuildingArtSet get _artSet {
+    final game = widget.game;
+    if (game is GwtEditionGame) {
+      return game.buildingArtSet;
+    }
+    return GwtBuildingArtSet.firstEdition;
+  }
+
   @override
   void initState() {
     super.initState();
     _layout = widget.initialLayout ??
-        GwtBuildingsLayout.random(random: widget.random);
+        GwtBuildingsLayout.random(
+          random: widget.random,
+          baseCount: _baseCount,
+        );
+    if (!_includeThirteenthBuilding &&
+        _layout.includesThirteenthBuilding) {
+      _layout = _layout.withThirteenthBuilding(false);
+    }
+    if (!_includeRailsToTheNorth && _layout.includesRailsToTheNorth) {
+      _layout = _layout.withRailsToTheNorth(false);
+    }
     _publicLayout = widget.initialPublicLayout ??
         GwtPublicBuildingsLayout.random(widget.random);
     _privateFade = AnimationController(
@@ -97,8 +134,11 @@ class _GwtBuildingsRandomizerScreenState
       setState(() {
         _layout = GwtBuildingsLayout.random(
           random: widget.random,
-          railsToTheNorth: _layout.includesRailsToTheNorth,
-          thirteenthBuilding: _layout.includesThirteenthBuilding,
+          baseCount: _baseCount,
+          railsToTheNorth: _includeRailsToTheNorth &&
+              _layout.includesRailsToTheNorth,
+          thirteenthBuilding: _includeThirteenthBuilding &&
+              _layout.includesThirteenthBuilding,
         );
       });
       _privateFade.duration = _fadeInDuration;
@@ -182,6 +222,9 @@ class _GwtBuildingsRandomizerScreenState
                   _PrivateBuildingsPanel(
                     layout: _layout,
                     visibility: _privateVisibility,
+                    artSet: _artSet,
+                    includeThirteenthBuilding: _includeThirteenthBuilding,
+                    includeRailsToTheNorth: _includeRailsToTheNorth,
                     onRailsToTheNorth: _setRailsToTheNorth,
                     onThirteenthBuilding: _setThirteenthBuilding,
                     onRandomize: _randomizePrivate,
@@ -189,6 +232,7 @@ class _GwtBuildingsRandomizerScreenState
                   _PublicBuildingsPanel(
                     layout: _publicLayout,
                     visibility: _publicVisibility,
+                    artSet: _artSet,
                     onRandomize: _randomizePublic,
                   ),
                 ],
@@ -205,6 +249,9 @@ class _PrivateBuildingsPanel extends StatelessWidget {
   const _PrivateBuildingsPanel({
     required this.layout,
     required this.visibility,
+    required this.artSet,
+    required this.includeThirteenthBuilding,
+    required this.includeRailsToTheNorth,
     required this.onRailsToTheNorth,
     required this.onThirteenthBuilding,
     required this.onRandomize,
@@ -212,6 +259,9 @@ class _PrivateBuildingsPanel extends StatelessWidget {
 
   final GwtBuildingsLayout layout;
   final Animation<double> visibility;
+  final GwtBuildingArtSet artSet;
+  final bool includeThirteenthBuilding;
+  final bool includeRailsToTheNorth;
   final ValueChanged<bool> onRailsToTheNorth;
   final ValueChanged<bool> onThirteenthBuilding;
   final VoidCallback onRandomize;
@@ -251,24 +301,26 @@ class _PrivateBuildingsPanel extends StatelessWidget {
                           runSpacing: 4,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            _ExpansionSwitch(
-                              switchKey: const ValueKey(
-                                'gwt-rails-to-the-north',
+                            if (includeRailsToTheNorth)
+                              _ExpansionSwitch(
+                                switchKey: const ValueKey(
+                                  'gwt-rails-to-the-north',
+                                ),
+                                title: l10n.t('gwt.randomizer.railsToTheNorth'),
+                                value: layout.includesRailsToTheNorth,
+                                onChanged: onRailsToTheNorth,
                               ),
-                              title: l10n.t('gwt.randomizer.railsToTheNorth'),
-                              value: layout.includesRailsToTheNorth,
-                              onChanged: onRailsToTheNorth,
-                            ),
-                            _ExpansionSwitch(
-                              switchKey: const ValueKey(
-                                'gwt-thirteenth-building',
+                            if (includeThirteenthBuilding)
+                              _ExpansionSwitch(
+                                switchKey: const ValueKey(
+                                  'gwt-thirteenth-building',
+                                ),
+                                title: l10n.t(
+                                  'gwt.randomizer.thirteenthBuilding',
+                                ),
+                                value: layout.includesThirteenthBuilding,
+                                onChanged: onThirteenthBuilding,
                               ),
-                              title: l10n.t(
-                                'gwt.randomizer.thirteenthBuilding',
-                              ),
-                              value: layout.includesThirteenthBuilding,
-                              onChanged: onThirteenthBuilding,
-                            ),
                           ],
                         ),
                       ),
@@ -302,6 +354,7 @@ class _PrivateBuildingsPanel extends StatelessWidget {
                         number: number,
                         side: layout.sideOf(number),
                         compact: compact,
+                        artSet: artSet,
                       );
                     },
                   ),
@@ -319,11 +372,13 @@ class _PublicBuildingsPanel extends StatelessWidget {
   const _PublicBuildingsPanel({
     required this.layout,
     required this.visibility,
+    required this.artSet,
     required this.onRandomize,
   });
 
   final GwtPublicBuildingsLayout layout;
   final Animation<double> visibility;
+  final GwtBuildingArtSet artSet;
   final VoidCallback onRandomize;
 
   @override
@@ -379,6 +434,7 @@ class _PublicBuildingsPanel extends StatelessWidget {
                         location: location,
                         tile: layout.tileOn(location),
                         compact: compact,
+                        artSet: artSet,
                       );
                     },
                   ),
@@ -457,16 +513,18 @@ class _BuildingTile extends StatelessWidget {
     required this.number,
     required this.side,
     required this.compact,
+    required this.artSet,
   });
 
   final int number;
   final GwtBuildingSide side;
   final bool compact;
+  final GwtBuildingArtSet artSet;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final art = GwtBuildingArt.private(number, side);
+    final art = GwtBuildingArt.private(number, side, artSet: artSet);
     return Semantics(
       label: l10n.t('gwt.randomizer.tileSemantics', {
         'n': '$number',
@@ -503,11 +561,13 @@ class _PublicLocationTile extends StatelessWidget {
     required this.location,
     required this.tile,
     required this.compact,
+    required this.artSet,
   });
 
   final String location;
   final String tile;
   final bool compact;
+  final GwtBuildingArtSet artSet;
 
   @override
   Widget build(BuildContext context) {
@@ -520,11 +580,12 @@ class _PublicLocationTile extends StatelessWidget {
       child: KeyedSubtree(
         key: ValueKey('gwt-public-location-$location'),
         child: _ArtTile(
-          asset: GwtBuildingArt.public(tile),
+          asset: GwtBuildingArt.public(tile, artSet: artSet),
           title: _SideOrLocationTitle(
             prefix: location,
             letter: tile,
             compact: compact,
+            showArrow: true,
           ),
           compact: compact,
           imageKey: ValueKey('gwt-public-tile-$location'),
@@ -652,51 +713,66 @@ class _SideOrLocationTitle extends StatelessWidget {
     this.prefix,
     required this.letter,
     required this.compact,
+    this.showArrow = false,
   });
 
   final String? prefix;
   final String letter;
   final bool compact;
+  final bool showArrow;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (prefix != null) ...[
-          Text(
+    final gap = SizedBox(width: compact ? 2 : 4);
+    final highlighted = DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.primary,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 7 : 9,
+          vertical: compact ? 1 : 2,
+        ),
+        child: Text(
+          letter,
+          style: TextStyle(
+            color: scheme.onPrimary,
+            fontWeight: FontWeight.w900,
+            fontSize: compact ? 14 : 16,
+            height: 1.2,
+          ),
+        ),
+      ),
+    );
+    final label = prefix == null
+        ? null
+        : Text(
             prefix!,
             style: TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: compact ? 14 : 16,
               color: scheme.onSurface,
             ),
-          ),
-          const SizedBox(width: 4),
-        ],
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: scheme.primary,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: compact ? 7 : 9,
-              vertical: compact ? 1 : 2,
-            ),
-            child: Text(
-              letter,
-              style: TextStyle(
-                color: scheme.onPrimary,
-                fontWeight: FontWeight.w900,
-                fontSize: compact ? 14 : 16,
-                height: 1.2,
-              ),
-            ),
-          ),
-        ),
-      ],
+          );
+    final arrow = Icon(
+      Icons.arrow_forward_rounded,
+      size: compact ? 13 : 15,
+      color: scheme.onSurfaceVariant,
+    );
+
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: showArrow && label != null
+            ? [highlighted, gap, arrow, gap, label]
+            : [
+                if (label != null) ...[label, gap],
+                highlighted,
+              ],
+      ),
     );
   }
 }
