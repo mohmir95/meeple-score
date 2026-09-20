@@ -64,6 +64,14 @@ class _GwtBuildingsRandomizerScreenState
     return 10;
   }
 
+  List<String> get _publicLocations {
+    final game = widget.game;
+    if (game is GwtEditionGame) {
+      return game.publicBuildingLocations;
+    }
+    return GwtPublicBuildingsLayout.classicLocations;
+  }
+
   GwtBuildingArtSet get _artSet {
     final game = widget.game;
     if (game is GwtEditionGame) {
@@ -88,7 +96,7 @@ class _GwtBuildingsRandomizerScreenState
       _layout = _layout.withRailsToTheNorth(false);
     }
     _publicLayout = widget.initialPublicLayout ??
-        GwtPublicBuildingsLayout.random(widget.random);
+        GwtPublicBuildingsLayout.random(widget.random, _publicLocations);
     _privateFade = AnimationController(
       vsync: this,
       duration: _appearDuration,
@@ -164,7 +172,10 @@ class _GwtBuildingsRandomizerScreenState
         return;
       }
       setState(() {
-        _publicLayout = GwtPublicBuildingsLayout.random(widget.random);
+        _publicLayout = GwtPublicBuildingsLayout.random(
+          widget.random,
+          _publicLocations,
+        );
       });
       _publicFade.duration = _fadeInDuration;
       await _publicFade.forward();
@@ -275,6 +286,12 @@ class _PrivateBuildingsPanel extends StatelessWidget {
         final columns = compact ? 3 : 5;
         final padding = compact ? 12.0 : 20.0;
         final gap = compact ? 10.0 : 12.0;
+        final showExpansions =
+            includeRailsToTheNorth || includeThirteenthBuilding;
+        final randomize = _RandomizeButton(
+          key: const ValueKey('gwt-buildings-randomize'),
+          onPressed: onRandomize,
+        );
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -290,49 +307,53 @@ class _PrivateBuildingsPanel extends StatelessWidget {
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(padding, 0, padding, 4),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Wrap(
-                          spacing: 20,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
+              child: showExpansions
+                  ? Card(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
+                        child: Row(
                           children: [
-                            if (includeRailsToTheNorth)
-                              _ExpansionSwitch(
-                                switchKey: const ValueKey(
-                                  'gwt-rails-to-the-north',
-                                ),
-                                title: l10n.t('gwt.randomizer.railsToTheNorth'),
-                                value: layout.includesRailsToTheNorth,
-                                onChanged: onRailsToTheNorth,
+                            Expanded(
+                              child: Wrap(
+                                spacing: 20,
+                                runSpacing: 4,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  if (includeRailsToTheNorth)
+                                    _ExpansionSwitch(
+                                      switchKey: const ValueKey(
+                                        'gwt-rails-to-the-north',
+                                      ),
+                                      title: l10n.t(
+                                        'gwt.randomizer.railsToTheNorth',
+                                      ),
+                                      value: layout.includesRailsToTheNorth,
+                                      onChanged: onRailsToTheNorth,
+                                    ),
+                                  if (includeThirteenthBuilding)
+                                    _ExpansionSwitch(
+                                      switchKey: const ValueKey(
+                                        'gwt-thirteenth-building',
+                                      ),
+                                      title: l10n.t(
+                                        'gwt.randomizer.thirteenthBuilding',
+                                      ),
+                                      value: layout.includesThirteenthBuilding,
+                                      onChanged: onThirteenthBuilding,
+                                    ),
+                                ],
                               ),
-                            if (includeThirteenthBuilding)
-                              _ExpansionSwitch(
-                                switchKey: const ValueKey(
-                                  'gwt-thirteenth-building',
-                                ),
-                                title: l10n.t(
-                                  'gwt.randomizer.thirteenthBuilding',
-                                ),
-                                value: layout.includesThirteenthBuilding,
-                                onChanged: onThirteenthBuilding,
-                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            randomize,
                           ],
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      _RandomizeButton(
-                        key: const ValueKey('gwt-buildings-randomize'),
-                        onPressed: onRandomize,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                    )
+                  : Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: randomize,
+                    ),
             ),
             Expanded(
               child: FadeTransition(
@@ -426,10 +447,9 @@ class _PublicBuildingsPanel extends StatelessWidget {
                       mainAxisSpacing: gap,
                       childAspectRatio: 0.82,
                     ),
-                    itemCount: GwtPublicBuildingsLayout.locations.length,
+                    itemCount: layout.locations.length,
                     itemBuilder: (context, index) {
-                      final location =
-                          GwtPublicBuildingsLayout.locations[index];
+                      final location = layout.locations[index];
                       return _PublicLocationTile(
                         location: location,
                         tile: layout.tileOn(location),

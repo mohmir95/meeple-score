@@ -9,6 +9,7 @@ import '../../domain/models/player_score.dart';
 import '../../shared/player_colors.dart';
 import 'gwt_building_art.dart';
 import 'gwt_config.dart';
+import 'gwt_public_buildings_layout.dart';
 import 'gwt_player_line.dart';
 import 'gwt_scoring.dart';
 import 'gwt_sheet.dart';
@@ -58,10 +59,16 @@ abstract class GwtEditionGame extends BoardGame {
 
   /// First Edition adds buildings 11–12 via Rails to the North.
   /// Second Edition adds building 13 with the same expansion.
+  /// Argentina has no building expansions.
   bool get includeRailsToTheNorthExpansion => true;
 
   /// First Edition has 10 private buildings; Second Edition has 12.
   int get privateBuildingBaseCount => 10;
+
+  /// First and Second Edition shuffle public tiles onto A–G.
+  /// Argentina uses A–H.
+  List<String> get publicBuildingLocations =>
+      GwtPublicBuildingsLayout.classicLocations;
 
   GwtBuildingArtSet get buildingArtSet => GwtBuildingArtSet.firstEdition;
 

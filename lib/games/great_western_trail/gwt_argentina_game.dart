@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import '../../domain/models/game_state.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
+import 'gwt_building_art.dart';
+import 'gwt_buildings_randomizer_screen.dart';
 import 'gwt_edition.dart';
+import 'gwt_public_buildings_layout.dart';
 import 'gwt_scoring.dart';
 import 'gwt_sheet.dart';
 import 'gwt_state.dart';
@@ -44,6 +47,24 @@ class GreatWesternTrailArgentinaGame extends GwtEditionGame {
 
   @override
   String? get coverImageAsset => coverAsset;
+
+  @override
+  GwtBuildingArtSet get buildingArtSet => GwtBuildingArtSet.argentina;
+
+  @override
+  bool get includeRailsToTheNorthExpansion => false;
+
+  @override
+  int get privateBuildingBaseCount => 10;
+
+  @override
+  List<String> get publicBuildingLocations =>
+      GwtPublicBuildingsLayout.argentinaLocations;
+
+  @override
+  Widget? buildBuildingsRandomizer() {
+    return GwtBuildingsRandomizerScreen(game: this);
+  }
 
   @override
   Widget buildScoreSheet({
