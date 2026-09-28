@@ -9,6 +9,7 @@
   "home.lastGame": "بازی قبلی",
   "hub.scoresheet": "برگه امتیاز",
   "hub.buildingsRandomizer": "تصادفی‌ساز ساختمان‌ها",
+  "hub.startingResources": "منابع شروع",
   "hub.comingSoon": "به زودی",
   "setup.continueSaved": "ادامه بازی ذخیره‌شده",
   "setup.reviewLast": "مشاهده بازی قبلی",
@@ -184,5 +185,13 @@
   "arnak.lostTempleTitle": "چه کسی اول به معبد گمشده رسید؟",
   "arnak.lostTempleMessage": "{names} مساوی هستند. کسی را انتخاب کنید که اول به معبد گمشده رسیده.",
   "arnak.lostTempleNone": "هیچ‌کس",
-  "arnak.lostTempleNoneHint": "بالاترین امتیاز پژوهش بین بازیکنان مساوی برنده است. اگر آن هم مساوی باشد، پیروزی مشترک است."
+  "arnak.lostTempleNoneHint": "بالاترین امتیاز پژوهش بین بازیکنان مساوی برنده است. اگر آن هم مساوی باشد، پیروزی مشترک است.",
+  "arnak.coin": "سکه",
+  "arnak.compass": "قطب‌نما",
+  "arnak.startingDeck.title": "دسته شروع شما (بازی پایه)",
+  "arnak.startingDeck.leadersNote": "با رهبرهای توسعه‌ها بازی می‌کنید؟ دسته شروع هر رهبر متفاوت است، پس به‌جای این از چیدمان همان رهبر استفاده کنید.",
+  "arnak.startingDeck.body": "هر بازیکن دسته خودش را دارد و همه دسته‌ها یکسان شروع می‌شوند. دسته شما باید ۴ کارت پایه به رنگ خودتان به اضافه ۲ کارت ترس داشته باشد:",
+  "arnak.startingDeck.funding": "۲ کارت تأمین مالی",
+  "arnak.startingDeck.exploration": "۲ کارت اکتشاف",
+  "arnak.startingDeck.fear": "۲ کارت ترس"
 }

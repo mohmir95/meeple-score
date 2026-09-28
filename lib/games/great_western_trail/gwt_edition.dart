@@ -54,6 +54,9 @@ abstract class GwtEditionGame extends BoardGame {
   @override
   bool get showBuildingsRandomizer => true;
 
+  @override
+  bool get showStartingResources => true;
+
   /// First Edition has a 13th-building mini expansion; later editions do not.
   bool get includeThirteenthBuildingExpansion => false;
 

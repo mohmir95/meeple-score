@@ -68,7 +68,8 @@ void main() {
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Scoresheet'), findsOneWidget);
     expect(find.text('Buildings Randomizer'), findsOneWidget);
-    expect(find.text('Coming Soon'), findsNothing);
+    expect(find.text('Starting Resources'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsOneWidget);
 
     await tester.tap(find.text('Scoresheet'));
     await pumpFor(tester);
@@ -197,7 +198,8 @@ void main() {
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Buildings Randomizer'), findsOneWidget);
-    expect(find.text('Coming Soon'), findsNothing);
+    expect(find.text('Starting Resources'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsOneWidget);
     await tester.tap(find.text('Scoresheet'));
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Start game'));
@@ -262,7 +264,8 @@ void main() {
     await tester.tap(find.byType(GameCard).first);
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Buildings Randomizer'));
-    expect(find.text('Coming Soon'), findsNothing);
+    expect(find.text('Starting Resources'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsOneWidget);
 
     await tester.tap(find.text('Buildings Randomizer'));
     await pumpFor(tester);
@@ -694,6 +697,8 @@ void main() {
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Scoresheet'), findsOneWidget);
     expect(find.text('Buildings Randomizer'), findsNothing);
+    expect(find.text('Starting Resources'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsNothing);
 
     await tester.tap(find.text('Scoresheet'));
     await pumpFor(tester);
@@ -750,7 +755,11 @@ void main() {
       find.byKey(const ValueKey('hub-buildings-randomizer')),
       findsOneWidget,
     );
-    expect(find.text('Coming Soon'), findsNothing);
+    expect(
+      find.byKey(const ValueKey('hub-starting-resources')),
+      findsOneWidget,
+    );
+    expect(find.text('Coming Soon'), findsOneWidget);
     expect(gwt.width, lessThan(220));
     expect(gwt.width, closeTo(gwt.height, 2));
 
@@ -764,6 +773,11 @@ void main() {
     expect(arnak.width, closeTo(gwt.width, 1));
     expect(arnak.height, closeTo(gwt.height, 1));
     expect(find.text('Buildings Randomizer'), findsNothing);
+    expect(
+      find.byKey(const ValueKey('hub-starting-resources')),
+      findsOneWidget,
+    );
+    expect(find.text('Coming Soon'), findsNothing);
   });
 
   testWidgets('Arnak finish asks who reached the Lost Temple first', (

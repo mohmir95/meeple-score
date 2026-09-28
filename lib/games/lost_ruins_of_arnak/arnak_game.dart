@@ -12,6 +12,7 @@ import 'arnak_finish.dart';
 import 'arnak_player_line.dart';
 import 'arnak_scoring.dart';
 import 'arnak_sheet.dart';
+import 'arnak_starting_resources_screen.dart';
 import 'arnak_state.dart';
 
 class LostRuinsOfArnakGame extends BoardGame {
@@ -62,6 +63,14 @@ class LostRuinsOfArnakGame extends BoardGame {
 
   @override
   String? get coverImageAsset => coverAsset;
+
+  @override
+  bool get showStartingResources => true;
+
+  @override
+  Widget? buildStartingResources() {
+    return const ArnakStartingResourcesScreen();
+  }
 
   @override
   List<PlayerColorOption> get playerColors => const [

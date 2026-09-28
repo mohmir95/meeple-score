@@ -9,6 +9,7 @@
   "home.lastGame": "Last game",
   "hub.scoresheet": "Scoresheet",
   "hub.buildingsRandomizer": "Buildings Randomizer",
+  "hub.startingResources": "Starting Resources",
   "hub.comingSoon": "Coming Soon",
   "setup.continueSaved": "Continue saved game",
   "setup.reviewLast": "Review last game",
@@ -184,5 +185,13 @@
   "arnak.lostTempleTitle": "Who reached the Lost Temple first?",
   "arnak.lostTempleMessage": "{names} are tied. Choose who got to the Lost Temple first.",
   "arnak.lostTempleNone": "No one",
-  "arnak.lostTempleNoneHint": "Highest Research among the tied players wins. If those are tied too, they share the win."
+  "arnak.lostTempleNoneHint": "Highest Research among the tied players wins. If those are tied too, they share the win.",
+  "arnak.coin": "Coin",
+  "arnak.compass": "Compass",
+  "arnak.startingDeck.title": "Your Starting Deck (Base Game)",
+  "arnak.startingDeck.leadersNote": "Playing with leaders from the expansions? Each leader has a different starting deck, so use the leader's setup instead.",
+  "arnak.startingDeck.body": "Each player has their own deck, and all decks start the same. Your deck should have the 4 basic cards in your color, plus 2 Fear cards:",
+  "arnak.startingDeck.funding": "2 Funding cards",
+  "arnak.startingDeck.exploration": "2 Exploration cards",
+  "arnak.startingDeck.fear": "2 Fear cards"
 }

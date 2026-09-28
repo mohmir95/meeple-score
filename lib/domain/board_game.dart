@@ -51,6 +51,12 @@ abstract class BoardGame {
   /// Ready randomizer UI. Null keeps the hub tile disabled as Coming Soon.
   Widget? buildBuildingsRandomizer() => null;
 
+  /// Hub tile for starting-resources setup help.
+  bool get showStartingResources => false;
+
+  /// Ready starting-resources UI. Null keeps the hub tile disabled as Coming Soon.
+  Widget? buildStartingResources() => null;
+
   GameConfig createDefaultConfig();
 
   GameConfig configFromJson(Map<String, dynamic> json);

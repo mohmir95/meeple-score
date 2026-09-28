@@ -30,53 +30,80 @@ class GameHubScreen extends StatelessWidget {
           final compact = constraints.maxWidth < Breakpoints.compact;
           final gap = compact ? 12.0 : 16.0;
           final padding = compact ? 12.0 : 20.0;
-          final scoresheet = _HubBanner(
-            key: const ValueKey('hub-scoresheet'),
-            title: l10n.t('hub.scoresheet'),
-            icon: Icons.grid_on_rounded,
-            color: game.accentColor,
-            compact: compact,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) =>
-                      SetupScreen(game: game, repository: repository),
-                ),
+          final randomizer = game.buildBuildingsRandomizer();
+          final startingResources = game.buildStartingResources();
+          final tiles = <Widget>[
+            _HubBanner(
+              key: const ValueKey('hub-scoresheet'),
+              title: l10n.t('hub.scoresheet'),
+              icon: Icons.grid_on_rounded,
+              color: game.accentColor,
+              compact: compact,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) =>
+                        SetupScreen(game: game, repository: repository),
+                  ),
+                );
+              },
+            ),
+            if (game.showBuildingsRandomizer)
+              _HubBanner(
+                key: const ValueKey('hub-buildings-randomizer'),
+                title: l10n.t('hub.buildingsRandomizer'),
+                icon: Icons.home_work_outlined,
+                color: game.accentColor,
+                compact: compact,
+                enabled: randomizer != null,
+                badge: randomizer == null ? l10n.t('hub.comingSoon') : null,
+                onTap: randomizer == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) =>
+                                game.buildBuildingsRandomizer()!,
+                          ),
+                        );
+                      },
+              ),
+            if (game.showStartingResources)
+              _HubBanner(
+                key: const ValueKey('hub-starting-resources'),
+                title: l10n.t('hub.startingResources'),
+                icon: Icons.inventory_2_outlined,
+                color: game.accentColor,
+                compact: compact,
+                enabled: startingResources != null,
+                badge: startingResources == null
+                    ? l10n.t('hub.comingSoon')
+                    : null,
+                onTap: startingResources == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) =>
+                                game.buildStartingResources()!,
+                          ),
+                        );
+                      },
+              ),
+          ];
+
+          final grid = LayoutBuilder(
+            builder: (context, gridConstraints) {
+              final tileWidth = (gridConstraints.maxWidth - gap) / 2;
+              return Wrap(
+                spacing: gap,
+                runSpacing: gap,
+                children: [
+                  for (final tile in tiles)
+                    SizedBox(width: tileWidth, child: tile),
+                ],
               );
             },
-          );
-          final randomizer = game.buildBuildingsRandomizer();
-          final tiles = Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: scoresheet),
-              SizedBox(width: gap),
-              Expanded(
-                child: game.showBuildingsRandomizer
-                    ? _HubBanner(
-                        key: const ValueKey('hub-buildings-randomizer'),
-                        title: l10n.t('hub.buildingsRandomizer'),
-                        icon: Icons.home_work_outlined,
-                        color: game.accentColor,
-                        compact: compact,
-                        enabled: randomizer != null,
-                        badge: randomizer == null
-                            ? l10n.t('hub.comingSoon')
-                            : null,
-                        onTap: randomizer == null
-                            ? null
-                            : () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (context) =>
-                                        game.buildBuildingsRandomizer()!,
-                                  ),
-                                );
-                              },
-                      )
-                    : const SizedBox.shrink(),
-              ),
-            ],
           );
 
           return ListView(
@@ -86,11 +113,11 @@ class GameHubScreen extends StatelessWidget {
                 Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 696),
-                    child: tiles,
+                    child: grid,
                   ),
                 )
               else
-                tiles,
+                grid,
             ],
           );
         },
