@@ -293,14 +293,21 @@ class GameGrid extends StatelessWidget {
         final rawWidth = (width - gap * (columns - 1)) / columns;
         final cardWidth = rawWidth.clamp(0, maxCardWidth).toDouble();
 
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          alignment: WrapAlignment.center,
-          children: [
-            for (final child in children)
-              SizedBox(width: cardWidth, child: child),
-          ],
+        // Center the grid as a block, but start a short last row at the
+        // leading edge so it lines up with the columns above.
+        final used = columns.clamp(1, children.length);
+        return Center(
+          child: SizedBox(
+            width: cardWidth * used + gap * (used - 1),
+            child: Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (final child in children)
+                  SizedBox(width: cardWidth, child: child),
+              ],
+            ),
+          ),
         );
       },
     );

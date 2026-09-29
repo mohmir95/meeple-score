@@ -9,6 +9,7 @@ import 'gwt_edition.dart';
 import 'gwt_public_buildings_layout.dart';
 import 'gwt_scoring.dart';
 import 'gwt_sheet.dart';
+import 'gwt_starting_resources_screen.dart';
 import 'gwt_state.dart';
 
 class GreatWesternTrailArgentinaGame extends GwtEditionGame {
@@ -64,6 +65,14 @@ class GreatWesternTrailArgentinaGame extends GwtEditionGame {
   @override
   Widget? buildBuildingsRandomizer() {
     return GwtBuildingsRandomizerScreen(game: this);
+  }
+
+  @override
+  Widget? buildStartingResources() {
+    return GwtStartingResourcesScreen(
+      game: this,
+      setup: GwtStartingSetup.argentina,
+    );
   }
 
   @override

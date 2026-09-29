@@ -146,6 +146,29 @@ void main() {
     expect(find.widgetWithText(AppBar, 'Great Western Trail'), findsOneWidget);
   });
 
+  testWidgets('desktop home starts a short last row under the first card', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1600, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await pumpScoreSheetApp(tester);
+    await pumpUntilFound(tester, find.text('Great Western Trail'));
+
+    final cards = find.byType(GameCard);
+    final first = tester.getRect(cards.first);
+    final last = tester.getRect(cards.last);
+    expect(last.top, greaterThan(first.bottom));
+    expect(last.left, closeTo(first.left, 1));
+
+    // The grid as a whole stays centered on the page.
+    final right = tester.getRect(cards.at(2)).right;
+    final pageCenter = tester.view.physicalSize.width / 2;
+    expect((first.left + right) / 2, closeTo(pageCenter, 1));
+  });
+
   testWidgets('home layout works on a narrow phone viewport', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
@@ -199,7 +222,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Buildings Randomizer'), findsOneWidget);
     expect(find.text('Starting Resources'), findsOneWidget);
-    expect(find.text('Coming Soon'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsNothing);
     await tester.tap(find.text('Scoresheet'));
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Start game'));

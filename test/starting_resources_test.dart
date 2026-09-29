@@ -26,6 +26,7 @@ Future<void> _openStartingResources(
 
 final _firstEdition = find.byType(GameCard).first;
 final _secondEdition = find.text('Second Edition');
+final _argentina = find.text('Argentina');
 
 void main() {
   testWidgets('Arnak starting resources opens the setup chart', (tester) async {
@@ -103,7 +104,7 @@ void main() {
     expect(find.byType(GwtStartingResourcesScreen), findsOneWidget);
     for (var seat = 1; seat <= 4; seat++) {
       expect(find.text('Player $seat:'), findsOneWidget);
-      expect(find.text('\$${5 + seat}'), findsOneWidget);
+      expect(find.text('${5 + seat} dollars'), findsOneWidget);
     }
     expect(find.image(coin5), findsNWidgets(4));
     expect(find.image(coin1), findsNWidgets(1 + 2 + 3 + 4));
@@ -149,7 +150,7 @@ void main() {
 
     for (var seat = 1; seat <= 4; seat++) {
       expect(find.text('Player $seat:'), findsOneWidget);
-      expect(find.text('\$${5 + seat}'), findsOneWidget);
+      expect(find.text('${5 + seat} dollars'), findsOneWidget);
       final cards = 3 + seat;
       expect(
         find.byWidgetPredicate(
@@ -182,17 +183,64 @@ void main() {
       find.byKey(const ValueKey('gwt-rails-to-the-north-option')),
       findsNothing,
     );
+    expect(
+      find.byKey(const ValueKey('gwt-exhaustion-card-callout')),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('GWT Argentina starts at 7 pesos with cards and a token', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    const setup = GwtStartingSetup.argentina;
+    await _openStartingResources(tester, gameCard: _argentina);
+
+    for (var seat = 1; seat <= 4; seat++) {
+      expect(find.text('Player $seat:'), findsOneWidget);
+      expect(find.text('${6 + seat} pesos'), findsOneWidget);
+      expect(find.text('${3 + seat} cards'), findsOneWidget);
+    }
+    expect(
+      find.image(AssetImage(setup.coin5Asset)),
+      findsNWidgets(1 + 1 + 1 + 2),
+    );
+    expect(
+      find.image(AssetImage(setup.coin1Asset)),
+      findsNWidgets(2 + 3 + 4 + 0),
+    );
+    expect(find.image(AssetImage(setup.token.asset)), findsNWidgets(4));
+    expect(
+      find.byKey(const ValueKey('gwt-exhaustion-card-callout')),
+      findsOneWidget,
+    );
+    expect(find.image(AssetImage(setup.exhaustionCardAsset!)), findsOneWidget);
+    expect(find.textContaining('1 Exhaustion card'), findsOneWidget);
+    expect(
+      find.text(
+        'Players 2, 3 and 4: discard down to 4 cards at the start of your '
+        'first turn.',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('gwt-rails-to-the-north-option')),
+      findsNothing,
+    );
     expect(tester.takeException(), isNull);
   });
 
   for (final (name, gameCard, setup, railsSwitch) in [
-    ('first', _firstEdition, GwtStartingSetup.firstEdition, true),
-    ('second', _secondEdition, GwtStartingSetup.secondEdition, false),
+    ('first edition', _firstEdition, GwtStartingSetup.firstEdition, true),
+    ('second edition', _secondEdition, GwtStartingSetup.secondEdition, false),
+    ('Argentina', _argentina, GwtStartingSetup.argentina, false),
   ]) {
     for (final width in [360.0, 412.0]) {
-      testWidgets('GWT $name edition player 4 fits one line at ${width}px', (
-        tester,
-      ) async {
+      testWidgets('GWT $name rows fit one line at ${width}px', (tester) async {
         tester.view.physicalSize = Size(width, 900);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
@@ -207,13 +255,14 @@ void main() {
           await pumpFor(tester);
         }
 
-        final seat4Coin5 = tester.getCenter(
-          find.image(AssetImage(setup.coin5Asset)).at(3),
-        );
-        final seat4Token = tester.getCenter(
-          find.image(AssetImage(setup.token.asset)).at(3),
-        );
-        expect(seat4Token.dy, closeTo(seat4Coin5.dy, 1));
+        // A wrapped row would push its token below the label's center line.
+        for (var seat = 1; seat <= 4; seat++) {
+          final label = tester.getCenter(find.text('Player $seat:'));
+          final token = tester.getCenter(
+            find.image(AssetImage(setup.token.asset)).at(seat - 1),
+          );
+          expect(token.dy, closeTo(label.dy, 1), reason: 'Player $seat');
+        }
         expect(tester.takeException(), isNull);
       });
     }
