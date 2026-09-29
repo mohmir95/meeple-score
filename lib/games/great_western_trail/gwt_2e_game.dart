@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'gwt_building_art.dart';
 import 'gwt_buildings_randomizer_screen.dart';
 import 'gwt_edition.dart';
+import 'gwt_starting_resources_screen.dart';
 
 class GreatWesternTrailSecondEditionGame extends GwtEditionGame {
   const GreatWesternTrailSecondEditionGame();
@@ -49,5 +50,13 @@ class GreatWesternTrailSecondEditionGame extends GwtEditionGame {
   @override
   Widget? buildBuildingsRandomizer() {
     return GwtBuildingsRandomizerScreen(game: this);
+  }
+
+  @override
+  Widget? buildStartingResources() {
+    return GwtStartingResourcesScreen(
+      game: this,
+      setup: GwtStartingSetup.secondEdition,
+    );
   }
 }

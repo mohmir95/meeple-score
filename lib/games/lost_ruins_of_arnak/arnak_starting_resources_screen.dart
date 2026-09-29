@@ -11,10 +11,14 @@ class ArnakStartingResourcesScreen extends StatelessWidget {
   static const coinAsset = 'assets/games/lost_ruins_of_arnak/icons/coin.png';
   static const compassAsset =
       'assets/games/lost_ruins_of_arnak/icons/compass.png';
-  static const fundingCardAsset =
+  static const fundingBoatCardAsset =
       'assets/games/lost_ruins_of_arnak/icons/card_funding.png';
-  static const explorationCardAsset =
+  static const fundingCarCardAsset =
+      'assets/games/lost_ruins_of_arnak/icons/card_funding_car.png';
+  static const explorationCarCardAsset =
       'assets/games/lost_ruins_of_arnak/icons/card_exploration.png';
+  static const explorationBoatCardAsset =
+      'assets/games/lost_ruins_of_arnak/icons/card_exploration_boat.png';
   static const fearCardAsset =
       'assets/games/lost_ruins_of_arnak/icons/card_fear.png';
 
@@ -25,10 +29,20 @@ class ArnakStartingResourcesScreen extends StatelessWidget {
     (coins: 1, compasses: 2),
   ];
 
-  static const _deckGroups = <({String asset, String captionKey})>[
-    (asset: fundingCardAsset, captionKey: 'arnak.startingDeck.funding'),
-    (asset: explorationCardAsset, captionKey: 'arnak.startingDeck.exploration'),
-    (asset: fearCardAsset, captionKey: 'arnak.startingDeck.fear'),
+  // Each Funding and Exploration pair has one boat and one car travel icon.
+  static const _deckGroups = <({List<String> assets, String captionKey})>[
+    (
+      assets: [fundingBoatCardAsset, fundingCarCardAsset],
+      captionKey: 'arnak.startingDeck.funding',
+    ),
+    (
+      assets: [explorationCarCardAsset, explorationBoatCardAsset],
+      captionKey: 'arnak.startingDeck.exploration',
+    ),
+    (
+      assets: [fearCardAsset, fearCardAsset],
+      captionKey: 'arnak.startingDeck.fear',
+    ),
   ];
 
   @override
@@ -57,19 +71,12 @@ class ArnakStartingResourcesScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _PanelTitle(
-                        text: l10n.isRtl
-                            ? l10n.t('hub.startingResources')
-                            : l10n.t('hub.startingResources').toUpperCase(),
-                        letterSpacing: l10n.isRtl ? 0 : 1.1,
-                      ),
+                      _PanelTitle(text: l10n.t('hub.startingResources')),
                       SizedBox(height: compact ? 18 : 24),
                       for (var i = 0; i < _rows.length; i++) ...[
                         if (i > 0) SizedBox(height: compact ? 12 : 16),
                         _PlayerResourceRow(
-                          label: l10n.t('players.numbered', {
-                            'n': '${i + 1}',
-                          }),
+                          label: l10n.t('players.numbered', {'n': '${i + 1}'}),
                           coins: _rows[i].coins,
                           compasses: _rows[i].compasses,
                           compact: compact,
@@ -86,10 +93,7 @@ class ArnakStartingResourcesScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _PanelTitle(
-                        text: l10n.t('arnak.startingDeck.title'),
-                        color: const Color(0xFF6B2030),
-                      ),
+                      _PanelTitle(text: l10n.t('arnak.startingDeck.title')),
                       SizedBox(height: compact ? 10 : 12),
                       Text(
                         l10n.t('arnak.startingDeck.body'),
@@ -100,10 +104,7 @@ class ArnakStartingResourcesScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: compact ? 16 : 20),
-                      _DeckGroups(
-                        groups: _deckGroups,
-                        compact: compact,
-                      ),
+                      _DeckGroups(groups: _deckGroups, compact: compact),
                       SizedBox(height: compact ? 16 : 20),
                       Text(
                         l10n.t('arnak.startingDeck.leadersNote'),
@@ -165,15 +166,9 @@ class _SetupPanel extends StatelessWidget {
 }
 
 class _PanelTitle extends StatelessWidget {
-  const _PanelTitle({
-    required this.text,
-    this.color = const Color(0xFF1C1A17),
-    this.letterSpacing = 0,
-  });
+  const _PanelTitle({required this.text});
 
   final String text;
-  final Color color;
-  final double letterSpacing;
 
   @override
   Widget build(BuildContext context) {
@@ -181,10 +176,9 @@ class _PanelTitle extends StatelessWidget {
       text,
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        color: color,
+        color: const Color(0xFF6B2030),
         fontWeight: FontWeight.w800,
         fontStyle: FontStyle.italic,
-        letterSpacing: letterSpacing,
         height: 1.15,
       ),
     );
@@ -251,37 +245,24 @@ class _PlayerResourceRow extends StatelessWidget {
 class _DeckGroups extends StatelessWidget {
   const _DeckGroups({required this.groups, required this.compact});
 
-  final List<({String asset, String captionKey})> groups;
+  final List<({List<String> assets, String captionKey})> groups;
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final children = [
-      for (final group in groups)
-        _DeckGroup(
-          asset: group.asset,
-          caption: l10n.t(group.captionKey),
-        ),
-    ];
-
-    if (compact) {
-      return Column(
-        children: [
-          for (var i = 0; i < children.length; i++) ...[
-            if (i > 0) const SizedBox(height: 16),
-            children[i],
-          ],
-        ],
-      );
-    }
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var i = 0; i < children.length; i++) ...[
-          if (i > 0) const SizedBox(width: 12),
-          Expanded(child: children[i]),
+        for (var i = 0; i < groups.length; i++) ...[
+          if (i > 0) SizedBox(width: compact ? 8 : 12),
+          Expanded(
+            child: _DeckGroup(
+              assets: groups[i].assets,
+              caption: l10n.t(groups[i].captionKey),
+              compact: compact,
+            ),
+          ),
         ],
       ],
     );
@@ -290,74 +271,87 @@ class _DeckGroups extends StatelessWidget {
 
 class _DeckGroup extends StatelessWidget {
   const _DeckGroup({
-    required this.asset,
+    required this.assets,
     required this.caption,
+    required this.compact,
   });
 
-  final String asset;
+  final List<String> assets;
   final String caption;
+  final bool compact;
 
   static const _cardAspect = 648 / 917;
+  static const _maxCardHeight = 156.0;
+
+  /// How far the second card is shifted, as a fraction of the card width.
+  static const _shift = 0.5;
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          height: 170,
-          child: AspectRatio(
-            aspectRatio: 1.45,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final cardHeight = constraints.maxHeight * 0.92;
-                final cardWidth = cardHeight * _cardAspect;
-                final spread = constraints.maxWidth - cardWidth;
-                return Stack(
-                  children: [
-                    for (final (index, angle) in const [(0, -0.07), (1, 0.07)])
-                      Positioned(
-                        left: index * spread,
-                        top: (constraints.maxHeight - cardHeight) / 2,
-                        width: cardWidth,
-                        height: cardHeight,
-                        child: Transform.rotate(
-                          angle: angle,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x33000000),
-                                  blurRadius: 6,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Image.asset(
-                              asset,
-                              fit: BoxFit.contain,
-                              filterQuality: FilterQuality.medium,
-                              semanticLabel: index == 0 ? caption : null,
-                              excludeFromSemantics: index != 0,
-                            ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final cardWidth = (constraints.maxWidth / (1 + _shift)).clamp(
+              0.0,
+              _maxCardHeight * _cardAspect,
+            );
+            final cardHeight = cardWidth / _cardAspect;
+            final fanWidth = cardWidth * (1 + _shift);
+            final left = (constraints.maxWidth - fanWidth) / 2;
+            // Extra room so the tilted corners aren't clipped.
+            final height = cardHeight * 1.06;
+            return SizedBox(
+              height: height,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  for (final (index, angle) in const [(0, -0.07), (1, 0.07)])
+                    Positioned(
+                      left: left + index * cardWidth * _shift,
+                      top: (height - cardHeight) / 2,
+                      width: cardWidth,
+                      height: cardHeight,
+                      child: Transform.rotate(
+                        angle: angle,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x33000000),
+                                blurRadius: 6,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Image.asset(
+                            assets[index],
+                            fit: BoxFit.contain,
+                            filterQuality: FilterQuality.medium,
+                            semanticLabel: index == 0 ? caption : null,
+                            excludeFromSemantics: index != 0,
                           ),
                         ),
                       ),
-                  ],
-                );
-              },
-            ),
-          ),
+                    ),
+                ],
+              ),
+            );
+          },
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: compact ? 6 : 10),
         Text(
           caption,
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: const Color(0xFF2A2620),
-            fontWeight: FontWeight.w700,
-          ),
+          style: (compact ? textTheme.labelMedium : textTheme.titleSmall)
+              ?.copyWith(
+                color: const Color(0xFF2A2620),
+                fontWeight: FontWeight.w700,
+                height: 1.2,
+              ),
         ),
       ],
     );

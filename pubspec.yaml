@@ -62,6 +62,7 @@ flutter:
     - assets/games/great_western_trail_2e/cover.webp
     - assets/games/great_western_trail_2e/buildings/public/
     - assets/games/great_western_trail_2e/buildings/private/
+    - assets/games/great_western_trail_2e/icons/
     - assets/games/great_western_trail_argentina/cover.webp
     - assets/games/great_western_trail_argentina/buildings/public/
     - assets/games/great_western_trail_argentina/buildings/private/

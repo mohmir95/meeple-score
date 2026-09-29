@@ -759,7 +759,7 @@ void main() {
       find.byKey(const ValueKey('hub-starting-resources')),
       findsOneWidget,
     );
-    expect(find.text('Coming Soon'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsNothing);
     expect(gwt.width, lessThan(220));
     expect(gwt.width, closeTo(gwt.height, 2));
 

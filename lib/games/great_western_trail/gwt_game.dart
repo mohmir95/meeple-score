@@ -39,6 +39,9 @@ class GreatWesternTrailGame extends GwtEditionGame {
 
   @override
   Widget? buildStartingResources() {
-    return GwtStartingResourcesScreen(game: this);
+    return GwtStartingResourcesScreen(
+      game: this,
+      setup: GwtStartingSetup.firstEdition,
+    );
   }
 }
