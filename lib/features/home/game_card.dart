@@ -37,6 +37,7 @@ class GameCard extends StatelessWidget {
         : Theme.of(context).textTheme.titleLarge;
     final showEdition = context.l10n.has('${game.l10nPrefix}.edition');
     final inset = compact ? 10.0 : 16.0;
+    const gold = Color(0xFFF8E5B0);
 
     return Material(
       color: Colors.transparent,
@@ -110,7 +111,7 @@ class GameCard extends StatelessWidget {
                                   Text(
                                     context.l10n.t('${game.l10nPrefix}.edition'),
                                     style: editionStyle?.copyWith(
-                                      color: const Color(0xFFF8E5B0),
+                                      color: gold,
                                       fontWeight: FontWeight.w800,
                                       height: 1.15,
                                       shadows: const [
@@ -128,7 +129,7 @@ class GameCard extends StatelessWidget {
                                       '${game.l10nPrefix}.name',
                                     ),
                                     style: editionStyle?.copyWith(
-                                      color: Colors.white,
+                                      color: gold,
                                       fontWeight: FontWeight.w800,
                                       height: 1.15,
                                       shadows: const [

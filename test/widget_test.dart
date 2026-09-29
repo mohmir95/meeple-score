@@ -69,7 +69,7 @@ void main() {
     expect(find.text('Scoresheet'), findsOneWidget);
     expect(find.text('Buildings Randomizer'), findsOneWidget);
     expect(find.text('Starting Resources'), findsOneWidget);
-    expect(find.text('Coming Soon'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsNothing);
 
     await tester.tap(find.text('Scoresheet'));
     await pumpFor(tester);
@@ -265,7 +265,7 @@ void main() {
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Buildings Randomizer'));
     expect(find.text('Starting Resources'), findsOneWidget);
-    expect(find.text('Coming Soon'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsNothing);
 
     await tester.tap(find.text('Buildings Randomizer'));
     await pumpFor(tester);
