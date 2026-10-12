@@ -158,10 +158,14 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
     final cards = find.byType(GameCard);
+    expect(cards, findsNWidgets(5));
     final first = tester.getRect(cards.first);
+    final rowStart = tester.getRect(cards.at(3));
     final last = tester.getRect(cards.last);
-    expect(last.top, greaterThan(first.bottom));
-    expect(last.left, closeTo(first.left, 1));
+    expect(rowStart.top, greaterThan(first.bottom));
+    expect(rowStart.left, closeTo(first.left, 1));
+    expect(last.top, closeTo(rowStart.top, 1));
+    expect(last.left, greaterThan(rowStart.right));
 
     // The grid as a whole stays centered on the page.
     final right = tester.getRect(cards.at(2)).right;
@@ -1010,6 +1014,102 @@ void main() {
     }
   });
 
+  testWidgets('home shows the Castles of Burgundy Special Edition banner', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await pumpScoreSheetApp(tester);
+    await pumpUntilFound(tester, find.text('Special Edition'));
+
+    expect(find.text('The Castles of Burgundy'), findsOneWidget);
+    expect(find.text('Special Edition'), findsOneWidget);
+    expect(
+      find.image(
+        const AssetImage('assets/games/castles_of_burgundy/cover.webp'),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Special Edition'));
+    await pumpFor(tester);
+    await pumpUntilFound(tester, find.text('Quick Reference (In Persian)'));
+    expect(find.text('Scoresheet'), findsNothing);
+    expect(find.text('Buildings Randomizer'), findsNothing);
+    expect(find.text('Starting Resources'), findsNothing);
+
+    await tester.tap(find.text('Quick Reference (In Persian)'));
+    await pumpFor(tester);
+    await pumpUntilFound(tester, find.byKey(const ValueKey('cob-reference-front')));
+    expect(
+      find.image(
+        const AssetImage(
+          'assets/games/castles_of_burgundy/quick_reference_front.png',
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.image(
+        const AssetImage(
+          'assets/games/castles_of_burgundy/quick_reference_back.png',
+        ),
+      ),
+      findsNothing,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('cob-reference-flip')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(
+      find.image(
+        const AssetImage(
+          'assets/games/castles_of_burgundy/quick_reference_back.png',
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.image(
+        const AssetImage(
+          'assets/games/castles_of_burgundy/quick_reference_front.png',
+        ),
+      ),
+      findsNothing,
+    );
+    expect(find.text('Front'), findsNothing);
+    expect(find.text('Back'), findsNothing);
+    expect(find.text('Tap the sheet to turn it over.'), findsOneWidget);
+    expect(find.text('Pinch to zoom in and out.'), findsOneWidget);
+    expect(find.text('Drag on the sheet to magnify a detail.'), findsOneWidget);
+
+    final sheet = find.byKey(const ValueKey('cob-reference-back'));
+    final gesture = await tester.startGesture(tester.getCenter(sheet));
+    await gesture.moveBy(const Offset(28, 20));
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('cob-reference-magnifier')),
+      findsOneWidget,
+    );
+    await gesture.moveBy(const Offset(24, 36));
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('cob-reference-magnifier')),
+      findsOneWidget,
+    );
+    await gesture.up();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+    expect(
+      find.byKey(const ValueKey('cob-reference-magnifier')),
+      findsNothing,
+    );
+
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('language toggle switches English and Persian', (tester) async {
     tester.view.physicalSize = const Size(1200, 1600);
     tester.view.devicePixelRatio = 1.0;
@@ -1027,5 +1127,7 @@ void main() {
     expect(find.text('نسخه دوم'), findsOneWidget);
     expect(find.text('آرژانتین'), findsOneWidget);
     expect(find.text('ویرانه‌های گمشده آرناک'), findsOneWidget);
+    expect(find.text('قلعه‌های بورگوندی'), findsOneWidget);
+    expect(find.text('نسخه ویژه'), findsOneWidget);
   });
 }

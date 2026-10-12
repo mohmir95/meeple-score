@@ -8,6 +8,7 @@
   "home.resume": "ادامه",
   "home.lastGame": "بازی قبلی",
   "hub.scoresheet": "برگه امتیاز",
+  "hub.quickReferencePersian": "راهنمای سریع (فارسی)",
   "hub.buildingsRandomizer": "تصادفی‌ساز ساختمان‌ها",
   "hub.startingResources": "منابع شروع",
   "hub.comingSoon": "به زودی",
@@ -206,5 +207,17 @@
   "arnak.startingDeck.body": "هر بازیکن دسته خودش را دارد و همه دسته‌ها یکسان شروع می‌شوند. دسته شما باید ۴ کارت پایه به رنگ خودتان به اضافه ۲ کارت ترس داشته باشد:",
   "arnak.startingDeck.funding": "۲ کارت تأمین مالی",
   "arnak.startingDeck.exploration": "۲ کارت اکتشاف",
-  "arnak.startingDeck.fear": "۲ کارت ترس"
+  "arnak.startingDeck.fear": "۲ کارت ترس",
+  "game.cobse.name": "قلعه‌های بورگوندی نسخه ویژه",
+  "game.cobse.series": "قلعه‌های بورگوندی",
+  "game.cobse.edition": "نسخه ویژه",
+  "game.cobse.description": "در دوک‌نشین بورگوندی املاک بسازید. در پنج مرحله کاشی برمی‌دارید، ناحیه‌های رنگی را کامل می‌کنید، کالا می‌فروشید و روی مسیر امتیاز بالا می‌روید. نسخه ویژه بازی انفرادی و کاشی‌های افزونه را اضافه می‌کند.",
+  "game.cobse.playTime": "۳۰–۹۰ دقیقه",
+  "cob.quickReference.front": "رو",
+  "cob.quickReference.back": "پشت",
+  "cob.quickReference.flip": "پشت و رو",
+  "cob.quickReference.hint": "برای دیدن روی دیگر، روی برگه بزنید.",
+  "cob.quickReference.pinch": "برای بزرگ و کوچک کردن، دو انگشت را باز و بسته کنید.",
+  "cob.quickReference.drag": "برای ذره‌بین، انگشت را روی برگه بکشید.",
+  "cob.quickReference.magnifier": "ذره‌بین"
 }

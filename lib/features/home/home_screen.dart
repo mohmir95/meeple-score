@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     final session = sessions[activeId];
     final game = widget.registry.tryLookup(activeId);
-    if (session == null || game == null || !mounted) {
+    if (session == null || game == null || !game.hasScoresheet || !mounted) {
       return;
     }
     await _openSaved(game, session);
@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _cardFor(BoardGame game) {
-    final session = _sessions[game.id];
+    final session = game.hasScoresheet ? _sessions[game.id] : null;
     return GameCard(
       game: game,
       session: session,

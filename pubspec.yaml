@@ -67,6 +67,9 @@ flutter:
     - assets/games/great_western_trail_argentina/buildings/public/
     - assets/games/great_western_trail_argentina/buildings/private/
     - assets/games/lost_ruins_of_arnak/cover.webp
+    - assets/games/castles_of_burgundy/cover.webp
+    - assets/games/castles_of_burgundy/quick_reference_front.png
+    - assets/games/castles_of_burgundy/quick_reference_back.png
     - assets/games/great_western_trail/icons/
     - assets/games/great_western_trail/buildings/placeholder.jpg
     - assets/games/great_western_trail/buildings/private/

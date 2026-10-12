@@ -2,6 +2,7 @@ import 'package:board_game_score_sheet/data/shared_preferences_session_repositor
 import 'package:board_game_score_sheet/domain/game_registry.dart';
 import 'package:board_game_score_sheet/domain/models/game_session.dart';
 import 'package:board_game_score_sheet/domain/models/player.dart';
+import 'package:board_game_score_sheet/games/castles_of_burgundy/cob_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_argentina_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_game.dart';
@@ -12,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   test('registry exposes Great Western Trail editions', () {
     final registry = GameRegistry();
-    expect(registry.games, hasLength(4));
+    expect(registry.games, hasLength(5));
     expect(
       registry.lookup(GreatWesternTrailGame.idValue),
       isA<GreatWesternTrailGame>(),
@@ -28,6 +29,10 @@ void main() {
     expect(
       registry.lookup(LostRuinsOfArnakGame.idValue),
       isA<LostRuinsOfArnakGame>(),
+    );
+    expect(
+      registry.lookup(CastlesOfBurgundySpecialEditionGame.idValue),
+      isA<CastlesOfBurgundySpecialEditionGame>(),
     );
     expect(registry.tryLookup('simple_tally'), isNull);
   });

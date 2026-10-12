@@ -8,6 +8,7 @@
   "home.resume": "Resume",
   "home.lastGame": "Last game",
   "hub.scoresheet": "Scoresheet",
+  "hub.quickReferencePersian": "Quick Reference (In Persian)",
   "hub.buildingsRandomizer": "Buildings Randomizer",
   "hub.startingResources": "Starting Resources",
   "hub.comingSoon": "Coming Soon",
@@ -206,5 +207,17 @@
   "arnak.startingDeck.body": "Each player has their own deck, and all decks start the same. Your deck should have the 4 basic cards in your color, plus 2 Fear cards:",
   "arnak.startingDeck.funding": "2 Funding cards",
   "arnak.startingDeck.exploration": "2 Exploration cards",
-  "arnak.startingDeck.fear": "2 Fear cards"
+  "arnak.startingDeck.fear": "2 Fear cards",
+  "game.cobse.name": "The Castles of Burgundy Special Edition",
+  "game.cobse.series": "The Castles of Burgundy",
+  "game.cobse.edition": "Special Edition",
+  "game.cobse.description": "Settle estates in the Duchy of Burgundy. Across five phases you draft tiles, complete colored regions, sell goods, and climb the victory track. The Special Edition adds solo play and the expansion tiles.",
+  "game.cobse.playTime": "30–90 min",
+  "cob.quickReference.front": "Front",
+  "cob.quickReference.back": "Back",
+  "cob.quickReference.flip": "Flip",
+  "cob.quickReference.hint": "Tap the sheet to turn it over.",
+  "cob.quickReference.pinch": "Pinch to zoom in and out.",
+  "cob.quickReference.drag": "Drag on the sheet to magnify a detail.",
+  "cob.quickReference.magnifier": "Magnifier"
 }

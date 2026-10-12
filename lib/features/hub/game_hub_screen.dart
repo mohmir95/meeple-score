@@ -33,21 +33,37 @@ class GameHubScreen extends StatelessWidget {
           final randomizer = game.buildBuildingsRandomizer();
           final startingResources = game.buildStartingResources();
           final tiles = <Widget>[
-            _HubBanner(
-              key: const ValueKey('hub-scoresheet'),
-              title: l10n.t('hub.scoresheet'),
-              icon: Icons.grid_on_rounded,
-              color: game.accentColor,
-              compact: compact,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (context) =>
-                        SetupScreen(game: game, repository: repository),
-                  ),
-                );
-              },
-            ),
+            if (game.showQuickReference)
+              _HubBanner(
+                key: const ValueKey('hub-quick-reference'),
+                title: l10n.t(game.quickReferenceTitleKey),
+                icon: Icons.menu_book_outlined,
+                color: game.accentColor,
+                compact: compact,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) => game.buildQuickReference(),
+                    ),
+                  );
+                },
+              )
+            else
+              _HubBanner(
+                key: const ValueKey('hub-scoresheet'),
+                title: l10n.t('hub.scoresheet'),
+                icon: Icons.grid_on_rounded,
+                color: game.accentColor,
+                compact: compact,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) =>
+                          SetupScreen(game: game, repository: repository),
+                    ),
+                  );
+                },
+              ),
             if (game.showBuildingsRandomizer)
               _HubBanner(
                 key: const ValueKey('hub-buildings-randomizer'),

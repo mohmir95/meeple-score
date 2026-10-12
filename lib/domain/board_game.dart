@@ -57,6 +57,16 @@ abstract class BoardGame {
   /// Ready starting-resources UI. Null keeps the hub tile disabled as Coming Soon.
   Widget? buildStartingResources() => null;
 
+  /// Replaces the scoresheet hub tile with a reference sheet.
+  bool get showQuickReference => false;
+
+  String get quickReferenceTitleKey => 'hub.quickReferencePersian';
+
+  Widget buildQuickReference() => const SizedBox.shrink();
+
+  /// False when the hub has no playable score sheet to resume.
+  bool get hasScoresheet => !showQuickReference;
+
   GameConfig createDefaultConfig();
 
   GameConfig configFromJson(Map<String, dynamic> json);
