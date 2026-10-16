@@ -8,6 +8,8 @@ import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
 import '../../shared/player_colors.dart';
 import 'cob_config.dart';
+import 'cob_palette.dart';
+import 'cob_duchy_randomizer_screen.dart';
 import 'cob_player_line.dart';
 import 'cob_quick_reference_screen.dart';
 import 'cob_scoring.dart';
@@ -71,12 +73,13 @@ class CastlesOfBurgundySpecialEditionGame extends BoardGame {
   Widget buildQuickReference() => const CobQuickReferenceScreen();
 
   @override
-  List<PlayerColorOption> get playerColors => const [
-    PlayerColorOption(name: 'Yellow', color: Color(0xFFF9A825)),
-    PlayerColorOption(name: 'Blue', color: Color(0xFF1565C0)),
-    PlayerColorOption(name: 'Green', color: Color(0xFF2E7D32)),
-    PlayerColorOption(name: 'Red', color: Color(0xFFC62828)),
-  ];
+  bool get showDuchyBoardRandomizer => true;
+
+  @override
+  Widget? buildDuchyBoardRandomizer() => const CobDuchyRandomizerScreen();
+
+  @override
+  List<PlayerColorOption> get playerColors => cobPlayerColors;
 
   @override
   GameConfig createDefaultConfig() => const CobConfig();

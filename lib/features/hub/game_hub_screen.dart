@@ -32,6 +32,7 @@ class GameHubScreen extends StatelessWidget {
           final padding = compact ? 12.0 : 20.0;
           final randomizer = game.buildBuildingsRandomizer();
           final startingResources = game.buildStartingResources();
+          final duchyBoards = game.buildDuchyBoardRandomizer();
           final tiles = <Widget>[
             if (game.showQuickReference)
               _HubBanner(
@@ -102,6 +103,26 @@ class GameHubScreen extends StatelessWidget {
                           MaterialPageRoute<void>(
                             builder: (context) =>
                                 game.buildStartingResources()!,
+                          ),
+                        );
+                      },
+              ),
+            if (game.showDuchyBoardRandomizer)
+              _HubBanner(
+                key: const ValueKey('hub-duchy-randomizer'),
+                title: l10n.t('hub.duchyBoardRandomizer'),
+                icon: Icons.hexagon_outlined,
+                color: game.accentColor,
+                compact: compact,
+                enabled: duchyBoards != null,
+                badge: duchyBoards == null ? l10n.t('hub.comingSoon') : null,
+                onTap: duchyBoards == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) =>
+                                game.buildDuchyBoardRandomizer()!,
                           ),
                         );
                       },

@@ -60,7 +60,9 @@ class PlayerEditor extends StatelessWidget {
       return;
     }
     final next = [...players];
-    final takenBy = next.indexWhere((player) => player.colorValue == colorValue);
+    final takenBy = next.indexWhere(
+      (player) => player.colorValue == colorValue,
+    );
     final previous = next[index].colorValue;
     next[index] = next[index].copyWith(colorValue: colorValue);
     if (takenBy != -1 && takenBy != index && uniqueColors) {
@@ -85,14 +87,17 @@ class PlayerEditor extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.t('players.title'), style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          l10n.t('players.title'),
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         const SizedBox(height: 8),
         for (var i = 0; i < players.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Row(
               children: [
-                _PlayerColorBadge(
+                PlayerColorBadge(
                   number: i + 1,
                   colorValue: players[i].colorValue,
                   colorName: _colorName(context, players[i].colorValue),
@@ -108,7 +113,9 @@ class PlayerEditor extends StatelessWidget {
                     enabled: !readOnly,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
-                      labelText: l10n.t('players.fieldLabel', {'n': '${i + 1}'}),
+                      labelText: l10n.t('players.fieldLabel', {
+                        'n': '${i + 1}',
+                      }),
                       border: const OutlineInputBorder(),
                     ),
                     onChanged: (value) => _rename(i, value),
@@ -117,8 +124,9 @@ class PlayerEditor extends StatelessWidget {
                 if (!readOnly)
                   IconButton(
                     tooltip: l10n.t('players.remove'),
-                    onPressed:
-                        players.length > minPlayers ? () => _remove(i) : null,
+                    onPressed: players.length > minPlayers
+                        ? () => _remove(i)
+                        : null,
                     icon: const Icon(Icons.remove_circle_outline),
                   ),
               ],
@@ -130,15 +138,18 @@ class PlayerEditor extends StatelessWidget {
                 ? l10n.t('players.limitReached')
                 : l10n.t('players.add'),
             icon: Icons.person_add_alt_1,
-            onPressed: players.length >= maxPlayers ? null : () => _add(context),
+            onPressed: players.length >= maxPlayers
+                ? null
+                : () => _add(context),
           ),
       ],
     );
   }
 }
 
-class _PlayerColorBadge extends StatelessWidget {
-  const _PlayerColorBadge({
+class PlayerColorBadge extends StatelessWidget {
+  const PlayerColorBadge({
+    super.key,
     required this.number,
     required this.colorValue,
     required this.colorName,

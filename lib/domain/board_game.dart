@@ -57,6 +57,12 @@ abstract class BoardGame {
   /// Ready starting-resources UI. Null keeps the hub tile disabled as Coming Soon.
   Widget? buildStartingResources() => null;
 
+  /// Hub tile for the Castles of Burgundy duchy board randomizer.
+  bool get showDuchyBoardRandomizer => false;
+
+  /// Ready randomizer UI. Null keeps the hub tile disabled as Coming Soon.
+  Widget? buildDuchyBoardRandomizer() => null;
+
   /// Replaces the scoresheet hub tile with a reference sheet.
   bool get showQuickReference => false;
 
