@@ -1038,7 +1038,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Quick Reference (In Persian)'));
     expect(find.text('Scoresheet'), findsNothing);
     expect(find.text('Buildings Randomizer'), findsNothing);
-    expect(find.text('Starting Resources'), findsNothing);
+    expect(find.text('Starting Resources'), findsOneWidget);
     expect(find.text('Duchy Board Randomizer'), findsOneWidget);
 
     await tester.tap(find.text('Quick Reference (In Persian)'));

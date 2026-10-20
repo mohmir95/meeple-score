@@ -1,4 +1,5 @@
 import 'package:board_game_score_sheet/features/home/game_card.dart';
+import 'package:board_game_score_sheet/games/castles_of_burgundy/cob_starting_resources_screen.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_starting_resources_screen.dart';
 import 'package:board_game_score_sheet/games/lost_ruins_of_arnak/arnak_starting_resources_screen.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,83 @@ final _secondEdition = find.text('Second Edition');
 final _argentina = find.text('Argentina');
 
 void main() {
+  testWidgets('CoB starting resources opens the setup chart', (tester) async {
+    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final locale = await createTestLocale();
+    await pumpScoreSheetApp(tester, localeController: locale);
+    await pumpUntilFound(tester, find.text('Special Edition'));
+    await tester.tap(find.text('Special Edition'));
+    await pumpFor(tester);
+    await pumpUntilFound(tester, find.text('Starting Resources'));
+
+    await tester.tap(find.text('Starting Resources'));
+    await pumpFor(tester);
+    await pumpUntilFound(
+      tester,
+      find.byKey(const ValueKey('cob-starting-resources-panel')),
+    );
+    expect(find.byType(CobStartingResourcesScreen), findsOneWidget);
+    expect(find.text('Player 1:'), findsOneWidget);
+    expect(find.text('Player 4:'), findsOneWidget);
+    expect(
+      find.image(
+        const AssetImage('assets/games/castles_of_burgundy/icons/worker.png'),
+      ),
+      findsNWidgets(10),
+    );
+    expect(
+      find.image(
+        const AssetImage('assets/games/castles_of_burgundy/icons/silver.png'),
+      ),
+      findsNWidgets(4),
+    );
+    expect(
+      find.image(
+        const AssetImage('assets/games/castles_of_burgundy/icons/goods.png'),
+      ),
+      findsNWidgets(12),
+    );
+    expect(find.textContaining('hand out workers clockwise'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final width in [360.0, 412.0]) {
+    testWidgets('CoB rows fit one line at ${width}px', (tester) async {
+      tester.view.physicalSize = Size(width, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      final locale = await createTestLocale();
+      await pumpScoreSheetApp(tester, localeController: locale);
+      await pumpUntilFound(tester, find.text('Special Edition'));
+      await tester.tap(find.text('Special Edition'));
+      await pumpFor(tester);
+      await pumpUntilFound(tester, find.text('Starting Resources'));
+      await tester.tap(find.text('Starting Resources'));
+      await pumpFor(tester);
+      await pumpUntilFound(
+        tester,
+        find.byKey(const ValueKey('cob-starting-resources-panel')),
+      );
+
+      // A wrapped row would push its last worker below the label's center.
+      final workers = find.image(
+        const AssetImage('assets/games/castles_of_burgundy/icons/worker.png'),
+      );
+      var lastWorker = -1;
+      for (var seat = 1; seat <= 4; seat++) {
+        lastWorker += seat;
+        final label = tester.getCenter(find.text('Player $seat:'));
+        final worker = tester.getCenter(workers.at(lastWorker));
+        expect(worker.dy, closeTo(label.dy, 1), reason: 'Player $seat');
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('Arnak starting resources opens the setup chart', (tester) async {
     tester.view.physicalSize = const Size(1200, 1600);
     tester.view.devicePixelRatio = 1.0;

@@ -249,5 +249,9 @@
   "cob.duchy.hint.borderPosts": "Each player receives one random duchy numbered 23–30. The border posts are on the player board, so this expansion can also be played with any other duchy.",
   "cob.duchy.hint.team": "Each team uses halves 31a and 32a. The other side, 31b and 32b, is the advanced team board.",
   "cob.duchy.hint.solo": "The solo game uses one duchy. Side 33 is for beginning players. Side 34 is the advanced side.",
-  "cob.duchy.tileSemantics": "{player}, duchy {id}"
+  "cob.duchy.tileSemantics": "{player}, duchy {id}",
+  "cob.silver": "Silver coin",
+  "cob.worker": "Worker",
+  "cob.goods": "Goods tile",
+  "cob.startingResources.note": "After you determine the starting player, hand out workers clockwise: 1, then 2, 3, and 4. Every player also receives 1 silver coin and 3 random goods tiles."
 }

@@ -70,6 +70,7 @@ flutter:
     - assets/games/castles_of_burgundy/cover.webp
     - assets/games/castles_of_burgundy/quick_reference_front.png
     - assets/games/castles_of_burgundy/quick_reference_back.png
+    - assets/games/castles_of_burgundy/icons/
     - assets/games/great_western_trail/icons/
     - assets/games/great_western_trail/buildings/placeholder.jpg
     - assets/games/great_western_trail/buildings/private/
