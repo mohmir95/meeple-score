@@ -209,6 +209,9 @@ void main() {
       ),
       findsOneWidget,
     );
+    // Row descriptions moved out of the cell and into a tooltip.
+    expect(find.text('5 dollars = 1 VP'), findsNothing);
+    expect(find.byTooltip('5 dollars = 1 VP'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

@@ -61,7 +61,6 @@
   "score.scores": "Scores",
   "score.pad": "Score pad",
   "score.padHint": "Tap a cell to enter points. Tap the 3-VP disc and job market token rows to toggle them.",
-  "score.padHintMobile": "Tap a player's score to edit it.",
   "score.totals": "Totals",
   "score.total": "Total",
   "score.totalHint": "Sum of VP",

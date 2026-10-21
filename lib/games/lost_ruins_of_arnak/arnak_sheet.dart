@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../app/theme.dart';
 import '../../domain/models/player.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/l10n_scope.dart';
@@ -287,14 +286,12 @@ class ArnakSheet extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Same table on every screen size; phones get tighter columns and
+        // scroll horizontally when the players don't fit.
         final compact = constraints.maxWidth < Breakpoints.compact;
-        if (compact) {
-          return _buildMobilePad(context, rows);
-        }
-
         final players = state.players.length;
-        const labelWidth = 168.0;
-        const minCol = 96.0;
+        final labelWidth = compact ? 84.0 : 160.0;
+        final minCol = compact ? 72.0 : 96.0;
         final openWidth = math.max(0.0, constraints.maxWidth - labelWidth);
         final columnWidth = players == 0
             ? minCol
@@ -303,8 +300,8 @@ class ArnakSheet extends StatelessWidget {
         final metrics = _PadMetrics(
           labelWidth: labelWidth,
           columnWidth: columnWidth,
-          rowHeight: 58,
-          compact: false,
+          rowHeight: compact ? 56 : 50,
+          compact: compact,
         );
 
         return Column(
@@ -348,254 +345,6 @@ class ArnakSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildMobilePad(BuildContext context, List<_ArnakRow> rows) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.t('score.pad'),
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-            color: _ink,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          context.l10n.t('score.padHintMobile'),
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: _muted),
-        ),
-        const SizedBox(height: 12),
-        _mobileTotals(context),
-        const SizedBox(height: 12),
-        for (final row in rows) ...[
-          _mobileCategory(context, row),
-          const SizedBox(height: 10),
-        ],
-      ],
-    );
-  }
-
-  Widget _mobileTotals(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppTheme.brand,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.l10n.t('score.totals'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                for (var i = 0; i < state.players.length; i++) ...[
-                  if (i > 0) const SizedBox(width: 8),
-                  Expanded(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.16),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 8,
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              state.players[i].name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${ArnakScoring.totalFor(state.lineFor(state.players[i].id))}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                fontSize: 22,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _mobileCategory(BuildContext context, _ArnakRow row) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _grid),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                _sheetIcon(row, size: 32, color: AppTheme.brand),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        row.title,
-                        style: const TextStyle(
-                          color: _ink,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        row.hint,
-                        style: const TextStyle(
-                          color: _muted,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            _mobileScoreButtons(row),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _mobileScoreButtons(_ArnakRow row) {
-    final twoCol = state.players.length >= 3;
-    final buttons = [
-      for (final player in state.players) _mobileScoreButton(player, row),
-    ];
-    if (!twoCol) {
-      return Row(
-        children: [
-          for (var i = 0; i < buttons.length; i++) ...[
-            if (i > 0) const SizedBox(width: 8),
-            Expanded(child: buttons[i]),
-          ],
-        ],
-      );
-    }
-    return Column(
-      children: [
-        for (var i = 0; i < buttons.length; i += 2) ...[
-          if (i > 0) const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(child: buttons[i]),
-              const SizedBox(width: 8),
-              Expanded(
-                child: i + 1 < buttons.length
-                    ? buttons[i + 1]
-                    : const SizedBox.shrink(),
-              ),
-            ],
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _mobileScoreButton(Player player, _ArnakRow row) {
-    final line = state.lineFor(player.id);
-    final label = '${row.valueOf(line)}';
-    return Material(
-      color: _paper,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: readOnly ? null : () => row.onEdit?.call(player, line),
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 72),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: playerColor(player.colorValue), width: 2),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: playerColor(player.colorValue),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: playerColorOutline(player.colorValue),
-                        width: isLightPlayerColor(player.colorValue) ? 1 : 0,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      player.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: _ink,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: _ink,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 24,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildHeader(BuildContext context, _PadMetrics metrics) {
     return SizedBox(
       height: metrics.rowHeight,
@@ -606,7 +355,6 @@ class ArnakSheet extends StatelessWidget {
             metrics: metrics,
             icon: Icons.shield_outlined,
             title: context.l10n.t('game.arnak.headerPlayers'),
-            hint: '',
             color: _header,
             bold: true,
           ),
@@ -645,6 +393,9 @@ class ArnakSheet extends StatelessWidget {
     );
   }
 
+  /// Zero cells (scores and totals) stay blank so the pad reads like paper.
+  static String _cellText(String text) => text == '0' ? '' : text;
+
   Widget _buildRow(BuildContext context, _ArnakRow row, _PadMetrics metrics) {
     return SizedBox(
       height: metrics.rowHeight,
@@ -666,13 +417,10 @@ class ArnakSheet extends StatelessWidget {
               metrics: metrics,
               onTap: readOnly
                   ? null
-                  : () => row.onEdit?.call(
-                      player,
-                      state.lineFor(player.id),
-                    ),
+                  : () => row.onEdit?.call(player, state.lineFor(player.id)),
               color: row.color,
               child: Text(
-                '${row.valueOf(state.lineFor(player.id))}',
+                _cellText('${row.valueOf(state.lineFor(player.id))}'),
                 style: TextStyle(
                   color: _ink,
                   fontWeight: FontWeight.w800,
@@ -706,7 +454,7 @@ class ArnakSheet extends StatelessWidget {
               metrics: metrics,
               color: _header,
               child: Text(
-                '${ArnakScoring.totalFor(state.lineFor(player.id))}',
+                _cellText('${ArnakScoring.totalFor(state.lineFor(player.id))}'),
                 style: TextStyle(
                   color: _ink,
                   fontWeight: FontWeight.w900,
@@ -716,16 +464,6 @@ class ArnakSheet extends StatelessWidget {
             ),
         ],
       ),
-    );
-  }
-
-  Widget _sheetIcon(_ArnakRow row, {required double size, Color? color}) {
-    return _padIcon(
-      icon: row.icon,
-      iconAsset: row.iconAsset,
-      size: size,
-      wide: row.wideIcon,
-      color: color ?? _ink,
     );
   }
 
@@ -759,61 +497,80 @@ class ArnakSheet extends StatelessWidget {
     String? iconAsset,
     bool wideIcon = false,
     required String title,
-    required String hint,
+    String hint = '',
     required Color color,
     bool bold = false,
   }) {
-    return Container(
+    final cell = Container(
       width: metrics.labelWidth,
       height: metrics.rowHeight,
-      padding: EdgeInsets.symmetric(horizontal: metrics.compact ? 8 : 10),
+      padding: EdgeInsets.symmetric(horizontal: metrics.compact ? 4 : 10),
       decoration: BoxDecoration(
         color: color,
         border: Border.all(color: _grid),
       ),
-      child: Row(
-        children: [
-          _padIcon(
-            icon: icon,
-            iconAsset: iconAsset,
-            size: metrics.compact ? 32 : 30,
-            wide: wideIcon,
-            color: _ink,
-          ),
-          SizedBox(width: metrics.compact ? 6 : 8),
-          Expanded(
-            child: Column(
+      // Phones stack the label under the icon to keep the column narrow.
+      child: metrics.compact
+          ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _padIcon(
+                  icon: icon,
+                  iconAsset: iconAsset,
+                  size: 24,
+                  wide: wideIcon,
+                  color: _ink,
+                ),
+                const SizedBox(height: 2),
                 Text(
                   title,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: _ink,
                     fontWeight: bold ? FontWeight.w800 : FontWeight.w700,
-                    fontSize: metrics.compact ? 13 : 14,
-                    height: 1.15,
+                    fontSize: 11,
+                    height: 1.1,
                   ),
                 ),
-                if (hint.isNotEmpty)
-                  Text(
-                    hint,
-                    maxLines: 2,
+              ],
+            )
+          : Row(
+              children: [
+                _padIcon(
+                  icon: icon,
+                  iconAsset: iconAsset,
+                  size: 30,
+                  wide: wideIcon,
+                  color: _ink,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: _muted,
-                      fontSize: metrics.compact ? 11 : 11,
+                      color: _ink,
+                      fontWeight: bold ? FontWeight.w800 : FontWeight.w700,
+                      fontSize: 14,
                       height: 1.15,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                ),
               ],
             ),
-          ),
-        ],
-      ),
+    );
+    if (hint.isEmpty) {
+      return cell;
+    }
+    // Descriptions live in a tooltip: hover on desktop, tap on phones.
+    return Tooltip(
+      message: hint,
+      triggerMode: TooltipTriggerMode.tap,
+      showDuration: const Duration(seconds: 4),
+      child: cell,
     );
   }
 
@@ -867,6 +624,7 @@ class _ArnakRow {
   });
 
   final String title;
+
   final String hint;
   final IconData icon;
   final String? iconAsset;

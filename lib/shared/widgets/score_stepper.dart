@@ -35,48 +35,10 @@ class ScoreStepper extends StatelessWidget {
   }
 
   Future<void> _edit(BuildContext context) async {
-    final l10n = context.l10n;
-    final controller = TextEditingController(text: '$value');
     final next = await showDialog<int>(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(
-            label == null
-                ? l10n.t('score.enter')
-                : l10n.t('score.enterFor', {'label': label!}),
-          ),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(signed: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'-?\d*')),
-            ],
-            decoration: InputDecoration(
-              labelText: l10n.t('score.points'),
-              border: const OutlineInputBorder(),
-            ),
-            onSubmitted: (text) {
-              Navigator.of(dialogContext).pop(int.tryParse(text) ?? value);
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(l10n.t('common.cancel')),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(int.tryParse(controller.text) ?? value);
-              },
-              child: Text(l10n.t('common.save')),
-            ),
-          ],
-        );
-      },
+      builder: (_) => _ScoreEntryDialog(value: value, label: label),
     );
-    controller.dispose();
     if (next != null) {
       onChanged(_clamp(next));
     }
@@ -92,10 +54,7 @@ class ScoreStepper extends StatelessWidget {
       children: [
         if (label != null) ...[
           Expanded(
-            child: Text(
-              label!,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            child: Text(label!, style: Theme.of(context).textTheme.titleMedium),
           ),
         ],
         IconButton.filledTonal(
@@ -132,6 +91,78 @@ class ScoreStepper extends StatelessWidget {
           ),
           icon: const Icon(Icons.add),
         ),
+      ],
+    );
+  }
+}
+
+/// Owns its controller so it is disposed only after the dialog's exit
+/// animation, not while the closing [TextField] is still on screen.
+class _ScoreEntryDialog extends StatefulWidget {
+  const _ScoreEntryDialog({required this.value, this.label});
+
+  final int value;
+  final String? label;
+
+  @override
+  State<_ScoreEntryDialog> createState() => _ScoreEntryDialogState();
+}
+
+class _ScoreEntryDialogState extends State<_ScoreEntryDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Start empty for 0, otherwise pre-select the value so typing replaces it.
+    final initial = widget.value == 0 ? '' : '${widget.value}';
+    _controller = TextEditingController.fromValue(
+      TextEditingValue(
+        text: initial,
+        selection: TextSelection(baseOffset: 0, extentOffset: initial.length),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final text = _controller.text;
+    Navigator.of(
+      context,
+    ).pop(text.isEmpty ? 0 : int.tryParse(text) ?? widget.value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AlertDialog(
+      title: Text(
+        widget.label == null
+            ? l10n.t('score.enter')
+            : l10n.t('score.enterFor', {'label': widget.label!}),
+      ),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        keyboardType: const TextInputType.numberWithOptions(signed: true),
+        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'-?\d*'))],
+        decoration: InputDecoration(
+          labelText: l10n.t('score.points'),
+          border: const OutlineInputBorder(),
+        ),
+        onSubmitted: (_) => _save(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.t('common.cancel')),
+        ),
+        FilledButton(onPressed: _save, child: Text(l10n.t('common.save'))),
       ],
     );
   }
