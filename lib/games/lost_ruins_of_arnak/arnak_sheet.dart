@@ -8,6 +8,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/player_colors.dart';
 import '../../shared/widgets/score_stepper.dart';
+import 'arnak_altars_dialog.dart';
 import 'arnak_player_line.dart';
 import 'arnak_scoring.dart';
 import 'arnak_state.dart';
@@ -322,6 +323,8 @@ class ArnakSheet extends StatelessWidget {
               ).textTheme.bodyMedium?.copyWith(color: _muted),
             ),
             const SizedBox(height: 12),
+            _buildSpiderTempleBar(context),
+            const SizedBox(height: 12),
             Card(
               clipBehavior: Clip.antiAlias,
               color: _header,
@@ -333,6 +336,8 @@ class ArnakSheet extends StatelessWidget {
                     children: [
                       _buildHeader(context, metrics),
                       for (final row in rows) _buildRow(context, row, metrics),
+                      if (state.spiderTemple)
+                        _buildDarkTabletsRow(context, metrics),
                       _buildTotalRow(context, metrics),
                     ],
                   ),
@@ -433,6 +438,135 @@ class ArnakSheet extends StatelessWidget {
     );
   }
 
+  Future<void> _openAltars(BuildContext context) async {
+    final saved = await showArnakAltarsDialog(
+      context,
+      players: state.players,
+      altars: state.altarTablets,
+      readOnly: readOnly,
+    );
+    if (saved != null) {
+      onChanged(state.copyWith(altarTablets: saved));
+    }
+  }
+
+  Widget _buildSpiderTempleBar(BuildContext context) {
+    final l10n = context.l10n;
+    return Wrap(
+      spacing: 12,
+      runSpacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Material(
+          color: _paper,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(
+              color: _grid.withValues(alpha: state.spiderTemple ? 0.8 : 0.4),
+            ),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: readOnly
+                ? null
+                : () => onChanged(
+                    state.copyWith(spiderTemple: !state.spiderTemple),
+                  ),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(10, 4, 4, 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(darkTabletAsset, height: 28),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.t('arnak.spiderTemple'),
+                    style: const TextStyle(
+                      color: _ink,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Switch(
+                    key: const ValueKey('arnak-spider-temple'),
+                    value: state.spiderTemple,
+                    onChanged: readOnly
+                        ? null
+                        : (on) => onChanged(state.copyWith(spiderTemple: on)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (state.spiderTemple)
+          FilledButton.tonalIcon(
+            key: const ValueKey('arnak-altars-button'),
+            onPressed: () => _openAltars(context),
+            icon: Image.asset(darkTabletAsset, height: 20),
+            label: Text(l10n.t('arnak.altarsButton')),
+          ),
+      ],
+    );
+  }
+
+  /// Read-only row: values come from the altars dialog, which a tap opens.
+  Widget _buildDarkTabletsRow(BuildContext context, _PadMetrics metrics) {
+    final l10n = context.l10n;
+    return SizedBox(
+      key: const ValueKey('arnak-dark-tablets-row'),
+      height: metrics.rowHeight,
+      child: Row(
+        children: [
+          _labelCell(
+            context,
+            metrics: metrics,
+            icon: Icons.dark_mode_outlined,
+            iconAsset: darkTabletAsset,
+            title: l10n.t('arnak.darkTablets'),
+            hint: l10n.t('arnak.darkTabletsHint'),
+            color: _paperAlt,
+          ),
+          for (final player in state.players)
+            _valueCell(
+              context,
+              metrics: metrics,
+              onTap: () => _openAltars(context),
+              color: _paperAlt,
+              child: Text(
+                switch (ArnakScoring.darkTabletsFor(state, player.id)) {
+                  null => '—',
+                  // A scored 0 is a result, so show it (unlike empty cells).
+                  final points => '$points',
+                },
+                style: TextStyle(
+                  color: _ink,
+                  fontWeight: FontWeight.w800,
+                  fontSize: metrics.compact ? 20 : 18,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Blank until something is scored for [player]; after that a total of 0
+  /// (e.g. dark tablets that broke even) is shown.
+  String _totalText(Player player) {
+    final total = ArnakScoring.totalForPlayer(state, player.id);
+    final line = state.lineFor(player.id);
+    final scored =
+        line.research != 0 ||
+        line.templeTiles != 0 ||
+        line.idols != 0 ||
+        line.guardians != 0 ||
+        line.cards != 0 ||
+        line.fear != 0 ||
+        ArnakScoring.darkTabletsFor(state, player.id) != null;
+    return scored ? '$total' : '';
+  }
+
   Widget _buildTotalRow(BuildContext context, _PadMetrics metrics) {
     return SizedBox(
       height: metrics.rowHeight,
@@ -454,7 +588,7 @@ class ArnakSheet extends StatelessWidget {
               metrics: metrics,
               color: _header,
               child: Text(
-                _cellText('${ArnakScoring.totalFor(state.lineFor(player.id))}'),
+                _totalText(player),
                 style: TextStyle(
                   color: _ink,
                   fontWeight: FontWeight.w900,

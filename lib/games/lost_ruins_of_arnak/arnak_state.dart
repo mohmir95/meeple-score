@@ -3,6 +3,7 @@ import '../../domain/models/game_state.dart';
 import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import 'arnak_config.dart';
+import 'arnak_dark_tablets.dart';
 import 'arnak_player_line.dart';
 
 class ArnakState extends GameState {
@@ -12,6 +13,8 @@ class ArnakState extends GameState {
     required this.status,
     required this.lines,
     this.lostTempleFirstPlayerId,
+    this.spiderTemple = false,
+    this.altarTablets,
   });
 
   /// Empty string means nobody reached the Lost Temple.
@@ -33,6 +36,13 @@ class ArnakState extends GameState {
   /// `null` if not chosen yet. [nobodyReachedLostTemple] if no one reached it.
   final String? lostTempleFirstPlayerId;
 
+  /// Spider Temple in play: adds the Dark Tablets row to the pad.
+  final bool spiderTemple;
+
+  /// Dark tablets each player placed on each altar, by player id. `null`
+  /// until the altars have been scored.
+  final Map<String, List<int>>? altarTablets;
+
   ArnakPlayerLine lineFor(String playerId) {
     return lines[playerId] ?? const ArnakPlayerLine();
   }
@@ -43,6 +53,8 @@ class ArnakState extends GameState {
     GameStatus? status,
     Map<String, ArnakPlayerLine>? lines,
     Object? lostTempleFirstPlayerId = _unset,
+    bool? spiderTemple,
+    Object? altarTablets = _unset,
   }) {
     return ArnakState(
       players: players ?? this.players,
@@ -52,6 +64,10 @@ class ArnakState extends GameState {
       lostTempleFirstPlayerId: identical(lostTempleFirstPlayerId, _unset)
           ? this.lostTempleFirstPlayerId
           : lostTempleFirstPlayerId as String?,
+      spiderTemple: spiderTemple ?? this.spiderTemple,
+      altarTablets: identical(altarTablets, _unset)
+          ? this.altarTablets
+          : altarTablets as Map<String, List<int>>?,
     );
   }
 
@@ -69,6 +85,7 @@ class ArnakState extends GameState {
         first == null || first == nobodyReachedLostTemple || ids.contains(first)
         ? first
         : null;
+    final altars = altarTablets;
     return ArnakState(
       players: players,
       config: config,
@@ -78,6 +95,13 @@ class ArnakState extends GameState {
           player.id: lines[player.id] ?? const ArnakPlayerLine(),
       },
       lostTempleFirstPlayerId: kept,
+      spiderTemple: spiderTemple,
+      altarTablets: altars == null
+          ? null
+          : {
+              for (final player in players)
+                player.id: ArnakDarkTablets.countsFor(altars, player.id),
+            },
     );
   }
 
@@ -94,12 +118,15 @@ class ArnakState extends GameState {
         for (final entry in lines.entries) entry.key: entry.value.toJson(),
       },
       'lostTempleFirstPlayerId': lostTempleFirstPlayerId,
+      'spiderTemple': spiderTemple,
+      'altarTablets': altarTablets,
     };
   }
 
   factory ArnakState.fromJson(Map<String, dynamic> json) {
     final rawLines = readMap(json['lines']);
     final rawFirst = json['lostTempleFirstPlayerId'];
+    final rawAltars = json['altarTablets'];
     return ArnakState(
       players: readMapList(json['players']).map(Player.fromJson).toList(),
       config: ArnakConfig.fromJson(readMap(json['config'])),
@@ -109,6 +136,16 @@ class ArnakState extends GameState {
           entry.key: ArnakPlayerLine.fromJson(readMap(entry.value)),
       },
       lostTempleFirstPlayerId: rawFirst is String ? rawFirst : null,
+      spiderTemple: readBool(json['spiderTemple']),
+      altarTablets: rawAltars is Map
+          ? {
+              for (final entry in readMap(rawAltars).entries)
+                entry.key: [
+                  if (entry.value is List)
+                    for (final n in entry.value as List) readInt(n),
+                ],
+            }
+          : null,
     );
   }
 }

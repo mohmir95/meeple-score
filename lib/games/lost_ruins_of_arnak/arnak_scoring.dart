@@ -1,11 +1,13 @@
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
+import 'arnak_dark_tablets.dart';
 import 'arnak_player_line.dart';
 import 'arnak_state.dart';
 
 class ArnakScoring {
   const ArnakScoring._();
 
+  /// Sum of one player's own pad rows (everything except dark tablets).
   static int totalFor(ArnakPlayerLine line) {
     return line.research +
         line.templeTiles +
@@ -15,7 +17,24 @@ class ArnakScoring {
         ArnakPlayerLine.normalizeFear(line.fear);
   }
 
+  /// Altar majorities plus used-tablet cost, or `null` when the Spider Temple
+  /// is off or its altars haven't been scored yet.
+  static int? darkTabletsFor(ArnakState state, String playerId) {
+    final altars = state.altarTablets;
+    if (!state.spiderTemple || altars == null) {
+      return null;
+    }
+    return ArnakDarkTablets.results(state.players, altars)[playerId]?.total;
+  }
+
+  /// Full pad total, including dark tablets when they are in play.
+  static int totalForPlayer(ArnakState state, String playerId) {
+    return totalFor(state.lineFor(playerId)) +
+        (darkTabletsFor(state, playerId) ?? 0);
+  }
+
   static bool hasAnyEntry(ArnakState state) {
+    final altars = state.altarTablets;
     return state.players.any((player) {
       final line = state.lineFor(player.id);
       return line.research != 0 ||
@@ -23,7 +42,10 @@ class ArnakScoring {
           line.idols != 0 ||
           line.guardians != 0 ||
           line.cards != 0 ||
-          line.fear != 0;
+          line.fear != 0 ||
+          (state.spiderTemple &&
+              altars != null &&
+              ArnakDarkTablets.usedBy(altars, player.id) > 0);
     });
   }
 
@@ -33,7 +55,7 @@ class ArnakScoring {
     }
     final totals = {
       for (final player in state.players)
-        player.id: totalFor(state.lineFor(player.id)),
+        player.id: totalForPlayer(state, player.id),
     };
     final best = totals.values.reduce((a, b) => a > b ? a : b);
     return [
@@ -48,7 +70,7 @@ class ArnakScoring {
       for (final player in state.players)
         PlayerScore(
           player: player,
-          total: totalFor(state.lineFor(player.id)),
+          total: totalForPlayer(state, player.id),
           isLeader: winningIds.contains(player.id),
         ),
     ];
