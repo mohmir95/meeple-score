@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import '../../domain/models/player.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/l10n_scope.dart';
+import '../../shared/export/score_sheet_export.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/player_colors.dart';
 import '../../shared/widgets/score_stepper.dart';
 import 'arnak_altars_dialog.dart';
+import 'arnak_leaders_setup.dart';
 import 'arnak_player_line.dart';
 import 'arnak_scoring.dart';
 import 'arnak_state.dart';
@@ -330,16 +332,20 @@ class ArnakSheet extends StatelessWidget {
               color: _header,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: tableWidth,
-                  child: Column(
-                    children: [
-                      _buildHeader(context, metrics),
-                      for (final row in rows) _buildRow(context, row, metrics),
-                      if (state.spiderTemple)
-                        _buildDarkTabletsRow(context, metrics),
-                      _buildTotalRow(context, metrics),
-                    ],
+                // Marks the full table (even scrolled off) for "Save image".
+                child: ScoreSheetExportTarget(
+                  child: SizedBox(
+                    width: tableWidth,
+                    child: Column(
+                      children: [
+                        _buildHeader(context, metrics),
+                        for (final row in rows)
+                          _buildRow(context, row, metrics),
+                        if (state.spiderTemple)
+                          _buildDarkTabletsRow(context, metrics),
+                        _buildTotalRow(context, metrics),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -351,13 +357,25 @@ class ArnakSheet extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context, _PadMetrics metrics) {
+    // Leader portraits need a taller header than the plain color dots.
+    final withLeaders = state.players.any(
+      (player) => state.config.leaderFor(player.id) != null,
+    );
+    final header = withLeaders
+        ? _PadMetrics(
+            labelWidth: metrics.labelWidth,
+            columnWidth: metrics.columnWidth,
+            rowHeight: metrics.rowHeight + 22,
+            compact: metrics.compact,
+          )
+        : metrics;
     return SizedBox(
-      height: metrics.rowHeight,
+      height: header.rowHeight,
       child: Row(
         children: [
           _labelCell(
             context,
-            metrics: metrics,
+            metrics: header,
             icon: Icons.shield_outlined,
             title: context.l10n.t('game.arnak.headerPlayers'),
             color: _header,
@@ -366,20 +384,28 @@ class ArnakSheet extends StatelessWidget {
           for (final player in state.players)
             _valueCell(
               context,
-              metrics: metrics,
+              metrics: header,
               color: _header,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: metrics.compact ? 24 : 20,
-                    height: metrics.compact ? 24 : 20,
-                    decoration: BoxDecoration(
-                      color: playerColor(player.colorValue),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: _grid),
+                  if (state.config.leaderFor(player.id) case final leader?)
+                    ArnakLeaderPortrait(
+                      key: ValueKey('arnak-sheet-leader-${player.id}'),
+                      leader: leader,
+                      size: 42,
+                      colorValue: player.colorValue,
+                    )
+                  else
+                    Container(
+                      width: metrics.compact ? 24 : 20,
+                      height: metrics.compact ? 24 : 20,
+                      decoration: BoxDecoration(
+                        color: playerColor(player.colorValue),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: _grid),
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 4),
                   Text(
                     player.name,

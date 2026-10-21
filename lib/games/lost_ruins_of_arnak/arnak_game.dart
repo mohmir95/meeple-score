@@ -9,6 +9,7 @@ import '../../domain/models/player_score.dart';
 import '../../shared/player_colors.dart';
 import 'arnak_config.dart';
 import 'arnak_finish.dart';
+import 'arnak_leaders_setup.dart';
 import 'arnak_player_line.dart';
 import 'arnak_scoring.dart';
 import 'arnak_sheet.dart';
@@ -81,7 +82,7 @@ class LostRuinsOfArnakGame extends BoardGame {
   ];
 
   @override
-  GameConfig createDefaultConfig() => const ArnakConfig();
+  GameConfig createDefaultConfig() => const ArnakConfig(leadersEnabled: true);
 
   @override
   GameConfig configFromJson(Map<String, dynamic> json) {
@@ -95,7 +96,7 @@ class LostRuinsOfArnakGame extends BoardGame {
   }) {
     return ArnakState(
       players: players,
-      config: config as ArnakConfig,
+      config: (config as ArnakConfig).forPlayers(players),
       status: GameStatus.inProgress,
       lines: {for (final player in players) player.id: const ArnakPlayerLine()},
     );
@@ -104,6 +105,37 @@ class LostRuinsOfArnakGame extends BoardGame {
   @override
   GameState stateFromJson(Map<String, dynamic> json) {
     return ArnakState.fromJson(json);
+  }
+
+  @override
+  Widget buildSetupOptions({
+    required GameConfig config,
+    required List<Player> players,
+    required ValueChanged<GameConfig> onChanged,
+  }) {
+    return ArnakLeadersToggle(
+      config: config as ArnakConfig,
+      onChanged: onChanged,
+    );
+  }
+
+  @override
+  Widget? buildPlayerAccessory({
+    required GameConfig config,
+    required List<Player> players,
+    required int index,
+    required ValueChanged<GameConfig> onChanged,
+  }) {
+    final arnak = config as ArnakConfig;
+    if (!arnak.leadersEnabled) {
+      return null;
+    }
+    return ArnakLeaderPicker(
+      config: arnak,
+      players: players,
+      index: index,
+      onChanged: onChanged,
+    );
   }
 
   @override

@@ -895,7 +895,9 @@ void main() {
 
     Uint8List? savedBytes;
     String? savedName;
+    GlobalKey? capturedKey;
     capturePngOverride = (key, {pixelRatio = 2}) async {
+      capturedKey = key;
       return Uint8List.fromList([137, 80, 78, 71, 13, 10, 26, 10, 1, 2, 3]);
     };
     pngSaveOverride = (bytes, filename) async {
@@ -919,6 +921,16 @@ void main() {
 
     expect(savedBytes, isNotNull);
     expect(savedBytes!.sublist(0, 8), <int>[137, 80, 78, 71, 13, 10, 26, 10]);
+    // Only the score table is captured, not the banner or Scores card.
+    final captured = find.byKey(capturedKey!);
+    expect(
+      find.descendant(of: captured, matching: find.text('Buildings')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: captured, matching: find.text('Scores')),
+      findsNothing,
+    );
     expect(savedName, contains(GreatWesternTrailGame.idValue));
     expect(savedName, endsWith('.png'));
     expect(

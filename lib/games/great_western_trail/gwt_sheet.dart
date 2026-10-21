@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../domain/models/player.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/l10n_scope.dart';
+import '../../shared/export/score_sheet_export.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/player_colors.dart';
 import '../../shared/widgets/score_stepper.dart';
@@ -649,14 +650,18 @@ class GwtSheet extends StatelessWidget {
               color: _header,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: tableWidth,
-                  child: Column(
-                    children: [
-                      _buildHeader(context, metrics),
-                      for (final row in rows) _buildRow(context, row, metrics),
-                      _buildTotalRow(context, metrics),
-                    ],
+                // Marks the full table (even scrolled off) for "Save image".
+                child: ScoreSheetExportTarget(
+                  child: SizedBox(
+                    width: tableWidth,
+                    child: Column(
+                      children: [
+                        _buildHeader(context, metrics),
+                        for (final row in rows)
+                          _buildRow(context, row, metrics),
+                        _buildTotalRow(context, metrics),
+                      ],
+                    ),
                   ),
                 ),
               ),

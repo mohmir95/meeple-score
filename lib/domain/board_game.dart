@@ -92,6 +92,26 @@ abstract class BoardGame {
     return const SizedBox.shrink();
   }
 
+  /// Optional setup options shown above the player list (expansions, modules).
+  Widget buildSetupOptions({
+    required GameConfig config,
+    required List<Player> players,
+    required ValueChanged<GameConfig> onChanged,
+  }) {
+    return const SizedBox.shrink();
+  }
+
+  /// Optional per-player control shown beside the player's color in setup
+  /// (e.g. a character pick). `null` shows nothing.
+  Widget? buildPlayerAccessory({
+    required GameConfig config,
+    required List<Player> players,
+    required int index,
+    required ValueChanged<GameConfig> onChanged,
+  }) {
+    return null;
+  }
+
   /// Game-specific score sheet. Call [onChanged] after every mutation.
   Widget buildScoreSheet({
     required GameState state,

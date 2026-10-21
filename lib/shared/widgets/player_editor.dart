@@ -15,6 +15,7 @@ class PlayerEditor extends StatelessWidget {
     this.colorOptions = const [],
     this.uniqueColors = false,
     this.readOnly = false,
+    this.accessoryBuilder,
   });
 
   final List<Player> players;
@@ -24,6 +25,9 @@ class PlayerEditor extends StatelessWidget {
   final List<PlayerColorOption> colorOptions;
   final bool uniqueColors;
   final bool readOnly;
+
+  /// Optional game-specific control shown beside each player's color.
+  final Widget? Function(BuildContext context, int index)? accessoryBuilder;
 
   void _rename(int index, String name) {
     final next = [...players];
@@ -105,6 +109,11 @@ class PlayerEditor extends StatelessWidget {
                   enabled: !readOnly && colorOptions.isNotEmpty,
                   onSelected: (value) => _setColor(i, value),
                 ),
+                if (accessoryBuilder?.call(context, i)
+                    case final accessory?) ...[
+                  const SizedBox(width: 8),
+                  accessory,
+                ],
                 const SizedBox(width: 12),
                 Expanded(
                   child: TextFormField(

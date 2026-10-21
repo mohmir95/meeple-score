@@ -209,12 +209,24 @@ class _SetupScreenState extends State<SetupScreen> {
                   ),
                 ],
                 const SizedBox(height: 24),
+                _game.buildSetupOptions(
+                  config: _config,
+                  players: _players,
+                  onChanged: (config) => setState(() => _config = config),
+                ),
                 PlayerEditor(
                   players: _players,
                   minPlayers: _game.minPlayers,
                   maxPlayers: _game.maxPlayers,
                   colorOptions: _game.playerColors,
                   uniqueColors: _game.uniquePlayerColors,
+                  accessoryBuilder: (context, index) =>
+                      _game.buildPlayerAccessory(
+                        config: _config,
+                        players: _players,
+                        index: index,
+                        onChanged: (config) => setState(() => _config = config),
+                      ),
                   onChanged: (players) {
                     setState(() => _players = players);
                     widget.repository.saveRoster(_game.id, players);

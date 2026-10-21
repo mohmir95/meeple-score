@@ -4,6 +4,7 @@ import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/export/png_save.dart';
+import '../../shared/export/score_sheet_export.dart';
 import '../../shared/export/widget_png.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
@@ -25,6 +26,9 @@ class PlayScreen extends StatefulWidget {
 class _PlayScreenState extends State<PlayScreen> {
   PlaySession get _session => widget.session;
   final _exportKey = GlobalKey();
+
+  /// Set by sheets that mark their score table; "Save image" prefers it.
+  final _tableKey = GlobalKey();
   var _savingImage = false;
 
   @override
@@ -101,7 +105,9 @@ class _PlayScreenState extends State<PlayScreen> {
         return;
       }
       final pixelRatio = MediaQuery.devicePixelRatioOf(context).clamp(2.0, 3.0);
-      final bytes = await capturePng(_exportKey, pixelRatio: pixelRatio);
+      // Just the score table when the sheet marks one, else the whole area.
+      final key = _tableKey.currentContext != null ? _tableKey : _exportKey;
+      final bytes = await capturePng(key, pixelRatio: pixelRatio);
       await savePng(
         bytes,
         scoreSheetPngName(gameId: _session.game.id, now: DateTime.now()),
@@ -311,10 +317,13 @@ class _PlayScreenState extends State<PlayScreen> {
                         ),
                         const SizedBox(height: 16),
                       ],
-                      _session.game.buildScoreSheet(
-                        state: state,
-                        onChanged: _session.update,
-                        readOnly: _session.isFinished,
+                      ScoreSheetExportScope(
+                        captureKey: _tableKey,
+                        child: _session.game.buildScoreSheet(
+                          state: state,
+                          onChanged: _session.update,
+                          readOnly: _session.isFinished,
+                        ),
                       ),
                     ],
                   ),
