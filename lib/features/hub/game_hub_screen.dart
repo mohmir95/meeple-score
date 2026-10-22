@@ -33,6 +33,7 @@ class GameHubScreen extends StatelessWidget {
           final randomizer = game.buildBuildingsRandomizer();
           final startingResources = game.buildStartingResources();
           final duchyBoards = game.buildDuchyBoardRandomizer();
+          final leaders = game.buildLeadersRandomizer();
           final tiles = <Widget>[
             if (game.showQuickReference)
               _HubBanner(
@@ -103,6 +104,26 @@ class GameHubScreen extends StatelessWidget {
                           MaterialPageRoute<void>(
                             builder: (context) =>
                                 game.buildStartingResources()!,
+                          ),
+                        );
+                      },
+              ),
+            if (game.showLeadersRandomizer)
+              _HubBanner(
+                key: const ValueKey('hub-leaders-randomizer'),
+                title: l10n.t('hub.leadersRandomizer'),
+                icon: Icons.shuffle,
+                color: game.accentColor,
+                compact: compact,
+                enabled: leaders != null,
+                badge: leaders == null ? l10n.t('hub.comingSoon') : null,
+                onTap: leaders == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) =>
+                                game.buildLeadersRandomizer()!,
                           ),
                         );
                       },

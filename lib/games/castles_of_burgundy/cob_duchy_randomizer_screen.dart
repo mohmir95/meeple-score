@@ -7,7 +7,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/player_colors.dart';
 import '../../shared/widgets/app_page.dart';
-import '../../shared/widgets/player_editor.dart';
+import '../../shared/widgets/player_color_roster.dart';
 import 'cob_duchy.dart';
 import 'cob_palette.dart';
 
@@ -497,34 +497,16 @@ class _Controls extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 12,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              for (var i = 0; i < colors.length; i++)
-                PlayerColorBadge(
-                  key: ValueKey('cob-duchy-color-$i'),
-                  number: i + 1,
-                  colorValue: colors[i].value,
-                  colorName: l10n.colorLabel(colors[i].name),
-                  options: cobPlayerColors,
-                  enabled: true,
-                  onSelected: (value) => onColor(i, value),
-                ),
-              if (showPlayerCount && colors.length < cobPlayerColors.length)
-                _AddPlayerButton(
-                  used: {for (final color in colors) color.value},
-                  onSelected: onAdd,
-                ),
-              if (showPlayerCount && colors.length > 2)
-                _PlayerCountButton(
-                  key: const ValueKey('cob-duchy-remove-player'),
-                  tooltip: l10n.t('players.remove'),
-                  icon: Icons.remove,
-                  onPressed: onRemove,
-                ),
-            ],
+          PlayerColorRoster(
+            colors: colors,
+            options: cobPlayerColors,
+            accent: _CobDuchyRandomizerScreenState._accent,
+            keyPrefix: 'cob-duchy',
+            minPlayers: 2,
+            showCountControls: showPlayerCount,
+            onAdd: onAdd,
+            onRemove: onRemove,
+            onColor: onColor,
           ),
           const SizedBox(height: 16),
         ],
@@ -598,111 +580,6 @@ class _Controls extends StatelessWidget {
         pool: CobDuchyPool.solo,
       ),
     ];
-  }
-}
-
-class _AddPlayerButton extends StatelessWidget {
-  const _AddPlayerButton({required this.used, required this.onSelected});
-
-  final Set<int> used;
-  final ValueChanged<int> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final remaining = [
-      for (final option in cobPlayerColors)
-        if (!used.contains(option.value)) option,
-    ];
-    if (remaining.length == 1) {
-      return _PlayerCountButton(
-        key: const ValueKey('cob-duchy-add-player'),
-        tooltip: l10n.t('players.add'),
-        icon: Icons.add,
-        onPressed: () => onSelected(remaining.single.value),
-      );
-    }
-    return PopupMenuButton<int>(
-      key: const ValueKey('cob-duchy-add-player'),
-      tooltip: l10n.t('players.add'),
-      position: PopupMenuPosition.under,
-      onSelected: onSelected,
-      itemBuilder: (context) => [
-        for (final option in remaining)
-          PopupMenuItem(
-            value: option.value,
-            child: Row(
-              children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: option.color,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: playerColorOutline(option.value),
-                      width: isLightPlayerColor(option.value) ? 1.5 : 0,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(l10n.colorLabel(option.name)),
-              ],
-            ),
-          ),
-      ],
-      child: const _PlayerCircle(icon: Icons.add),
-    );
-  }
-}
-
-class _PlayerCountButton extends StatelessWidget {
-  const _PlayerCountButton({
-    super.key,
-    required this.tooltip,
-    required this.icon,
-    this.onPressed,
-  });
-
-  final String tooltip;
-  final IconData icon;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.transparent,
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed,
-          child: _PlayerCircle(icon: icon),
-        ),
-      ),
-    );
-  }
-}
-
-class _PlayerCircle extends StatelessWidget {
-  const _PlayerCircle({required this.icon});
-
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = _CobDuchyRandomizerScreenState._accent;
-    return Container(
-      width: 44,
-      height: 44,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: accent, width: 1.5),
-      ),
-      child: Icon(icon, color: accent),
-    );
   }
 }
 

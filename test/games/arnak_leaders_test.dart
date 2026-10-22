@@ -131,7 +131,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('score sheet shows each player\'s leader in the header', (
+  testWidgets('score sheet header shows leaders; finished games read-only', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1200, 1400);
@@ -144,14 +144,14 @@ void main() {
         leadersEnabled: true,
         leaders: {'ada': 'captain'},
       ),
-      status: GameStatus.inProgress,
+      status: GameStatus.finished,
       lines: const {},
     );
     await pumpWithL10n(
       tester,
       Scaffold(
         body: SingleChildScrollView(
-          child: ArnakSheet(state: state, readOnly: false, onChanged: (_) {}),
+          child: ArnakSheet(state: state, readOnly: true, onChanged: (_) {}),
         ),
       ),
     );
@@ -160,7 +160,53 @@ void main() {
       find.byKey(const ValueKey('arnak-sheet-leader-ada')),
       findsOneWidget,
     );
+    // No pick for Sam, and no pickers once the game is finished.
     expect(find.byKey(const ValueKey('arnak-sheet-leader-sam')), findsNothing);
+    expect(find.byType(PopupMenuButton<String>), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('leaders can be toggled and picked from the score sheet', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    var state = ArnakState(
+      players: const [ada, sam],
+      config: const ArnakConfig(),
+      status: GameStatus.inProgress,
+      lines: const {},
+    );
+    await pumpWithL10n(
+      tester,
+      Scaffold(
+        body: SingleChildScrollView(
+          child: StatefulBuilder(
+            builder: (context, setState) => ArnakSheet(
+              state: state,
+              readOnly: false,
+              onChanged: (next) => setState(() => state = next),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(PopupMenuButton<String>), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('arnak-sheet-leaders')));
+    await pumpFor(tester);
+    expect(state.config.leadersEnabled, isTrue);
+    expect(find.byType(PopupMenuButton<String>), findsNWidgets(2));
+
+    await tester.tap(find.byKey(const ValueKey('arnak-sheet-leader-sam')));
+    await pumpFor(tester);
+    await tester.tap(
+      find.byKey(const ValueKey('arnak-leader-option-falconer')),
+    );
+    await pumpFor(tester);
+    expect(state.config.leaderFor('sam')!.id, 'falconer');
     expect(tester.takeException(), isNull);
   });
 }

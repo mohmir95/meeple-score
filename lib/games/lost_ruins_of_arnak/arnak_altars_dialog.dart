@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../domain/models/player.dart';
@@ -128,9 +130,14 @@ class _AltarsEditorState extends State<_AltarsEditor> {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     const gap = 10.0;
+                    // Cap the width so wide windows don't stretch the altars
+                    // into flat strips; extra room goes to the sides.
+                    const maxCardWidth = 240.0;
                     final perRow = constraints.maxWidth < 640 ? 2 : 3;
-                    final width =
-                        (constraints.maxWidth - gap * (perRow - 1)) / perRow;
+                    final width = math.min(
+                      maxCardWidth,
+                      (constraints.maxWidth - gap * (perRow - 1)) / perRow,
+                    );
                     return Wrap(
                       alignment: WrapAlignment.center,
                       spacing: gap,
@@ -268,7 +275,7 @@ class _CounterRow extends StatelessWidget {
   final bool winner;
   final bool readOnly;
 
-  /// Name beside the counter (wide cards) instead of above it (phones).
+  /// Roomier sizing for wide cards; tighter for narrow (phone) cards.
   final bool inline;
   final ValueChanged<int> onChanged;
   final Color gold;
@@ -276,7 +283,7 @@ class _CounterRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final buttonSize = inline ? 28.0 : 26.0;
+    final buttonSize = inline ? 28.0 : 24.0;
     final buttonStyle = IconButton.styleFrom(
       foregroundColor: Colors.white,
       backgroundColor: Colors.white.withValues(alpha: 0.14),
@@ -290,15 +297,15 @@ class _CounterRow extends StatelessWidget {
     );
     final nameParts = <Widget>[
       Container(
-        width: 10,
-        height: 10,
+        width: inline ? 10 : 8,
+        height: inline ? 10 : 8,
         decoration: BoxDecoration(
           color: playerColor(player.colorValue),
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white70),
         ),
       ),
-      const SizedBox(width: 6),
+      SizedBox(width: inline ? 6 : 4),
       Expanded(
         child: Text(
           player.name,
@@ -323,14 +330,14 @@ class _CounterRow extends StatelessWidget {
           icon: const Icon(Icons.remove),
         ),
         SizedBox(
-          width: 26,
+          width: inline ? 26 : 20,
           child: Text(
             '$value',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w900,
-              fontSize: inline ? 18 : 16,
+              fontSize: inline ? 18 : 15,
             ),
           ),
         ),
@@ -351,7 +358,7 @@ class _CounterRow extends StatelessWidget {
         message: player.name,
         child: Container(
           padding: EdgeInsets.symmetric(
-            horizontal: 6,
+            horizontal: inline ? 6 : 4,
             vertical: inline ? 3 : 2,
           ),
           decoration: BoxDecoration(
@@ -362,16 +369,9 @@ class _CounterRow extends StatelessWidget {
               width: 1.5,
             ),
           ),
-          child: inline
-              ? Row(children: [...nameParts, counter])
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(children: nameParts),
-                    const SizedBox(height: 3),
-                    Center(child: counter),
-                  ],
-                ),
+          // Name and counter share a row; narrow (phone) cards just use
+          // tighter sizes and let long names ellipsize.
+          child: Row(children: [...nameParts, counter]),
         ),
       ),
     );

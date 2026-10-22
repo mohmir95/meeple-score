@@ -100,6 +100,7 @@ class ArnakLeaderPicker extends StatelessWidget {
     required this.config,
     required this.players,
     required this.index,
+    this.size = 44,
     required this.onChanged,
   });
 
@@ -107,6 +108,9 @@ class ArnakLeaderPicker extends StatelessWidget {
   final List<Player> players;
   final int index;
   final ValueChanged<ArnakConfig> onChanged;
+
+  /// Diameter of the portrait (or empty pick circle).
+  final double size;
 
   static const _none = '';
 
@@ -123,8 +127,8 @@ class ArnakLeaderPicker extends StatelessWidget {
 
     final Widget face = current == null
         ? Container(
-            width: 44,
-            height: 44,
+            width: size,
+            height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
@@ -139,7 +143,7 @@ class ArnakLeaderPicker extends StatelessWidget {
           )
         : ArnakLeaderPortrait(
             leader: current,
-            size: 44,
+            size: size,
             colorValue: player.colorValue,
           );
 

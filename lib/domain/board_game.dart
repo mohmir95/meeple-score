@@ -58,6 +58,11 @@ abstract class BoardGame {
   Widget? buildStartingResources() => null;
 
   /// Hub tile for the Castles of Burgundy duchy board randomizer.
+  bool get showLeadersRandomizer => false;
+
+  /// Optional page that deals random character/leader choices.
+  Widget? buildLeadersRandomizer() => null;
+
   bool get showDuchyBoardRandomizer => false;
 
   /// Ready randomizer UI. Null keeps the hub tile disabled as Coming Soon.

@@ -9,6 +9,7 @@ import '../../domain/models/player_score.dart';
 import '../../shared/player_colors.dart';
 import 'arnak_config.dart';
 import 'arnak_finish.dart';
+import 'arnak_leaders_randomizer_screen.dart';
 import 'arnak_leaders_setup.dart';
 import 'arnak_player_line.dart';
 import 'arnak_scoring.dart';
@@ -71,6 +72,14 @@ class LostRuinsOfArnakGame extends BoardGame {
   @override
   Widget? buildStartingResources() {
     return const ArnakStartingResourcesScreen();
+  }
+
+  @override
+  bool get showLeadersRandomizer => true;
+
+  @override
+  Widget? buildLeadersRandomizer() {
+    return const ArnakLeadersRandomizerScreen();
   }
 
   @override

@@ -10,6 +10,7 @@ import '../../shared/layout/breakpoints.dart';
 import '../../shared/player_colors.dart';
 import '../../shared/widgets/score_stepper.dart';
 import 'arnak_altars_dialog.dart';
+import 'arnak_leaders.dart';
 import 'arnak_leaders_setup.dart';
 import 'arnak_player_line.dart';
 import 'arnak_scoring.dart';
@@ -357,18 +358,16 @@ class ArnakSheet extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context, _PadMetrics metrics) {
-    // Leader portraits need a taller header than the plain color dots.
-    final withLeaders = state.players.any(
-      (player) => state.config.leaderFor(player.id) != null,
+    // One header height and circle size whether or not leaders are on, so
+    // toggling them doesn't shift the table.
+    const circleSize = 42.0;
+    final withLeaders = state.config.leadersEnabled;
+    final header = _PadMetrics(
+      labelWidth: metrics.labelWidth,
+      columnWidth: metrics.columnWidth,
+      rowHeight: metrics.rowHeight + 22,
+      compact: metrics.compact,
     );
-    final header = withLeaders
-        ? _PadMetrics(
-            labelWidth: metrics.labelWidth,
-            columnWidth: metrics.columnWidth,
-            rowHeight: metrics.rowHeight + 22,
-            compact: metrics.compact,
-          )
-        : metrics;
     return SizedBox(
       height: header.rowHeight,
       child: Row(
@@ -389,17 +388,27 @@ class ArnakSheet extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (state.config.leaderFor(player.id) case final leader?)
+                  if (withLeaders && !readOnly)
+                    ArnakLeaderPicker(
+                      key: ValueKey('arnak-sheet-leader-${player.id}'),
+                      config: state.config,
+                      players: state.players,
+                      index: state.players.indexOf(player),
+                      size: circleSize,
+                      onChanged: (config) =>
+                          onChanged(state.copyWith(config: config)),
+                    )
+                  else if (state.config.leaderFor(player.id) case final leader?)
                     ArnakLeaderPortrait(
                       key: ValueKey('arnak-sheet-leader-${player.id}'),
                       leader: leader,
-                      size: 42,
+                      size: circleSize,
                       colorValue: player.colorValue,
                     )
                   else
                     Container(
-                      width: metrics.compact ? 24 : 20,
-                      height: metrics.compact ? 24 : 20,
+                      width: circleSize,
+                      height: circleSize,
                       decoration: BoxDecoration(
                         color: playerColor(player.colorValue),
                         shape: BoxShape.circle,
@@ -476,6 +485,50 @@ class ArnakSheet extends StatelessWidget {
     }
   }
 
+  /// A labelled switch chip for the options above the table.
+  Widget _optionToggle({
+    required Key switchKey,
+    required Widget icon,
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Material(
+      color: _paper,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: _grid.withValues(alpha: value ? 0.8 : 0.4)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: readOnly ? null : () => onChanged(!value),
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(10, 4, 4, 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              icon,
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: _ink,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Switch(
+                key: switchKey,
+                value: value,
+                onChanged: readOnly ? null : onChanged,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSpiderTempleBar(BuildContext context) {
     final l10n = context.l10n;
     return Wrap(
@@ -483,47 +536,21 @@ class ArnakSheet extends StatelessWidget {
       runSpacing: 8,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        Material(
-          color: _paper,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-            side: BorderSide(
-              color: _grid.withValues(alpha: state.spiderTemple ? 0.8 : 0.4),
-            ),
+        _optionToggle(
+          switchKey: const ValueKey('arnak-sheet-leaders'),
+          icon: ArnakLeaderPortrait(leader: ArnakLeader.all[4], size: 28),
+          label: l10n.t('arnak.leaders'),
+          value: state.config.leadersEnabled,
+          onChanged: (on) => onChanged(
+            state.copyWith(config: state.config.copyWith(leadersEnabled: on)),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: readOnly
-                ? null
-                : () => onChanged(
-                    state.copyWith(spiderTemple: !state.spiderTemple),
-                  ),
-            child: Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(10, 4, 4, 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(darkTabletAsset, height: 28),
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n.t('arnak.spiderTemple'),
-                    style: const TextStyle(
-                      color: _ink,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Switch(
-                    key: const ValueKey('arnak-spider-temple'),
-                    value: state.spiderTemple,
-                    onChanged: readOnly
-                        ? null
-                        : (on) => onChanged(state.copyWith(spiderTemple: on)),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        ),
+        _optionToggle(
+          switchKey: const ValueKey('arnak-spider-temple'),
+          icon: Image.asset(darkTabletAsset, height: 28),
+          label: l10n.t('arnak.spiderTemple'),
+          value: state.spiderTemple,
+          onChanged: (on) => onChanged(state.copyWith(spiderTemple: on)),
         ),
         if (state.spiderTemple)
           FilledButton.tonalIcon(
