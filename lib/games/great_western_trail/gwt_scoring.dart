@@ -3,7 +3,7 @@ import '../../domain/models/player_score.dart';
 import 'gwt_player_line.dart';
 import 'gwt_state.dart';
 
-enum GwtPadKind { classic, argentina }
+enum GwtPadKind { classic, argentina, newZealand }
 
 class GwtScoring {
   const GwtScoring._();
@@ -20,7 +20,16 @@ class GwtScoring {
     return pad == GwtPadKind.argentina ? 2 : 3;
   }
 
-  static int jobMarketPoints(bool hasToken) => hasToken ? 2 : 0;
+  /// Job market token: 2 VP. New Zealand's bonus tiles market token: 5 VP.
+  static int jobMarketPoints(
+    bool hasToken, [
+    GwtPadKind pad = GwtPadKind.classic,
+  ]) {
+    if (!hasToken) {
+      return 0;
+    }
+    return pad == GwtPadKind.newZealand ? 5 : 2;
+  }
 
   static int totalFor(
     GwtPlayerLine line, {
@@ -35,9 +44,16 @@ class GwtScoring {
         line.stationMasters +
         line.playerBoard +
         discPoints(line.clearedThreeVpSpace, pad) +
-        jobMarketPoints(line.hasJobMarketToken);
+        jobMarketPoints(line.hasJobMarketToken, pad);
     if (pad == GwtPadKind.argentina) {
       return shared + line.ships + line.cityMaps + line.farmers;
+    }
+    if (pad == GwtPadKind.newZealand) {
+      return shared +
+          line.tradingPosts +
+          line.harbours +
+          line.pathfinder +
+          line.hazards;
     }
     return shared + line.deliveries + line.hazards;
   }
@@ -53,6 +69,9 @@ class GwtScoring {
           line.stations != 0 ||
           line.hazards != 0 ||
           line.farmers != 0 ||
+          line.tradingPosts != 0 ||
+          line.harbours != 0 ||
+          line.pathfinder != 0 ||
           line.cattle != 0 ||
           line.objectives != 0 ||
           line.stationMasters != 0 ||

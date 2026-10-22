@@ -6,6 +6,7 @@ import 'package:board_game_score_sheet/games/castles_of_burgundy/cob_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_argentina_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_game.dart';
+import 'package:board_game_score_sheet/games/great_western_trail/gwt_new_zealand_game.dart';
 import 'package:board_game_score_sheet/games/lost_ruins_of_arnak/arnak_game.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   test('registry exposes Great Western Trail editions', () {
     final registry = GameRegistry();
-    expect(registry.games, hasLength(5));
+    expect(registry.games, hasLength(6));
     expect(
       registry.lookup(GreatWesternTrailGame.idValue),
       isA<GreatWesternTrailGame>(),
@@ -25,6 +26,10 @@ void main() {
     expect(
       registry.lookup(GreatWesternTrailArgentinaGame.idValue),
       isA<GreatWesternTrailArgentinaGame>(),
+    );
+    expect(
+      registry.lookup(GreatWesternTrailNewZealandGame.idValue),
+      isA<GreatWesternTrailNewZealandGame>(),
     );
     expect(
       registry.lookup(LostRuinsOfArnakGame.idValue),

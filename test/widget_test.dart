@@ -53,13 +53,15 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
     expect(find.text('Meeple Score'), findsOneWidget);
-    expect(find.text('Great Western Trail'), findsNWidgets(3));
+    expect(find.text('Great Western Trail'), findsNWidgets(4));
     expect(find.text('Great Western Trail First Edition'), findsNothing);
     expect(find.text('Great Western Trail Second Edition'), findsNothing);
     expect(find.text('Great Western Trail Argentina'), findsNothing);
+    expect(find.text('Great Western Trail New Zealand'), findsNothing);
     expect(find.text('First Edition'), findsNothing);
     expect(find.text('Second Edition'), findsOneWidget);
     expect(find.text('Argentina'), findsOneWidget);
+    expect(find.text('New Zealand'), findsOneWidget);
     expect(find.text('Simple Tally'), findsNothing);
     expect(find.text('فارسی'), findsOneWidget);
 
@@ -158,7 +160,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
     final cards = find.byType(GameCard);
-    expect(cards, findsNWidgets(5));
+    expect(cards, findsNWidgets(6));
     final first = tester.getRect(cards.first);
     final rowStart = tester.getRect(cards.at(3));
     final last = tester.getRect(cards.last);
@@ -213,6 +215,58 @@ void main() {
     expect(find.text('5 dollars = 1 VP'), findsNothing);
     expect(find.byTooltip('5 dollars = 1 VP'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('New Zealand pad scores pounds, harbours, and the bonus token', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await pumpScoreSheetApp(tester, localeController: await createTestLocale());
+    await pumpUntilFound(tester, find.text('New Zealand'));
+    await tester.tap(find.text('New Zealand'));
+    await pumpFor(tester);
+    await pumpUntilFound(tester, find.text('Scoresheet'));
+    expect(find.text('Buildings Randomizer'), findsOneWidget);
+    expect(find.text('Starting Resources'), findsOneWidget);
+    expect(find.text('Coming Soon'), findsNWidgets(2));
+    await tester.tap(find.text('Scoresheet'));
+    await pumpFor(tester);
+    await pumpUntilFound(tester, find.text('Start game'));
+    expect(
+      find.widgetWithText(AppBar, 'Great Western Trail New Zealand'),
+      findsWidgets,
+    );
+    await tester.tap(find.text('Start game'));
+    await pumpFor(tester);
+    await pumpUntilFound(tester, find.text('Score pad'));
+
+    expect(find.text('Pounds'), findsOneWidget);
+    expect(find.text('Trading posts'), findsOneWidget);
+    expect(find.text('Harbours'), findsOneWidget);
+    expect(find.text('Pathfinder'), findsOneWidget);
+    expect(find.text('Hazards & bonus tiles'), findsOneWidget);
+    expect(find.text('Sheep & bonus cards'), findsOneWidget);
+    expect(find.text('Harbourmasters'), findsOneWidget);
+    expect(find.text('3-VP disc'), findsOneWidget);
+    expect(find.text('Bonus tiles token'), findsOneWidget);
+    expect(find.text('Deliveries'), findsNothing);
+    expect(find.text('Stations'), findsNothing);
+    expect(find.text('Job market token'), findsNothing);
+    expect(
+      find.image(
+        const AssetImage(
+          'assets/games/great_western_trail_new_zealand/icons/pathfinder.png',
+        ),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('—').last);
+    await pumpFor(tester);
+    expect(find.text('5'), findsWidgets);
   });
 
   testWidgets('Argentina pad uses pesos, ships, and a 2-VP disc', (

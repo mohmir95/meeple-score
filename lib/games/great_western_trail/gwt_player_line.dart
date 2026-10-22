@@ -10,6 +10,9 @@ class GwtPlayerLine {
     this.stations = 0,
     this.hazards = 0,
     this.farmers = 0,
+    this.tradingPosts = 0,
+    this.harbours = 0,
+    this.pathfinder = 0,
     this.cattle = 0,
     this.objectives = 0,
     this.stationMasters = 0,
@@ -27,6 +30,9 @@ class GwtPlayerLine {
   final int stations;
   final int hazards;
   final int farmers;
+  final int tradingPosts;
+  final int harbours;
+  final int pathfinder;
   final int cattle;
   final int objectives;
   final int stationMasters;
@@ -45,6 +51,9 @@ class GwtPlayerLine {
     int? stations,
     int? hazards,
     int? farmers,
+    int? tradingPosts,
+    int? harbours,
+    int? pathfinder,
     int? cattle,
     int? objectives,
     int? stationMasters,
@@ -61,6 +70,9 @@ class GwtPlayerLine {
       stations: stations ?? this.stations,
       hazards: hazards ?? this.hazards,
       farmers: farmers ?? this.farmers,
+      tradingPosts: tradingPosts ?? this.tradingPosts,
+      harbours: harbours ?? this.harbours,
+      pathfinder: pathfinder ?? this.pathfinder,
       cattle: cattle ?? this.cattle,
       objectives: objectives ?? this.objectives,
       stationMasters: stationMasters ?? this.stationMasters,
@@ -80,6 +92,9 @@ class GwtPlayerLine {
       'stations': stations,
       'hazards': hazards,
       'farmers': farmers,
+      'tradingPosts': tradingPosts,
+      'harbours': harbours,
+      'pathfinder': pathfinder,
       'cattle': cattle,
       'objectives': objectives,
       'stationMasters': stationMasters,
@@ -99,6 +114,9 @@ class GwtPlayerLine {
       stations: readInt(json['stations']),
       hazards: readInt(json['hazards']),
       farmers: readInt(json['farmers']),
+      tradingPosts: readInt(json['tradingPosts']),
+      harbours: readInt(json['harbours']),
+      pathfinder: readInt(json['pathfinder']),
       cattle: readInt(json['cattle']),
       objectives: readInt(json['objectives']),
       stationMasters: readInt(json['stationMasters']),

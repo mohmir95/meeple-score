@@ -93,4 +93,31 @@ void main() {
     );
     expect(GwtScoring.totalFor(line), 4 + 10 + 5 - 2 + 3 + 4 + 8 + 3 + 2);
   });
+
+  test('New Zealand pad scores its 12 categories', () {
+    const line = GwtPlayerLine(
+      dollars: 23,
+      buildings: 10,
+      tradingPosts: -3,
+      harbours: 7,
+      pathfinder: 6,
+      hazards: 9,
+      cattle: 12,
+      objectives: -2,
+      stationMasters: 5,
+      clearedThreeVpSpace: true,
+      playerBoard: 14,
+      hasJobMarketToken: true,
+    );
+
+    expect(
+      GwtScoring.totalFor(line, pad: GwtPadKind.newZealand),
+      4 + 10 - 3 + 7 + 6 + 9 + 12 - 2 + 5 + 3 + 14 + 5,
+    );
+
+    final restored = GwtPlayerLine.fromJson(line.toJson());
+    expect(restored.tradingPosts, -3);
+    expect(restored.harbours, 7);
+    expect(restored.pathfinder, 6);
+  });
 }

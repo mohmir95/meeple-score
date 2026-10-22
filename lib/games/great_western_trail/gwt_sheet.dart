@@ -54,6 +54,7 @@ class GwtSheet extends StatelessWidget {
       'assets/games/great_western_trail_argentina/icons/farmers.png';
   static const _iconTwoVp =
       'assets/games/great_western_trail_argentina/icons/two-vp.png';
+  static const _nzIcons = 'assets/games/great_western_trail_new_zealand/icons';
 
   final GwtState state;
   final ValueChanged<GwtState> onChanged;
@@ -217,7 +218,217 @@ class GwtSheet extends StatelessWidget {
     if (pad == GwtPadKind.argentina) {
       return _argentinaRows(context, l10n);
     }
+    if (pad == GwtPadKind.newZealand) {
+      return _newZealandRows(context, l10n);
+    }
     return _classicRows(context, l10n);
+  }
+
+  /// Follows the 12 categories of the New Zealand scoring pad.
+  List<_GwtRow> _newZealandRows(BuildContext context, AppLocalizations l10n) {
+    return [
+      _GwtRow(
+        title: _pad(l10n, 'coins'),
+        hint: _pad(l10n, 'coinsHint'),
+        icon: Icons.monetization_on_outlined,
+        iconAsset: '$_nzIcons/coins.png',
+        wideIcon: true,
+        color: _sage,
+        valueOf: (line) => line.dollars,
+        displayOf: (line) {
+          final vp = GwtScoring.coinPoints(line.dollars);
+          return line.dollars == 0 ? '0' : '${line.dollars}→$vp';
+        },
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'coinsTitle'),
+          helper: _pad(l10n, 'coinsHelper'),
+          value: line.dollars,
+          min: 0,
+          update: (current, value) => current.copyWith(dollars: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'buildings'),
+        hint: _pad(l10n, 'buildingsHint'),
+        icon: Icons.home_work_outlined,
+        iconAsset: '$_nzIcons/buildings.png',
+        color: _dust,
+        valueOf: (line) => line.buildings,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'buildings'),
+          helper: _pad(l10n, 'buildingsHelper'),
+          value: line.buildings,
+          min: 0,
+          update: (current, value) => current.copyWith(buildings: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'tradingPosts'),
+        hint: _pad(l10n, 'tradingPostsHint'),
+        icon: Icons.storefront_outlined,
+        iconAsset: '$_nzIcons/trading-posts.png',
+        wideIcon: true,
+        color: _sage,
+        valueOf: (line) => line.tradingPosts,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'tradingPosts'),
+          helper: _pad(l10n, 'tradingPostsHelper'),
+          value: line.tradingPosts,
+          update: (current, value) => current.copyWith(tradingPosts: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'harbours'),
+        hint: _pad(l10n, 'harboursHint'),
+        icon: Icons.directions_boat_outlined,
+        iconAsset: '$_nzIcons/harbours.png',
+        wideIcon: true,
+        color: _dust,
+        valueOf: (line) => line.harbours,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'harbours'),
+          helper: _pad(l10n, 'harboursHelper'),
+          value: line.harbours,
+          min: 0,
+          update: (current, value) => current.copyWith(harbours: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'pathfinder'),
+        hint: _pad(l10n, 'pathfinderHint'),
+        icon: Icons.explore_outlined,
+        iconAsset: '$_nzIcons/pathfinder.png',
+        color: _sage,
+        valueOf: (line) => line.pathfinder,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'pathfinder'),
+          helper: _pad(l10n, 'pathfinderHelper'),
+          value: line.pathfinder,
+          min: 0,
+          update: (current, value) => current.copyWith(pathfinder: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'hazards'),
+        hint: _pad(l10n, 'hazardsHint'),
+        icon: Icons.landscape_outlined,
+        iconAsset: '$_nzIcons/hazards.png',
+        wideIcon: true,
+        color: _dust,
+        valueOf: (line) => line.hazards,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'hazards'),
+          helper: _pad(l10n, 'hazardsHelper'),
+          value: line.hazards,
+          update: (current, value) => current.copyWith(hazards: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'cattle'),
+        hint: _pad(l10n, 'cattleHint'),
+        icon: Icons.pets_outlined,
+        iconAsset: '$_nzIcons/sheep.png',
+        wideIcon: true,
+        color: _sage,
+        valueOf: (line) => line.cattle,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'cattle'),
+          helper: _pad(l10n, 'cattleHelper'),
+          value: line.cattle,
+          update: (current, value) => current.copyWith(cattle: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'objectives'),
+        hint: _pad(l10n, 'objectivesHint'),
+        icon: Icons.task_alt_outlined,
+        iconAsset: '$_nzIcons/objectives.png',
+        color: _dust,
+        valueOf: (line) => line.objectives,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'objectives'),
+          helper: _pad(l10n, 'objectivesHelper'),
+          value: line.objectives,
+          update: (current, value) => current.copyWith(objectives: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'stationMasters'),
+        hint: _pad(l10n, 'stationMastersHint'),
+        icon: Icons.anchor,
+        iconAsset: '$_nzIcons/harbourmasters.png',
+        color: _sage,
+        valueOf: (line) => line.stationMasters,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'stationMasters'),
+          helper: _pad(l10n, 'stationMastersHelper'),
+          value: line.stationMasters,
+          min: 0,
+          update: (current, value) => current.copyWith(stationMasters: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'threeVp'),
+        hint: _pad(l10n, 'threeVpHint'),
+        icon: Icons.looks_3_outlined,
+        iconAsset: '$_nzIcons/three-vp.png',
+        color: _dust,
+        valueOf: (line) => GwtScoring.discPoints(line.clearedThreeVpSpace, pad),
+        displayOf: (line) => line.clearedThreeVpSpace
+            ? '${GwtScoring.discPoints(true, pad)}'
+            : '—',
+        onTap: _toggleThree,
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'playerBoard'),
+        hint: _pad(l10n, 'playerBoardHint'),
+        icon: Icons.person_outline,
+        iconAsset: '$_nzIcons/player-board.png',
+        wideIcon: true,
+        color: _sage,
+        valueOf: (line) => line.playerBoard,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'playerBoard'),
+          helper: _pad(l10n, 'playerBoardHelper'),
+          value: line.playerBoard,
+          min: 0,
+          update: (current, value) => current.copyWith(playerBoard: value),
+        ),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'endGameToken'),
+        hint: _pad(l10n, 'endGameTokenHint'),
+        icon: Icons.workspace_premium_outlined,
+        iconAsset: '$_nzIcons/bonus-token.png',
+        color: _dust,
+        valueOf: (line) =>
+            GwtScoring.jobMarketPoints(line.hasJobMarketToken, pad),
+        displayOf: (line) => line.hasJobMarketToken
+            ? '${GwtScoring.jobMarketPoints(true, pad)}'
+            : '—',
+        onTap: _toggleJobMarket,
+      ),
+    ];
   }
 
   List<_GwtRow> _classicRows(BuildContext context, AppLocalizations l10n) {
@@ -396,8 +607,11 @@ class GwtSheet extends StatelessWidget {
         icon: Icons.workspace_premium_outlined,
         iconAsset: _iconJobMarket,
         color: _sage,
-        valueOf: (line) => GwtScoring.jobMarketPoints(line.hasJobMarketToken),
-        displayOf: (line) => line.hasJobMarketToken ? '2' : '—',
+        valueOf: (line) =>
+            GwtScoring.jobMarketPoints(line.hasJobMarketToken, pad),
+        displayOf: (line) => line.hasJobMarketToken
+            ? '${GwtScoring.jobMarketPoints(true, pad)}'
+            : '—',
         onTap: _toggleJobMarket,
       ),
     ];
@@ -595,8 +809,11 @@ class GwtSheet extends StatelessWidget {
         icon: Icons.workspace_premium_outlined,
         iconAsset: _iconJobMarket,
         color: _dust,
-        valueOf: (line) => GwtScoring.jobMarketPoints(line.hasJobMarketToken),
-        displayOf: (line) => line.hasJobMarketToken ? '2' : '—',
+        valueOf: (line) =>
+            GwtScoring.jobMarketPoints(line.hasJobMarketToken, pad),
+        displayOf: (line) => line.hasJobMarketToken
+            ? '${GwtScoring.jobMarketPoints(true, pad)}'
+            : '—',
         onTap: _toggleJobMarket,
       ),
     ];
@@ -625,6 +842,9 @@ class GwtSheet extends StatelessWidget {
           columnWidth: columnWidth,
           rowHeight: compact ? 56 : 50,
           compact: compact,
+          // Most New Zealand rows pair two icons, so every icon gets the
+          // wide slot and the titles line up.
+          iconSlot: pad == GwtPadKind.newZealand ? 51 : null,
         );
 
         return Column(
@@ -879,12 +1099,17 @@ class GwtSheet extends StatelessWidget {
             )
           : Row(
               children: [
-                _padIcon(
-                  icon: icon,
-                  iconAsset: iconAsset,
-                  size: 30,
-                  wide: wideIcon,
-                  color: _ink,
+                SizedBox(
+                  width: metrics.iconSlot,
+                  child: Center(
+                    child: _padIcon(
+                      icon: icon,
+                      iconAsset: iconAsset,
+                      size: 30,
+                      wide: wideIcon,
+                      color: _ink,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -944,12 +1169,16 @@ class _PadMetrics {
     required this.columnWidth,
     required this.rowHeight,
     required this.compact,
+    this.iconSlot,
   });
 
   final double labelWidth;
   final double columnWidth;
   final double rowHeight;
   final bool compact;
+
+  /// Fixed icon width in the wide label layout; null sizes to each icon.
+  final double? iconSlot;
 }
 
 class _GwtRow {
