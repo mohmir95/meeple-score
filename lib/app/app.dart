@@ -6,6 +6,8 @@ import '../domain/game_registry.dart';
 import '../features/home/home_screen.dart';
 import '../l10n/l10n_scope.dart';
 import '../l10n/locale_controller.dart';
+import '../shared/update/app_update.dart';
+import '../shared/update/update_banner.dart';
 import 'theme.dart';
 
 class BoardGameScoreSheetApp extends StatefulWidget {
@@ -14,11 +16,15 @@ class BoardGameScoreSheetApp extends StatefulWidget {
     required this.repository,
     required this.registry,
     required this.localeController,
+    this.updateController,
   });
 
   final GameSessionRepository repository;
   final GameRegistry registry;
   final LocaleController localeController;
+
+  /// Watches for newer deployed builds; null in tests.
+  final AppUpdateController? updateController;
 
   @override
   State<BoardGameScoreSheetApp> createState() => _BoardGameScoreSheetAppState();
@@ -68,19 +74,20 @@ class _BoardGameScoreSheetAppState extends State<BoardGameScoreSheetApp> {
         darkTheme: AppTheme.light(),
         themeMode: ThemeMode.light,
         locale: Locale(strings.language.id),
-        supportedLocales: const [
-          Locale('en'),
-          Locale('fa'),
-        ],
+        supportedLocales: const [Locale('en'), Locale('fa')],
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
         builder: (context, child) {
+          final page = child ?? const SizedBox.shrink();
+          final updates = widget.updateController;
           return Directionality(
             textDirection: direction,
-            child: child ?? const SizedBox.shrink(),
+            child: updates == null
+                ? page
+                : UpdateBanner(controller: updates, child: page),
           );
         },
         home: HomeScreen(

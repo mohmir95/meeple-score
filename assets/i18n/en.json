@@ -1,5 +1,8 @@
 {
   "app.title": "Meeple Score",
+  "update.available": "A new version of Meeple Score is available.",
+  "update.now": "Update",
+  "update.later": "Later",
   "app.iconLabel": "Meeple Score",
   "language.english": "English",
   "language.persian": "فارسی",

@@ -5,6 +5,7 @@ import 'app/app.dart';
 import 'data/shared_preferences_session_repository.dart';
 import 'domain/game_registry.dart';
 import 'l10n/locale_controller.dart';
+import 'shared/update/app_update.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +16,7 @@ Future<void> main() async {
       repository: SharedPreferencesSessionRepository(prefs),
       registry: GameRegistry(),
       localeController: localeController,
+      updateController: AppUpdateController()..start(),
     ),
   );
 }

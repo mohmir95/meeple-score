@@ -57,11 +57,17 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # The app compares its compiled APP_BUILD with app_version.json to offer
+      # an update when a newer build is deployed.
       - name: Build web
-        run: flutter build web --release --base-href /${{ github.event.repository.name }}/
+        run: >-
+          flutter build web --release
+          --base-href /${{ github.event.repository.name }}/
+          --dart-define=APP_BUILD=${{ github.sha }}
 
       - name: Prepare GitHub Pages files
         run: |
+          echo '{"build":"${{ github.sha }}"}' > build/web/app_version.json
           touch build/web/.nojekyll
           cp build/web/index.html build/web/404.html
 
