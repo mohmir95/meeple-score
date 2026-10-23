@@ -1,18 +1,17 @@
 import 'dart:math' as math;
 
 /// The 4 bonus cards tiles next to the sea routes board (New Zealand), from
-/// the lowest drawn set to the highest. [gold] is the price of one card.
+/// the lowest drawn set to the highest.
 enum GwtBonusTile {
-  steeringWheel('steeringWheel', 'steering-wheel', 3),
-  barrel('barrel', 'barrel', 3),
-  bell('bell', 'bell', 4),
-  compass('compass', 'compass', 5);
+  steeringWheel('steeringWheel', 'steering-wheel'),
+  barrel('barrel', 'barrel'),
+  bell('bell', 'bell'),
+  compass('compass', 'compass');
 
-  const GwtBonusTile(this.key, this._file, this.gold);
+  const GwtBonusTile(this.key, this._file);
 
   final String key;
   final String _file;
-  final int gold;
 
   String get asset => '${GwtBonusCardsSupply.assetRoot}/$_file.png';
 }

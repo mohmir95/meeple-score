@@ -73,14 +73,12 @@ void main() {
         findsOneWidget,
       );
     }
-    expect(find.text('Steering wheel'), findsOneWidget);
-    expect(find.text('5 gold per card'), findsOneWidget);
+    expect(find.textContaining('gold'), findsNothing);
     expect(find.text('3 cards'), findsNWidgets(4));
 
     await tester.tap(find.text('4 players'));
     await pumpFor(tester);
     expect(find.text('6 cards'), findsNWidgets(4));
-    expect(find.textContaining('plus 5 more'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('gwt-bonus-randomize')));
     await pumpFor(tester);
@@ -88,28 +86,41 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('fits a narrow phone', (tester) async {
-    tester.view.physicalSize = const Size(360, 900);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
+  for (final size in [const Size(360, 900), const Size(412, 1000)]) {
+    testWidgets('fits a ${size.width.toInt()}px phone', (tester) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
 
-    await pumpWithL10n(
-      tester,
-      const GwtBonusCardsRandomizerScreen(
-        game: GreatWesternTrailNewZealandGame(),
-      ),
-    );
-    await pumpUntilFound(
-      tester,
-      find.byKey(const ValueKey('gwt-bonus-randomize')),
-    );
-    // All 4 stacks share one row on a phone.
-    final tops = {
-      for (final tile in GwtBonusTile.values)
-        tester.getTopLeft(find.byKey(ValueKey('gwt-bonus-${tile.key}'))).dy,
-    };
-    expect(tops, hasLength(1));
-    expect(find.text('5 gold'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
+      await pumpWithL10n(
+        tester,
+        const GwtBonusCardsRandomizerScreen(
+          game: GreatWesternTrailNewZealandGame(),
+        ),
+      );
+      await pumpUntilFound(
+        tester,
+        find.byKey(const ValueKey('gwt-bonus-randomize')),
+      );
+      // Two stacks per row on a phone, each capped in width.
+      final tops = {
+        for (final tile in GwtBonusTile.values)
+          tester.getTopLeft(find.byKey(ValueKey('gwt-bonus-${tile.key}'))).dy,
+      };
+      expect(tops, hasLength(2));
+      final stack = tester.getSize(
+        find.byKey(const ValueKey('gwt-bonus-bell')),
+      );
+      expect(stack.width, lessThanOrEqualTo(180));
+      if (size.width >= 412) {
+        // With room to spare, both rows fit the area without scrolling.
+        final area = tester.getRect(find.byType(SingleChildScrollView).last);
+        final bottom = tester
+            .getBottomLeft(find.byKey(const ValueKey('gwt-bonus-compass')))
+            .dy;
+        expect(bottom, lessThanOrEqualTo(area.bottom));
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
 }
