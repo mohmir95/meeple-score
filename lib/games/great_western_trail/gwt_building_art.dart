@@ -1,12 +1,14 @@
 import 'gwt_buildings_layout.dart';
 
-enum GwtBuildingArtSet { firstEdition, secondEdition, argentina }
+enum GwtBuildingArtSet { firstEdition, secondEdition, argentina, newZealand }
 
 abstract final class GwtBuildingArt {
   static const _root = 'assets/games/great_western_trail/buildings';
   static const _secondRoot = 'assets/games/great_western_trail_2e/buildings';
   static const _argentinaRoot =
       'assets/games/great_western_trail_argentina/buildings';
+  static const _newZealandRoot =
+      'assets/games/great_western_trail_new_zealand/buildings';
   static const placeholderAsset = '$_root/placeholder.jpg';
 
   static String? private(
@@ -26,6 +28,12 @@ abstract final class GwtBuildingArt {
       }
       return placeholderAsset;
     }
+    if (artSet == GwtBuildingArtSet.newZealand) {
+      if (number >= 1 && number <= 10) {
+        return '$_newZealandRoot/private/$number${side.code.toLowerCase()}.jpg';
+      }
+      return placeholderAsset;
+    }
     if (number < 1 || number > 13) {
       return null;
     }
@@ -41,6 +49,9 @@ abstract final class GwtBuildingArt {
     }
     if (artSet == GwtBuildingArtSet.argentina) {
       return '$_argentinaRoot/public/${tile.toLowerCase()}.jpg';
+    }
+    if (artSet == GwtBuildingArtSet.newZealand) {
+      return '$_newZealandRoot/public/${tile.toLowerCase()}.jpg';
     }
     return '$_root/public/${tile.toLowerCase()}.jpg';
   }

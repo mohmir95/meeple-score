@@ -28,6 +28,7 @@ Future<void> _openStartingResources(
 final _firstEdition = find.byType(GameCard).first;
 final _secondEdition = find.text('Second Edition');
 final _argentina = find.text('Argentina');
+final _newZealand = find.text('New Zealand');
 
 void main() {
   testWidgets('CoB starting resources opens the setup chart', (tester) async {
@@ -312,10 +313,61 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('GWT New Zealand starts at 7 pounds with cards and a token', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    const setup = GwtStartingSetup.newZealand;
+    await _openStartingResources(tester, gameCard: _newZealand);
+
+    for (var seat = 1; seat <= 4; seat++) {
+      expect(find.text('Player $seat:'), findsOneWidget);
+      expect(find.text('${6 + seat} pounds'), findsOneWidget);
+      expect(find.text('${3 + seat} cards'), findsOneWidget);
+    }
+    expect(
+      find.image(AssetImage(setup.coin5Asset)),
+      findsNWidgets(1 + 1 + 1 + 2),
+    );
+    expect(
+      find.image(AssetImage(setup.coin1Asset)),
+      findsNWidgets(2 + 3 + 4 + 0),
+    );
+    expect(find.image(AssetImage(setup.token.asset)), findsNWidgets(4));
+    expect(
+      find.byKey(const ValueKey('gwt-exhaustion-card-callout')),
+      findsNothing,
+    );
+    expect(
+      find.text(
+        'Players 2, 3 and 4: discard down to 4 cards at the start of your '
+        'first turn.',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('gwt-pathfinder-callout')),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('space 0 of the pathfinder track'),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('gwt-rails-to-the-north-option')),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   for (final (name, gameCard, setup, railsSwitch) in [
     ('first edition', _firstEdition, GwtStartingSetup.firstEdition, true),
     ('second edition', _secondEdition, GwtStartingSetup.secondEdition, false),
     ('Argentina', _argentina, GwtStartingSetup.argentina, false),
+    ('New Zealand', _newZealand, GwtStartingSetup.newZealand, false),
   ]) {
     for (final width in [360.0, 412.0]) {
       testWidgets('GWT $name rows fit one line at ${width}px', (tester) async {

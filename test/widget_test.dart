@@ -6,6 +6,7 @@ import 'package:board_game_score_sheet/domain/models/player.dart';
 import 'package:board_game_score_sheet/features/home/game_card.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_argentina_game.dart';
+import 'package:board_game_score_sheet/games/great_western_trail/gwt_new_zealand_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_buildings_layout.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_buildings_randomizer_screen.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_config.dart';
@@ -231,7 +232,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Buildings Randomizer'), findsOneWidget);
     expect(find.text('Starting Resources'), findsOneWidget);
-    expect(find.text('Coming Soon'), findsNWidgets(2));
+    expect(find.text('Coming Soon'), findsNothing);
     await tester.tap(find.text('Scoresheet'));
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Start game'));
@@ -766,6 +767,119 @@ void main() {
     expect(_publicTileOn(tester, 'A'), 'C');
     expect(_publicTileOn(tester, 'H'), 'H');
   });
+
+  testWidgets(
+    'GWT New Zealand has ten private buildings, no expansions, and public A–H',
+    (tester) async {
+    tester.view.physicalSize = const Size(1200, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    const allA = GwtBuildingsLayout([
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+      GwtBuildingSide.a,
+    ]);
+    await pumpWithL10n(
+      tester,
+      const GwtBuildingsRandomizerScreen(
+        game: GreatWesternTrailNewZealandGame(),
+        initialLayout: allA,
+        initialPublicLayout: GwtPublicBuildingsLayout(
+          ['C', 'A', 'G', 'B', 'F', 'D', 'E', 'H'],
+          locations: GwtPublicBuildingsLayout.argentinaLocations,
+        ),
+      ),
+    );
+    await pumpUntilFound(
+      tester,
+      find.byKey(const ValueKey('gwt-buildings-randomize')),
+    );
+    expect(find.text('"Rails to the North" Expansion'), findsNothing);
+    expect(find.text('"13th Building" Expansion'), findsNothing);
+    expect(find.byKey(const ValueKey('gwt-thirteenth-building')), findsNothing);
+    expect(find.byKey(const ValueKey('gwt-rails-to-the-north')), findsNothing);
+    expect(find.byType(Card), findsNothing);
+    for (var n = 1; n <= 10; n++) {
+      expect(find.byKey(ValueKey('gwt-building-$n')), findsOneWidget);
+    }
+    expect(find.byKey(const ValueKey('gwt-building-11')), findsNothing);
+    expect(find.byKey(const ValueKey('gwt-building-13')), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-building-1')),
+        matching: find.image(
+          const AssetImage(
+            'assets/games/great_western_trail_new_zealand/buildings/private/1a.jpg',
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-building-10')),
+        matching: find.image(
+          const AssetImage(
+            'assets/games/great_western_trail_new_zealand/buildings/private/10a.jpg',
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('gwt-tab-public')));
+    await pumpFor(tester);
+    await pumpUntilFound(
+      tester,
+      find.byKey(const ValueKey('gwt-public-location-A')),
+    );
+    expect(
+      find.text(
+        'Shuffle the 8 public buildings onto board spaces A–H. For a first '
+        'game, place each tile on its matching letter.',
+      ),
+      findsOneWidget,
+    );
+    for (final location in GwtPublicBuildingsLayout.argentinaLocations) {
+      expect(
+        find.byKey(ValueKey('gwt-public-location-$location')),
+        findsOneWidget,
+      );
+    }
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-public-location-A')),
+        matching: find.image(
+          const AssetImage(
+            'assets/games/great_western_trail_new_zealand/buildings/public/c.jpg',
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('gwt-public-location-H')),
+        matching: find.image(
+          const AssetImage(
+            'assets/games/great_western_trail_new_zealand/buildings/public/h.jpg',
+          ),
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(_publicTileOn(tester, 'A'), 'C');
+    expect(_publicTileOn(tester, 'H'), 'H');
+  });
+
 
   testWidgets('Arnak pad uses research, idols, guardians, and fear', (
     tester,

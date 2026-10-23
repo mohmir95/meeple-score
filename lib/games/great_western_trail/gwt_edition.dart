@@ -62,14 +62,14 @@ abstract class GwtEditionGame extends BoardGame {
 
   /// First Edition adds buildings 11–12 via Rails to the North.
   /// Second Edition adds building 13 with the same expansion.
-  /// Argentina has no building expansions.
+  /// Argentina and New Zealand have no building expansions.
   bool get includeRailsToTheNorthExpansion => true;
 
   /// First Edition has 10 private buildings; Second Edition has 12.
   int get privateBuildingBaseCount => 10;
 
   /// First and Second Edition shuffle public tiles onto A–G.
-  /// Argentina uses A–H.
+  /// Argentina and New Zealand use A–H.
   List<String> get publicBuildingLocations =>
       GwtPublicBuildingsLayout.classicLocations;
 

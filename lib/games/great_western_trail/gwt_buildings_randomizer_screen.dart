@@ -417,7 +417,10 @@ class _PublicBuildingsPanel extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(padding, padding, padding, 8),
               child: Text(
-                l10n.t('gwt.randomizer.publicHint'),
+                l10n.t('gwt.randomizer.publicHint', {
+                  'n': '${layout.locations.length}',
+                  'last': layout.locations.last,
+                }),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   height: 1.35,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,

@@ -51,7 +51,12 @@ class GwtStartingSetup {
     this.coinKey = 'gwt.startingResources.coin',
     this.exhaustionCardAsset,
     this.exhaustionCardAspect = 1,
+    this.pathfinderIconAsset,
   });
+
+  /// New Zealand: each player also puts a disc on space 0 of the pathfinder
+  /// track during their first turn.
+  final String? pathfinderIconAsset;
 
   /// Argentina shuffles 1 Exhaustion card into every starting deck.
   final String? exhaustionCardAsset;
@@ -121,6 +126,25 @@ class GwtStartingSetup {
     exhaustionCardAsset:
         'assets/games/great_western_trail_argentina/icons/exhaustion-card.png',
     exhaustionCardAspect: 307 / 480,
+  );
+
+  static const newZealand = GwtStartingSetup(
+    coin5Asset: 'assets/games/great_western_trail_new_zealand/icons/coin-5.png',
+    coin1Asset: 'assets/games/great_western_trail_new_zealand/icons/coin-1.png',
+    token: GwtTokenArt.cutout(
+      asset:
+          'assets/games/great_western_trail_new_zealand/icons/exchange-token.png',
+      size: Size(139, 111),
+    ),
+    cardBackAsset:
+        'assets/games/great_western_trail_new_zealand/icons/card-back.png',
+    cardBackAspect: 97 / 142,
+    firstPlayerCards: 4,
+    firstPlayerMoney: 7,
+    moneyKey: 'gwt.startingResources.pounds',
+    coinKey: 'gwt.startingResources.poundCoin',
+    pathfinderIconAsset:
+        'assets/games/great_western_trail_new_zealand/icons/pathfinder.png',
   );
 
   /// Hand size players discard down to at the start of their first turn.
@@ -251,6 +275,16 @@ class _GwtStartingResourcesScreenState
                             }),
                           ),
                         ],
+                        if (setup.pathfinderIconAsset case final asset?) ...[
+                          SizedBox(height: compact ? 10 : 12),
+                          _DiscardCallout(
+                            key: const ValueKey('gwt-pathfinder-callout'),
+                            iconAsset: asset,
+                            text: l10n.t(
+                              'gwt.startingResources.pathfinderNote',
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -341,17 +375,22 @@ class _ExhaustionCardCallout extends StatelessWidget {
   }
 }
 
+/// First-turn reminder. Defaults to the hand-limit discard note.
 class _DiscardCallout extends StatelessWidget {
-  const _DiscardCallout({required this.text});
+  const _DiscardCallout({
+    super.key = const ValueKey('gwt-discard-callout'),
+    required this.text,
+    this.iconAsset,
+  });
 
   final String text;
+  final String? iconAsset;
 
   static const _ink = Color(0xFF6B2030);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      key: const ValueKey('gwt-discard-callout'),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: _ink.withValues(alpha: 0.08),
@@ -361,7 +400,17 @@ class _DiscardCallout extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.back_hand_outlined, size: 20, color: _ink),
+          if (iconAsset case final asset?)
+            Image.asset(
+              asset,
+              width: 20,
+              height: 20,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.medium,
+              excludeFromSemantics: true,
+            )
+          else
+            const Icon(Icons.back_hand_outlined, size: 20, color: _ink),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

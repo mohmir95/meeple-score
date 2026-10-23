@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 /// Neutral/public buildings placed on the matching board spaces.
-/// First and Second Edition use A–G; Argentina uses A–H.
+/// First and Second Edition use A–G; Argentina and New Zealand use A–H.
 /// A first game puts each tile on its own letter; later games shuffle them.
 class GwtPublicBuildingsLayout {
   const GwtPublicBuildingsLayout(
