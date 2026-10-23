@@ -63,6 +63,12 @@ abstract class BoardGame {
   /// Optional page that deals random character/leader choices.
   Widget? buildLeadersRandomizer() => null;
 
+  /// Hub tile for dealing a game's bonus card sets.
+  bool get showBonusCardsRandomizer => false;
+
+  /// Ready randomizer UI. Null keeps the hub tile disabled as Coming Soon.
+  Widget? buildBonusCardsRandomizer() => null;
+
   bool get showDuchyBoardRandomizer => false;
 
   /// Ready randomizer UI. Null keeps the hub tile disabled as Coming Soon.

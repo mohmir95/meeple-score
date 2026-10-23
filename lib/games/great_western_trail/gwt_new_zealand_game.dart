@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/models/game_state.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
+import 'gwt_bonus_cards_randomizer_screen.dart';
 import 'gwt_building_art.dart';
 import 'gwt_buildings_randomizer_screen.dart';
 import 'gwt_edition.dart';
@@ -65,6 +66,14 @@ class GreatWesternTrailNewZealandGame extends GwtEditionGame {
   @override
   Widget? buildBuildingsRandomizer() {
     return GwtBuildingsRandomizerScreen(game: this);
+  }
+
+  @override
+  bool get showBonusCardsRandomizer => true;
+
+  @override
+  Widget? buildBonusCardsRandomizer() {
+    return GwtBonusCardsRandomizerScreen(game: this);
   }
 
   @override

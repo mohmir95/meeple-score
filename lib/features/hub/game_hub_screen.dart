@@ -34,6 +34,7 @@ class GameHubScreen extends StatelessWidget {
           final startingResources = game.buildStartingResources();
           final duchyBoards = game.buildDuchyBoardRandomizer();
           final leaders = game.buildLeadersRandomizer();
+          final bonusCards = game.buildBonusCardsRandomizer();
           final tiles = <Widget>[
             if (game.showQuickReference)
               _HubBanner(
@@ -124,6 +125,26 @@ class GameHubScreen extends StatelessWidget {
                           MaterialPageRoute<void>(
                             builder: (context) =>
                                 game.buildLeadersRandomizer()!,
+                          ),
+                        );
+                      },
+              ),
+            if (game.showBonusCardsRandomizer)
+              _HubBanner(
+                key: const ValueKey('hub-bonus-cards-randomizer'),
+                title: l10n.t('hub.bonusCardsRandomizer'),
+                icon: Icons.style_outlined,
+                color: game.accentColor,
+                compact: compact,
+                enabled: bonusCards != null,
+                badge: bonusCards == null ? l10n.t('hub.comingSoon') : null,
+                onTap: bonusCards == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) =>
+                                game.buildBonusCardsRandomizer()!,
                           ),
                         );
                       },

@@ -232,6 +232,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Buildings Randomizer'), findsOneWidget);
     expect(find.text('Starting Resources'), findsOneWidget);
+    expect(find.text('Bonus Cards Randomizer'), findsOneWidget);
     expect(find.text('Coming Soon'), findsNothing);
     await tester.tap(find.text('Scoresheet'));
     await pumpFor(tester);
