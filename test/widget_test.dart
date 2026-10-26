@@ -161,14 +161,13 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
     final cards = find.byType(GameCard);
-    expect(cards, findsNWidgets(6));
+    expect(cards, findsNWidgets(7));
     final first = tester.getRect(cards.first);
-    final rowStart = tester.getRect(cards.at(3));
-    final last = tester.getRect(cards.last);
-    expect(rowStart.top, greaterThan(first.bottom));
+    final secondRow = tester.getRect(cards.at(3));
+    final rowStart = tester.getRect(cards.at(6));
+    expect(secondRow.left, closeTo(first.left, 1));
+    expect(rowStart.top, greaterThan(secondRow.bottom));
     expect(rowStart.left, closeTo(first.left, 1));
-    expect(last.top, closeTo(rowStart.top, 1));
-    expect(last.left, greaterThan(rowStart.right));
 
     // The grid as a whole stays centered on the page.
     final right = tester.getRect(cards.at(2)).right;

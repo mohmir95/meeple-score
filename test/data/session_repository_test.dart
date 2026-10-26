@@ -14,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   test('registry exposes Great Western Trail editions', () {
     final registry = GameRegistry();
-    expect(registry.games, hasLength(6));
+    expect(registry.games, hasLength(7));
     expect(
       registry.lookup(GreatWesternTrailGame.idValue),
       isA<GreatWesternTrailGame>(),

@@ -5,6 +5,7 @@ import '../games/great_western_trail/gwt_argentina_game.dart';
 import '../games/great_western_trail/gwt_game.dart';
 import '../games/great_western_trail/gwt_new_zealand_game.dart';
 import '../games/lost_ruins_of_arnak/arnak_game.dart';
+import '../games/shelfie_stacker/shelfie_game.dart';
 
 /// Single registration point for available board games.
 class GameRegistry {
@@ -18,6 +19,7 @@ class GameRegistry {
               GreatWesternTrailNewZealandGame(),
               LostRuinsOfArnakGame(),
               CastlesOfBurgundySpecialEditionGame(),
+              ShelfieStackerGame(),
             ],
       );
 
