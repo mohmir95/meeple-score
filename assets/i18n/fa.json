@@ -18,6 +18,7 @@
   "hub.duchyBoardRandomizer": "تصادفی‌ساز تخته دوک‌نشین",
   "hub.leadersRandomizer": "رهبران تصادفی",
   "hub.bonusCardsRandomizer": "کارت‌های پاداش تصادفی",
+  "hub.setupHints": "نکته‌های چیدمان",
   "setup.continueSaved": "ادامه بازی ذخیره‌شده",
   "setup.reviewLast": "مشاهده بازی قبلی",
   "setup.storedOnDevice": "روی همین دستگاه ذخیره می‌شود.",
@@ -365,5 +366,18 @@
   "shelfie.tieTitle": "کم‌ارزش‌ترین کارت شخصیت دست کیست؟",
   "shelfie.tieMessage": "{names} مساوی هستند. کسی را انتخاب کنید که کم‌ارزش‌ترین کارت شخصیت را هنوز در دست دارد.",
   "shelfie.tieShared": "باز هم مساوی",
-  "shelfie.tieSharedHint": "بازیکنان مساوی پیروزی را تقسیم می‌کنند و باید ده بار سریع بگویند «Shelfie Stacker Sidekick»."
+  "shelfie.tieSharedHint": "بازیکنان مساوی پیروزی را تقسیم می‌کنند و باید ده بار سریع بگویند «Shelfie Stacker Sidekick».",
+  "shelfie.setup.solo": "انفرادی",
+  "shelfie.setup.players": "{n} بازیکن",
+  "shelfie.setup.boxesTitle": "{n} جعبه تحویل",
+  "shelfie.setup.boxesBody": "وسط میز، برای هر بازیکن ۱ جعبه تحویل و ۱ جعبه تحویل اضافه بگذارید. جعبه‌های استفاده‌نشده را به، اِم، جعبه بازی برگردانید.",
+  "shelfie.setup.box": "جعبه تحویل",
+  "shelfie.setup.diceTitle": "{n} تاس در کیسه",
+  "shelfie.setup.diceAll": "همه {n} تاس را در کیسه بریزید.",
+  "shelfie.setup.diceRemove": "از هر رنگ {n} تاس (در کل {total} تاس) کنار بگذارید و به جعبه برگردانید. بقیه را در کیسه بریزید.",
+  "shelfie.setup.removed": "−{n} به جعبه",
+  "shelfie.setup.color.blue": "آبی",
+  "shelfie.setup.color.green": "سبز",
+  "shelfie.setup.color.orange": "نارنجی",
+  "shelfie.setup.color.purple": "بنفش"
 }

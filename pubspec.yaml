@@ -74,6 +74,7 @@ flutter:
     - assets/games/lost_ruins_of_arnak/cover.webp
     - assets/games/castles_of_burgundy/cover.webp
     - assets/games/shelfie_stacker/cover.jpg
+    - assets/games/shelfie_stacker/boxes/
     - assets/games/castles_of_burgundy/quick_reference_en_front.png
     - assets/games/castles_of_burgundy/quick_reference_en_back.png
     - assets/games/castles_of_burgundy/quick_reference_fa_front.png

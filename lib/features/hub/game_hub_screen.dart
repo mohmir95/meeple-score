@@ -35,6 +35,7 @@ class GameHubScreen extends StatelessWidget {
           final duchyBoards = game.buildDuchyBoardRandomizer();
           final leaders = game.buildLeadersRandomizer();
           final bonusCards = game.buildBonusCardsRandomizer();
+          final setupHints = game.buildSetupHints();
           final tiles = <Widget>[
             if (game.showQuickReference)
               _HubBanner(
@@ -66,6 +67,25 @@ class GameHubScreen extends StatelessWidget {
                     ),
                   );
                 },
+              ),
+            if (game.showSetupHints)
+              _HubBanner(
+                key: const ValueKey('hub-setup-hints'),
+                title: l10n.t('hub.setupHints'),
+                icon: Icons.tips_and_updates_outlined,
+                color: game.accentColor,
+                compact: compact,
+                enabled: setupHints != null,
+                badge: setupHints == null ? l10n.t('hub.comingSoon') : null,
+                onTap: setupHints == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) => game.buildSetupHints()!,
+                          ),
+                        );
+                      },
               ),
             if (game.showBuildingsRandomizer)
               _HubBanner(

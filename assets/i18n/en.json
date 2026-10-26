@@ -18,6 +18,7 @@
   "hub.duchyBoardRandomizer": "Duchy Board Randomizer",
   "hub.leadersRandomizer": "Randomize Leaders",
   "hub.bonusCardsRandomizer": "Bonus Cards Randomizer",
+  "hub.setupHints": "Setup Hints",
   "setup.continueSaved": "Continue saved game",
   "setup.reviewLast": "Review last game",
   "setup.storedOnDevice": "Stored on this device.",
@@ -364,5 +365,18 @@
   "shelfie.tieTitle": "Who has the lowest Character Card?",
   "shelfie.tieMessage": "{names} are tied. Choose who has the lowest-valued Character Card still in hand.",
   "shelfie.tieShared": "Still tied",
-  "shelfie.tieSharedHint": "The tied players share the victory, and must say \"Shelfie Stacker Sidekick\" ten times quickly."
+  "shelfie.tieSharedHint": "The tied players share the victory, and must say \"Shelfie Stacker Sidekick\" ten times quickly.",
+  "shelfie.setup.solo": "Solo",
+  "shelfie.setup.players": "{n} players",
+  "shelfie.setup.boxesTitle": "{n} Delivery Boxes",
+  "shelfie.setup.boxesBody": "In the center of the table, place 1 Delivery Box per player, plus 1 additional Delivery Box. Return the unused Boxes to the, umm, box.",
+  "shelfie.setup.box": "Delivery Box",
+  "shelfie.setup.diceTitle": "{n} Dice in the Bag",
+  "shelfie.setup.diceAll": "Place all {n} Dice into the Bag.",
+  "shelfie.setup.diceRemove": "Remove {n} Dice of each colour ({total} in all) and return them to the box. Place the rest into the Bag.",
+  "shelfie.setup.removed": "−{n} to the box",
+  "shelfie.setup.color.blue": "Blue",
+  "shelfie.setup.color.green": "Green",
+  "shelfie.setup.color.orange": "Orange",
+  "shelfie.setup.color.purple": "Purple"
 }

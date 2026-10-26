@@ -11,6 +11,7 @@ import 'shelfie_config.dart';
 import 'shelfie_finish.dart';
 import 'shelfie_player_line.dart';
 import 'shelfie_scoring.dart';
+import 'shelfie_setup_hints_screen.dart';
 import 'shelfie_sheet.dart';
 import 'shelfie_state.dart';
 
@@ -62,6 +63,12 @@ class ShelfieStackerGame extends BoardGame {
 
   @override
   String? get coverImageAsset => coverAsset;
+
+  @override
+  bool get showSetupHints => true;
+
+  @override
+  Widget? buildSetupHints() => const ShelfieSetupHintsScreen();
 
   /// The four colors across the top of the printed pad.
   @override
