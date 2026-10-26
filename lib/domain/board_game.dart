@@ -60,6 +60,9 @@ abstract class BoardGame {
   /// Hub tile for the Castles of Burgundy duchy board randomizer.
   bool get showLeadersRandomizer => false;
 
+  /// Hub tile title for [buildLeadersRandomizer].
+  String get leadersRandomizerTitleKey => 'hub.leadersRandomizer';
+
   /// Optional page that deals random character/leader choices.
   Widget? buildLeadersRandomizer() => null;
 

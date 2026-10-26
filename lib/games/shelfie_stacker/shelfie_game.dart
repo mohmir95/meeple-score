@@ -7,6 +7,7 @@ import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
 import '../../shared/player_colors.dart';
+import 'shelfie_character_randomizer_screen.dart';
 import 'shelfie_config.dart';
 import 'shelfie_finish.dart';
 import 'shelfie_player_line.dart';
@@ -69,6 +70,15 @@ class ShelfieStackerGame extends BoardGame {
 
   @override
   Widget? buildSetupHints() => const ShelfieSetupHintsScreen();
+
+  @override
+  bool get showLeadersRandomizer => true;
+
+  @override
+  String get leadersRandomizerTitleKey => 'hub.characterRandomizer';
+
+  @override
+  Widget? buildLeadersRandomizer() => const ShelfieCharacterRandomizerScreen();
 
   /// The four colors across the top of the printed pad.
   @override

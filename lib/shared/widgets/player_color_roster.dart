@@ -18,6 +18,7 @@ class PlayerColorRoster extends StatelessWidget {
     required this.onColor,
     this.minPlayers = 1,
     this.showCountControls = true,
+    this.showNumbers = true,
   });
 
   /// Each player's color, in seat order.
@@ -36,6 +37,9 @@ class PlayerColorRoster extends StatelessWidget {
   final int minPlayers;
   final bool showCountControls;
 
+  /// False shows plain color circles, for pages that name players by color.
+  final bool showNumbers;
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -48,6 +52,7 @@ class PlayerColorRoster extends StatelessWidget {
           PlayerColorBadge(
             key: ValueKey('$keyPrefix-color-$i'),
             number: i + 1,
+            showNumber: showNumbers,
             colorValue: colors[i].value,
             colorName: l10n.colorLabel(colors[i].name),
             options: options,

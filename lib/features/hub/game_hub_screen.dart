@@ -132,7 +132,7 @@ class GameHubScreen extends StatelessWidget {
             if (game.showLeadersRandomizer)
               _HubBanner(
                 key: const ValueKey('hub-leaders-randomizer'),
-                title: l10n.t('hub.leadersRandomizer'),
+                title: l10n.t(game.leadersRandomizerTitleKey),
                 icon: Icons.shuffle,
                 color: game.accentColor,
                 compact: compact,

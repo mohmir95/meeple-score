@@ -165,6 +165,7 @@ class PlayerColorBadge extends StatelessWidget {
     required this.options,
     required this.enabled,
     required this.onSelected,
+    this.showNumber = true,
   });
 
   final int number;
@@ -173,6 +174,9 @@ class PlayerColorBadge extends StatelessWidget {
   final List<PlayerColorOption> options;
   final bool enabled;
   final ValueChanged<int> onSelected;
+
+  /// False leaves the circle plain, for rosters that name the color instead.
+  final bool showNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -189,13 +193,15 @@ class PlayerColorBadge extends StatelessWidget {
           width: isLightPlayerColor(colorValue) ? 1.5 : 0,
         ),
       ),
-      child: Text(
-        '$number',
-        style: TextStyle(
-          color: onPlayerColor(colorValue),
-          fontWeight: FontWeight.w800,
-        ),
-      ),
+      child: showNumber
+          ? Text(
+              '$number',
+              style: TextStyle(
+                color: onPlayerColor(colorValue),
+                fontWeight: FontWeight.w800,
+              ),
+            )
+          : null,
     );
 
     if (!enabled) {
