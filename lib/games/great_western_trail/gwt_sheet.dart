@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../domain/models/player.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/l10n_scope.dart';
-import '../../shared/export/score_sheet_export.dart';
+import '../../shared/widgets/score_pad_frame.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/player_colors.dart';
 import '../../shared/widgets/score_stepper.dart';
@@ -826,12 +826,13 @@ class GwtSheet extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Same table on every screen size; phones get tighter columns and
-        // scroll horizontally when the players don't fit.
+        // Same table on every screen size; phones get tighter columns (4
+        // players still fit a 360px phone) and scroll sideways only when the
+        // players don't fit.
         final compact = constraints.maxWidth < Breakpoints.compact;
         final players = state.players.length;
         final labelWidth = compact ? 84.0 : 160.0;
-        final minCol = compact ? 72.0 : 96.0;
+        final minCol = compact ? 56.0 : 96.0;
         final openWidth = math.max(0.0, constraints.maxWidth - labelWidth);
         final columnWidth = players == 0
             ? minCol
@@ -865,25 +866,16 @@ class GwtSheet extends StatelessWidget {
               ).textTheme.bodyMedium?.copyWith(color: _muted),
             ),
             const SizedBox(height: 12),
-            Card(
-              clipBehavior: Clip.antiAlias,
+            ScorePadFrame(
+              tableWidth: tableWidth,
               color: _header,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                // Marks the full table (even scrolled off) for "Save image".
-                child: ScoreSheetExportTarget(
-                  child: SizedBox(
-                    width: tableWidth,
-                    child: Column(
-                      children: [
-                        _buildHeader(context, metrics),
-                        for (final row in rows)
-                          _buildRow(context, row, metrics),
-                        _buildTotalRow(context, metrics),
-                      ],
-                    ),
-                  ),
-                ),
+              gridColor: _grid,
+              child: Column(
+                children: [
+                  _buildHeader(context, metrics),
+                  for (final row in rows) _buildRow(context, row, metrics),
+                  _buildTotalRow(context, metrics),
+                ],
               ),
             ),
           ],
