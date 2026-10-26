@@ -7,13 +7,34 @@ import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import 'cob_game.dart';
 
+class CobReferenceSheet {
+  const CobReferenceSheet({
+    required this.frontAsset,
+    required this.backAsset,
+    required this.aspect,
+  });
+
+  final String frontAsset;
+  final String backAsset;
+  final double aspect;
+}
+
 class CobQuickReferenceScreen extends StatefulWidget {
   const CobQuickReferenceScreen({super.key});
 
-  static const frontAsset =
-      'assets/games/castles_of_burgundy/quick_reference_front.png';
-  static const backAsset =
-      'assets/games/castles_of_burgundy/quick_reference_back.png';
+  static const english = CobReferenceSheet(
+    frontAsset: 'assets/games/castles_of_burgundy/quick_reference_en_front.png',
+    backAsset: 'assets/games/castles_of_burgundy/quick_reference_en_back.png',
+    aspect: 717 / 986,
+  );
+  static const persian = CobReferenceSheet(
+    frontAsset: 'assets/games/castles_of_burgundy/quick_reference_fa_front.png',
+    backAsset: 'assets/games/castles_of_burgundy/quick_reference_fa_back.png',
+    aspect: 3 / 4,
+  );
+
+  static CobReferenceSheet sheetFor(String languageId) =>
+      languageId == 'fa' ? persian : english;
 
   @override
   State<CobQuickReferenceScreen> createState() =>
@@ -38,7 +59,7 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
   Offset _focalOnStack = Offset.zero;
   Size _cardSize = Size.zero;
   Size _stackSize = Size.zero;
-  String _lensAsset = CobQuickReferenceScreen.frontAsset;
+  var _lensOnBack = false;
   var _panToken = 0;
 
   @override
@@ -162,9 +183,7 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
       _cardSize = cardBox.size;
       _stackSize = stackBox.size;
       _focal = clamped;
-      _lensAsset = _turn.value >= 0.5
-          ? CobQuickReferenceScreen.backAsset
-          : CobQuickReferenceScreen.frontAsset;
+      _lensOnBack = _turn.value >= 0.5;
     });
   }
 
@@ -174,9 +193,10 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
     final padding = compact ? 12.0 : 20.0;
     final lensSize = compact ? 168.0 : 210.0;
+    final sheet = CobQuickReferenceScreen.sheetFor(l10n.language.id);
 
     return AppPage(
-      title: l10n.t('hub.quickReferencePersian'),
+      title: l10n.t('hub.quickReference'),
       coverImageAsset: CastlesOfBurgundySpecialEditionGame.coverAsset,
       body: Stack(
         key: _stackKey,
@@ -205,7 +225,10 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final card = _fittedCard(constraints.biggest);
+                      final card = _fittedCard(
+                        constraints.biggest,
+                        sheet.aspect,
+                      );
                       return InteractiveViewer(
                         minScale: 1,
                         maxScale: 4,
@@ -220,14 +243,14 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
                             children: [
                               _FlippingSheet(
                                 turns: _turn,
-                                front: const _ReferenceFace(
-                                  key: ValueKey('cob-reference-front'),
-                                  asset: CobQuickReferenceScreen.frontAsset,
+                                front: _ReferenceFace(
+                                  key: const ValueKey('cob-reference-front'),
+                                  asset: sheet.frontAsset,
                                   labelKey: 'cob.quickReference.front',
                                 ),
-                                back: const _ReferenceFace(
-                                  key: ValueKey('cob-reference-back'),
-                                  asset: CobQuickReferenceScreen.backAsset,
+                                back: _ReferenceFace(
+                                  key: const ValueKey('cob-reference-back'),
+                                  asset: sheet.backAsset,
                                   labelKey: 'cob.quickReference.back',
                                 ),
                               ),
@@ -277,7 +300,7 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
               anchor: _focalOnStack,
               cardSize: _cardSize,
               stackSize: _stackSize,
-              asset: _lensAsset,
+              asset: _lensOnBack ? sheet.backAsset : sheet.frontAsset,
               diameter: lensSize,
               label: l10n.t('cob.quickReference.magnifier'),
             ),
@@ -286,8 +309,7 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
     );
   }
 
-  Size _fittedCard(Size bounds) {
-    const aspect = 3 / 4;
+  Size _fittedCard(Size bounds, double aspect) {
     var width = bounds.width;
     var height = width / aspect;
     if (height > bounds.height) {

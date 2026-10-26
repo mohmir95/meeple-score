@@ -1219,19 +1219,19 @@ void main() {
 
     await tester.tap(find.text('Special Edition'));
     await pumpFor(tester);
-    await pumpUntilFound(tester, find.text('Quick Reference (In Persian)'));
+    await pumpUntilFound(tester, find.text('Quick Reference'));
     expect(find.text('Scoresheet'), findsNothing);
     expect(find.text('Buildings Randomizer'), findsNothing);
     expect(find.text('Starting Resources'), findsOneWidget);
     expect(find.text('Duchy Board Randomizer'), findsOneWidget);
 
-    await tester.tap(find.text('Quick Reference (In Persian)'));
+    await tester.tap(find.text('Quick Reference'));
     await pumpFor(tester);
     await pumpUntilFound(tester, find.byKey(const ValueKey('cob-reference-front')));
     expect(
       find.image(
         const AssetImage(
-          'assets/games/castles_of_burgundy/quick_reference_front.png',
+          'assets/games/castles_of_burgundy/quick_reference_en_front.png',
         ),
       ),
       findsOneWidget,
@@ -1239,7 +1239,7 @@ void main() {
     expect(
       find.image(
         const AssetImage(
-          'assets/games/castles_of_burgundy/quick_reference_back.png',
+          'assets/games/castles_of_burgundy/quick_reference_en_back.png',
         ),
       ),
       findsNothing,
@@ -1251,7 +1251,7 @@ void main() {
     expect(
       find.image(
         const AssetImage(
-          'assets/games/castles_of_burgundy/quick_reference_back.png',
+          'assets/games/castles_of_burgundy/quick_reference_en_back.png',
         ),
       ),
       findsOneWidget,
@@ -1259,7 +1259,7 @@ void main() {
     expect(
       find.image(
         const AssetImage(
-          'assets/games/castles_of_burgundy/quick_reference_front.png',
+          'assets/games/castles_of_burgundy/quick_reference_en_front.png',
         ),
       ),
       findsNothing,

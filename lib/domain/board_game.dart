@@ -77,7 +77,7 @@ abstract class BoardGame {
   /// Replaces the scoresheet hub tile with a reference sheet.
   bool get showQuickReference => false;
 
-  String get quickReferenceTitleKey => 'hub.quickReferencePersian';
+  String get quickReferenceTitleKey => 'hub.quickReference';
 
   Widget buildQuickReference() => const SizedBox.shrink();
 
