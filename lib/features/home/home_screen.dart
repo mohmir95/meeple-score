@@ -7,6 +7,7 @@ import '../../domain/models/game_session.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
+import '../first_player/first_player_screen.dart';
 import '../hub/game_hub_screen.dart';
 import '../play/play_screen.dart';
 import '../play/play_session.dart';
@@ -123,6 +124,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+      actions: [
+        IconButton(
+          key: const ValueKey('home-first-player'),
+          tooltip: l10n.t('firstPlayer.button'),
+          icon: const Icon(Icons.touch_app_outlined, color: Colors.white),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (context) => const FirstPlayerScreen()),
+          ),
+        ),
+      ],
       body: _loading
           ? const Center(child: CircularProgressIndicator(value: 0))
           : ListView(
