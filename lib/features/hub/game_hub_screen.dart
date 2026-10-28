@@ -68,25 +68,6 @@ class GameHubScreen extends StatelessWidget {
                   );
                 },
               ),
-            if (game.showSetupHints)
-              _HubBanner(
-                key: const ValueKey('hub-setup-hints'),
-                title: l10n.t('hub.setupHints'),
-                icon: Icons.tips_and_updates_outlined,
-                color: game.accentColor,
-                compact: compact,
-                enabled: setupHints != null,
-                badge: setupHints == null ? l10n.t('hub.comingSoon') : null,
-                onTap: setupHints == null
-                    ? null
-                    : () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (context) => game.buildSetupHints()!,
-                          ),
-                        );
-                      },
-              ),
             if (game.showBuildingsRandomizer)
               _HubBanner(
                 key: const ValueKey('hub-buildings-randomizer'),
@@ -125,6 +106,25 @@ class GameHubScreen extends StatelessWidget {
                           MaterialPageRoute<void>(
                             builder: (context) =>
                                 game.buildStartingResources()!,
+                          ),
+                        );
+                      },
+              ),
+            if (game.showSetupHints)
+              _HubBanner(
+                key: const ValueKey('hub-setup-hints'),
+                title: l10n.t('hub.setupHints'),
+                icon: Icons.tips_and_updates_outlined,
+                color: game.accentColor,
+                compact: compact,
+                enabled: setupHints != null,
+                badge: setupHints == null ? l10n.t('hub.comingSoon') : null,
+                onTap: setupHints == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) => game.buildSetupHints()!,
                           ),
                         );
                       },

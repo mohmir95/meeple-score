@@ -443,5 +443,20 @@
   "shelfie.char.15.name": "Rad Renter",
   "shelfie.char.15.rules": "Take 1 Dice from your Delivery Box and return it to the Dice Bag. Randomly draw 1 Dice from the Bag, set it to any value, and add it to your Box.",
   "shelfie.char.16.name": "The Shuffler",
-  "shelfie.char.16.rules": "This allows you to move multiple adjacent Dice in a single column up 1 space each. After doing so, you must immediately place 1 Dice from your Box into the gap. This Dice must be of the correct colour, plus be higher in value than any Dice below it and lower than those above it. You cannot use the Shuffler’s ability if you do not have a Dice to legally place into the newly created gap."
+  "shelfie.char.16.rules": "This allows you to move multiple adjacent Dice in a single column up 1 space each. After doing so, you must immediately place 1 Dice from your Box into the gap. This Dice must be of the correct colour, plus be higher in value than any Dice below it and lower than those above it. You cannot use the Shuffler’s ability if you do not have a Dice to legally place into the newly created gap.",
+  "gwt.setup.players": "{n} players",
+  "gwt.setup.sign": "{n}P",
+  "gwt.setup.tileBack": "Tile back",
+  "gwt.setup.tilesTitle": "{n} Kansas City Tiles",
+  "gwt.setup.tilesBody": "From the Kansas City supply, reveal tiles with a 1 on their back one at a time and place each on the board. Stop once {n} tiles are on the board.",
+  "gwt.setup.teepeeTitle": "Teepee (green or blue)",
+  "gwt.setup.teepeeBody": "Indian trade section: the empty space with the lowest money value, starting at −3.",
+  "gwt.setup.outlawTitle": "Outlaw (green or orange)",
+  "gwt.setup.outlawBody": "Outlaw section: the empty space with the lowest number (1–9).",
+  "gwt.setup.hazardBodyBag": "Its matching hazard section: the empty space with the lowest number (1–4). If that section is full, return the tile to the bag and draw a new one.",
+  "gwt.setup.hazardTitle": "Hazard (flood, drought or rockfall)",
+  "gwt.setup.hazardBody": "Its matching hazard section: the empty space with the lowest number (1–4). If that section is full, return the tile face down to the Kansas City supply.",
+  "gwt.setup.jobMarketTitle": "{n} Workers in the Job Market",
+  "gwt.setup.jobMarketBody": "Reveal tiles with a 2 on their back (all workers). Start in the top row under your player count sign and fill rightwards. Continue on the second row from the same column, and stop at the space left of the job market token.",
+  "gwt.setup.jobMarketToken": "Job market token"
 }

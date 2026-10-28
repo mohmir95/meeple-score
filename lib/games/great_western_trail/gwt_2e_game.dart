@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'gwt_building_art.dart';
 import 'gwt_buildings_randomizer_screen.dart';
 import 'gwt_edition.dart';
+import 'gwt_setup_hints_screen.dart';
 import 'gwt_starting_resources_screen.dart';
 
 class GreatWesternTrailSecondEditionGame extends GwtEditionGame {
@@ -59,4 +60,11 @@ class GreatWesternTrailSecondEditionGame extends GwtEditionGame {
       setup: GwtStartingSetup.secondEdition,
     );
   }
+
+  @override
+  bool get showSetupHints => true;
+
+  @override
+  Widget? buildSetupHints() =>
+      GwtSetupHintsScreen(game: this, art: GwtSetupHintsArt.secondEdition);
 }
