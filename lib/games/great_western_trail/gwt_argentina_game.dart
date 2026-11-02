@@ -5,9 +5,11 @@ import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
 import 'gwt_building_art.dart';
 import 'gwt_buildings_randomizer_screen.dart';
+import 'gwt_city_maps_randomizer_screen.dart';
 import 'gwt_edition.dart';
 import 'gwt_public_buildings_layout.dart';
 import 'gwt_scoring.dart';
+import 'gwt_setup_hints_screen.dart';
 import 'gwt_sheet.dart';
 import 'gwt_starting_resources_screen.dart';
 import 'gwt_state.dart';
@@ -74,6 +76,19 @@ class GreatWesternTrailArgentinaGame extends GwtEditionGame {
       setup: GwtStartingSetup.argentina,
     );
   }
+
+  @override
+  bool get showSetupHints => true;
+
+  @override
+  Widget? buildSetupHints() =>
+      GwtSetupHintsScreen(game: this, art: GwtSetupHintsArt.argentina);
+
+  @override
+  bool get showCityMapsRandomizer => true;
+
+  @override
+  Widget? buildCityMapsRandomizer() => GwtCityMapsRandomizerScreen(game: this);
 
   @override
   Widget buildScoreSheet({

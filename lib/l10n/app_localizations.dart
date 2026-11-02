@@ -82,8 +82,13 @@ class AppLocalizations {
 
   static Future<AppLocalizations> load(String languageId) async {
     final language = AppLanguage.byId(languageId);
-    final raw = await rootBundle.loadString(language.asset);
-    final decoded = jsonDecode(raw);
+    // Not loadString: it hands files over 50 KB to a background isolate.
+    final data = await rootBundle.load(language.asset);
+    final decoded = jsonDecode(
+      utf8.decode(
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+      ),
+    );
     if (decoded is! Map) {
       return AppLocalizations(language, const {});
     }

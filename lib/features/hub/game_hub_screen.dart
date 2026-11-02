@@ -36,6 +36,7 @@ class GameHubScreen extends StatelessWidget {
           final leaders = game.buildLeadersRandomizer();
           final bonusCards = game.buildBonusCardsRandomizer();
           final setupHints = game.buildSetupHints();
+          final cityMaps = game.buildCityMapsRandomizer();
           final tiles = <Widget>[
             if (game.showQuickReference)
               _HubBanner(
@@ -125,6 +126,26 @@ class GameHubScreen extends StatelessWidget {
                         Navigator.of(context).push(
                           MaterialPageRoute<void>(
                             builder: (context) => game.buildSetupHints()!,
+                          ),
+                        );
+                      },
+              ),
+            if (game.showCityMapsRandomizer)
+              _HubBanner(
+                key: const ValueKey('hub-city-maps-randomizer'),
+                title: l10n.t('hub.cityMapsRandomizer'),
+                icon: Icons.map_outlined,
+                color: game.accentColor,
+                compact: compact,
+                enabled: cityMaps != null,
+                badge: cityMaps == null ? l10n.t('hub.comingSoon') : null,
+                onTap: cityMaps == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) =>
+                                game.buildCityMapsRandomizer()!,
                           ),
                         );
                       },
