@@ -3,7 +3,7 @@ import '../../domain/models/player_score.dart';
 import 'gwt_player_line.dart';
 import 'gwt_state.dart';
 
-enum GwtPadKind { classic, argentina, newZealand }
+enum GwtPadKind { classic, argentina, newZealand, elPaso }
 
 class GwtScoring {
   const GwtScoring._();
@@ -21,6 +21,7 @@ class GwtScoring {
   }
 
   /// Job market token: 2 VP. New Zealand's bonus tiles market token: 5 VP.
+  /// El Paso gives the same 2 VP to the player who triggers the game end.
   static int jobMarketPoints(
     bool hasToken, [
     GwtPadKind pad = GwtPadKind.classic,
@@ -35,6 +36,16 @@ class GwtScoring {
     GwtPlayerLine line, {
     GwtPadKind pad = GwtPadKind.classic,
   }) {
+    if (pad == GwtPadKind.elPaso) {
+      return coinPoints(line.dollars) +
+          line.buildings +
+          line.tradingPosts +
+          line.workers +
+          line.cattle +
+          line.bonusTiles +
+          line.objectives +
+          jobMarketPoints(line.hasJobMarketToken, pad);
+    }
     final shared =
         coinPoints(line.dollars) +
         line.buildings +
@@ -58,6 +69,12 @@ class GwtScoring {
     return shared + line.deliveries + line.hazards;
   }
 
+  /// El Paso ties go to the most money left after converting it to VP.
+  /// Other editions share the win.
+  static int tieBreak(GwtPlayerLine line, GwtPadKind pad) {
+    return pad == GwtPadKind.elPaso ? line.dollars % 5 : 0;
+  }
+
   static bool hasAnyEntry(GwtState state) {
     return state.players.any((player) {
       final line = state.lineFor(player.id);
@@ -72,6 +89,8 @@ class GwtScoring {
           line.tradingPosts != 0 ||
           line.harbours != 0 ||
           line.pathfinder != 0 ||
+          line.workers != 0 ||
+          line.bonusTiles != 0 ||
           line.cattle != 0 ||
           line.objectives != 0 ||
           line.stationMasters != 0 ||
@@ -91,13 +110,19 @@ class GwtScoring {
     };
     final best = totals.values.reduce((a, b) => a > b ? a : b);
     final started = hasAnyEntry(state);
+    int tieOf(Player player) => tieBreak(state.lineFor(player.id), pad);
+    final bestTie = state.players
+        .where((player) => totals[player.id] == best)
+        .map(tieOf)
+        .reduce((a, b) => a > b ? a : b);
 
     return [
       for (final player in state.players)
         PlayerScore(
           player: player,
           total: totals[player.id] ?? 0,
-          isLeader: started && totals[player.id] == best,
+          isLeader:
+              started && totals[player.id] == best && tieOf(player) == bestTie,
         ),
     ];
   }

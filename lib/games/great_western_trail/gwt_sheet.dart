@@ -55,6 +55,7 @@ class GwtSheet extends StatelessWidget {
   static const _iconTwoVp =
       'assets/games/great_western_trail_argentina/icons/two-vp.png';
   static const _nzIcons = 'assets/games/great_western_trail_new_zealand/icons';
+  static const _elPasoIcons = 'assets/games/great_western_trail_el_paso/icons';
 
   final GwtState state;
   final ValueChanged<GwtState> onChanged;
@@ -221,7 +222,126 @@ class GwtSheet extends StatelessWidget {
     if (pad == GwtPadKind.newZealand) {
       return _newZealandRows(context, l10n);
     }
+    if (pad == GwtPadKind.elPaso) {
+      return _elPasoRows(context, l10n);
+    }
     return _classicRows(context, l10n);
+  }
+
+  /// Follows the 7 categories of the El Paso scoring pad.
+  List<_GwtRow> _elPasoRows(BuildContext context, AppLocalizations l10n) {
+    _GwtRow points({
+      required String name,
+      required IconData icon,
+      required String iconFile,
+      required Color color,
+      required int Function(GwtPlayerLine line) valueOf,
+      required _LineUpdate update,
+    }) {
+      return _GwtRow(
+        title: _pad(l10n, name),
+        hint: _pad(l10n, '${name}Hint'),
+        icon: icon,
+        iconAsset: '$_elPasoIcons/$iconFile.png',
+        color: color,
+        valueOf: valueOf,
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, name),
+          helper: _pad(l10n, '${name}Helper'),
+          value: valueOf(line),
+          min: 0,
+          update: update,
+        ),
+      );
+    }
+
+    return [
+      _GwtRow(
+        title: _pad(l10n, 'coins'),
+        hint: _pad(l10n, 'coinsHint'),
+        icon: Icons.monetization_on_outlined,
+        iconAsset: '$_elPasoIcons/coins.png',
+        wideIcon: true,
+        color: _sage,
+        valueOf: (line) => line.dollars,
+        displayOf: (line) {
+          final vp = GwtScoring.coinPoints(line.dollars);
+          return line.dollars == 0 ? '0' : '${line.dollars}→$vp';
+        },
+        onEdit: (player, line) => _editNumber(
+          context: context,
+          player: player,
+          title: _pad(l10n, 'coinsTitle'),
+          helper: _pad(l10n, 'coinsHelper'),
+          value: line.dollars,
+          min: 0,
+          update: (current, value) => current.copyWith(dollars: value),
+        ),
+      ),
+      points(
+        name: 'buildings',
+        icon: Icons.home_work_outlined,
+        iconFile: 'buildings',
+        color: _dust,
+        valueOf: (line) => line.buildings,
+        update: (current, value) => current.copyWith(buildings: value),
+      ),
+      points(
+        name: 'tradingPosts',
+        icon: Icons.storefront_outlined,
+        iconFile: 'trading-posts',
+        color: _sage,
+        valueOf: (line) => line.tradingPosts,
+        update: (current, value) => current.copyWith(tradingPosts: value),
+      ),
+      points(
+        name: 'workers',
+        icon: Icons.groups_outlined,
+        iconFile: 'workers',
+        color: _dust,
+        valueOf: (line) => line.workers,
+        update: (current, value) => current.copyWith(workers: value),
+      ),
+      points(
+        name: 'cattle',
+        icon: Icons.pets_outlined,
+        iconFile: 'cattle',
+        color: _sage,
+        valueOf: (line) => line.cattle,
+        update: (current, value) => current.copyWith(cattle: value),
+      ),
+      points(
+        name: 'bonusTiles',
+        icon: Icons.notifications_outlined,
+        iconFile: 'bonus-tiles',
+        color: _dust,
+        valueOf: (line) => line.bonusTiles,
+        update: (current, value) => current.copyWith(bonusTiles: value),
+      ),
+      points(
+        name: 'objectives',
+        icon: Icons.flag_outlined,
+        iconFile: 'objectives',
+        color: _sage,
+        valueOf: (line) => line.objectives,
+        update: (current, value) => current.copyWith(objectives: value),
+      ),
+      _GwtRow(
+        title: _pad(l10n, 'endGameToken'),
+        hint: _pad(l10n, 'endGameTokenHint'),
+        icon: Icons.sports_score_outlined,
+        iconAsset: '$_elPasoIcons/end-game.png',
+        color: _dust,
+        valueOf: (line) =>
+            GwtScoring.jobMarketPoints(line.hasJobMarketToken, pad),
+        displayOf: (line) => line.hasJobMarketToken
+            ? '${GwtScoring.jobMarketPoints(true, pad)}'
+            : '—',
+        onTap: _toggleJobMarket,
+      ),
+    ];
   }
 
   /// Follows the 12 categories of the New Zealand scoring pad.

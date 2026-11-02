@@ -54,7 +54,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
     expect(find.text('Meeple Score'), findsOneWidget);
-    expect(find.text('Great Western Trail'), findsNWidgets(4));
+    expect(find.text('Great Western Trail'), findsNWidgets(5));
     expect(find.text('Great Western Trail First Edition'), findsNothing);
     expect(find.text('Great Western Trail Second Edition'), findsNothing);
     expect(find.text('Great Western Trail Argentina'), findsNothing);
@@ -161,7 +161,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
     final cards = find.byType(GameCard);
-    expect(cards, findsNWidgets(7));
+    expect(cards, findsNWidgets(8));
     final first = tester.getRect(cards.first);
     final secondRow = tester.getRect(cards.at(3));
     final rowStart = tester.getRect(cards.at(6));
