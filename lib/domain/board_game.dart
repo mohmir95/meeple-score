@@ -84,6 +84,12 @@ abstract class BoardGame {
   /// Ready randomizer UI. Null keeps the hub tile disabled as Coming Soon.
   Widget? buildCityMapsRandomizer() => null;
 
+  /// Hub tile for randomizing the train card sides.
+  bool get showTrainCardsRandomizer => false;
+
+  /// Ready randomizer UI. Null keeps the hub tile disabled as Coming Soon.
+  Widget? buildTrainCardsRandomizer() => null;
+
   bool get showDuchyBoardRandomizer => false;
 
   /// Ready randomizer UI. Null keeps the hub tile disabled as Coming Soon.

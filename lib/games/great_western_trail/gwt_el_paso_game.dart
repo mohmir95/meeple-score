@@ -7,6 +7,7 @@ import 'gwt_edition.dart';
 import 'gwt_scoring.dart';
 import 'gwt_sheet.dart';
 import 'gwt_starting_resources_screen.dart';
+import 'gwt_train_cards_randomizer_screen.dart';
 import 'gwt_state.dart';
 
 class GreatWesternTrailElPasoGame extends GwtEditionGame {
@@ -68,6 +69,13 @@ class GreatWesternTrailElPasoGame extends GwtEditionGame {
 
   @override
   bool get includeRailsToTheNorthExpansion => false;
+
+  @override
+  bool get showTrainCardsRandomizer => true;
+
+  @override
+  Widget? buildTrainCardsRandomizer() =>
+      GwtTrainCardsRandomizerScreen(game: this);
 
   @override
   Widget buildScoreSheet({
