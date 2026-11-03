@@ -4,6 +4,7 @@ import '../../domain/models/game_state.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
 import 'gwt_edition.dart';
+import 'gwt_el_paso_buildings_screen.dart';
 import 'gwt_scoring.dart';
 import 'gwt_sheet.dart';
 import 'gwt_starting_resources_screen.dart';
@@ -57,7 +58,7 @@ class GreatWesternTrailElPasoGame extends GwtEditionGame {
   String? get coverImageAsset => coverAsset;
 
   @override
-  bool get showBuildingsRandomizer => false;
+  Widget? buildBuildingsRandomizer() => GwtElPasoBuildingsScreen(game: this);
 
   @override
   Widget? buildStartingResources() {

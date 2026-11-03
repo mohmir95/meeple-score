@@ -69,6 +69,8 @@ flutter:
     - assets/games/great_western_trail_new_zealand/cover.webp
     - assets/games/great_western_trail_el_paso/cover.jpg
     - assets/games/great_western_trail_el_paso/icons/
+    - assets/games/great_western_trail_el_paso/buildings/common/
+    - assets/games/great_western_trail_el_paso/buildings/neutral/
     - assets/games/great_western_trail_new_zealand/icons/
     - assets/games/great_western_trail_new_zealand/buildings/public/
     - assets/games/great_western_trail_new_zealand/buildings/private/

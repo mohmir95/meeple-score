@@ -81,8 +81,9 @@ void main() {
     expect(GwtScoring.winners(state), [ann, ben]);
   });
 
-  test('the hub offers the scoresheet and starting resources', () {
-    expect(game.showBuildingsRandomizer, isFalse);
+  test('the hub offers the scoresheet, setup pages and randomizers', () {
+    expect(game.showBuildingsRandomizer, isTrue);
+    expect(game.buildBuildingsRandomizer(), isNotNull);
     expect(game.showStartingResources, isTrue);
     expect(game.hasScoresheet, isTrue);
   });
