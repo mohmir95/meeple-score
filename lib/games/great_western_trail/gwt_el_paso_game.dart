@@ -6,6 +6,7 @@ import '../../domain/models/player_score.dart';
 import 'gwt_edition.dart';
 import 'gwt_scoring.dart';
 import 'gwt_sheet.dart';
+import 'gwt_starting_resources_screen.dart';
 import 'gwt_state.dart';
 
 class GreatWesternTrailElPasoGame extends GwtEditionGame {
@@ -58,7 +59,12 @@ class GreatWesternTrailElPasoGame extends GwtEditionGame {
   bool get showBuildingsRandomizer => false;
 
   @override
-  bool get showStartingResources => false;
+  Widget? buildStartingResources() {
+    return GwtStartingResourcesScreen(
+      game: this,
+      setup: GwtStartingSetup.elPaso,
+    );
+  }
 
   @override
   bool get includeRailsToTheNorthExpansion => false;

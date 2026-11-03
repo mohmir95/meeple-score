@@ -29,6 +29,7 @@ final _firstEdition = find.byType(GameCard).first;
 final _secondEdition = find.text('Second Edition');
 final _argentina = find.text('Argentina');
 final _newZealand = find.text('New Zealand');
+final _elPaso = find.text('El Paso');
 
 void main() {
   testWidgets('CoB starting resources opens the setup chart', (tester) async {
@@ -362,6 +363,63 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('GWT El Paso hands out money, tokens and worker cards', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 1800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    const setup = GwtStartingSetup.elPaso;
+    expect([for (var s = 1; s <= 4; s++) setup.dollarsFor(s)], [4, 5, 4, 5]);
+    expect([for (var s = 1; s <= 4; s++) setup.tokensFor(s)], [1, 1, 2, 2]);
+
+    await _openStartingResources(tester, gameCard: _elPaso);
+
+    expect(find.text('4 dollars'), findsNWidgets(2));
+    expect(find.text('5 dollars'), findsNWidgets(2));
+    expect(find.image(AssetImage(setup.coin5Asset)), findsNWidgets(2));
+    expect(find.image(AssetImage(setup.coin1Asset)), findsNWidgets(8));
+    expect(find.image(AssetImage(setup.token.asset)), findsNWidgets(6));
+    expect(
+      find.byKey(const ValueKey('gwt-starting-cards-panel')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey('gwt-rails-to-the-north-option')),
+      findsNothing,
+    );
+
+    final cards = find.byKey(const ValueKey('gwt-worker-cards-panel'));
+    await tester.ensureVisible(cards);
+    for (final label in ['Cowboy', 'Craftsman', 'Engineer', 'Wild worker']) {
+      expect(find.text(label), findsOneWidget);
+    }
+    for (final card in setup.workerCards) {
+      expect(find.image(AssetImage(card.asset)), findsOneWidget);
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final width in [360.0, 412.0]) {
+    testWidgets('GWT El Paso rows fit one line at ${width}px', (tester) async {
+      tester.view.physicalSize = Size(width, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await _openStartingResources(tester, gameCard: _elPaso);
+      final tokens = find.image(
+        const AssetImage(
+          'assets/games/great_western_trail_el_paso/icons/exchange-token.png',
+        ),
+      );
+      // Player 3 has the widest row: 4 coins and 2 tokens.
+      final label = tester.getCenter(find.text('Player 3:'));
+      expect(tester.getCenter(tokens.at(3)).dy, closeTo(label.dy, 1));
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   for (final (name, gameCard, setup, railsSwitch) in [
     ('first edition', _firstEdition, GwtStartingSetup.firstEdition, true),

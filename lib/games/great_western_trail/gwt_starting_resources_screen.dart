@@ -52,7 +52,19 @@ class GwtStartingSetup {
     this.exhaustionCardAsset,
     this.exhaustionCardAspect = 1,
     this.pathfinderIconAsset,
+    this.moneyBySeat,
+    this.tokensBySeat,
+    this.workerCards = const [],
+    this.workerCardAspect = 1,
   });
+
+  /// El Paso hands out money and tokens per seat instead of 1 more per seat.
+  final List<int>? moneyBySeat;
+  final List<int>? tokensBySeat;
+
+  /// El Paso: every player starts with these cards in their worker area.
+  final List<GwtWorkerCard> workerCards;
+  final double workerCardAspect;
 
   /// New Zealand: each player also puts a disc on space 0 of the pathfinder
   /// track during their first turn.
@@ -147,15 +159,59 @@ class GwtStartingSetup {
         'assets/games/great_western_trail_new_zealand/icons/pathfinder.png',
   );
 
+  static const elPaso = GwtStartingSetup(
+    coin5Asset: '$_elPasoIcons/coin-5.png',
+    coin1Asset: '$_elPasoIcons/coin-1.png',
+    token: GwtTokenArt.cutout(
+      asset: '$_elPasoIcons/exchange-token.png',
+      size: Size(286, 213),
+    ),
+    moneyBySeat: [4, 5, 4, 5],
+    tokensBySeat: [1, 1, 2, 2],
+    workerCards: [
+      GwtWorkerCard(
+        asset: '$_elPasoIcons/worker-cowboy.png',
+        labelKey: 'gwt.workerCards.cowboy',
+      ),
+      GwtWorkerCard(
+        asset: '$_elPasoIcons/worker-craftsman.png',
+        labelKey: 'gwt.workerCards.craftsman',
+      ),
+      GwtWorkerCard(
+        asset: '$_elPasoIcons/worker-engineer.png',
+        labelKey: 'gwt.workerCards.engineer',
+      ),
+      GwtWorkerCard(
+        asset: '$_elPasoIcons/worker-wild.png',
+        labelKey: 'gwt.workerCards.wild',
+      ),
+    ],
+    workerCardAspect: 320 / 496,
+  );
+
   /// Hand size players discard down to at the start of their first turn.
   static const handLimit = 4;
 
   bool get hasCards => cardBackAsset != null && firstPlayerCards != null;
 
-  int dollarsFor(int seat) => firstPlayerMoney + seat - 1;
+  int dollarsFor(int seat) =>
+      moneyBySeat?[seat - 1] ?? firstPlayerMoney + seat - 1;
+
+  int tokensFor(int seat) => tokensBySeat?[seat - 1] ?? 1;
+
+  int get maxTokens => tokensBySeat?.reduce(math.max) ?? 1;
 
   int? cardsFor(int seat) => hasCards ? firstPlayerCards! + seat - 1 : null;
 }
+
+class GwtWorkerCard {
+  const GwtWorkerCard({required this.asset, required this.labelKey});
+
+  final String asset;
+  final String labelKey;
+}
+
+const _elPasoIcons = 'assets/games/great_western_trail_el_paso/icons';
 
 class GwtStartingResourcesScreen extends StatefulWidget {
   const GwtStartingResourcesScreen({
@@ -231,6 +287,32 @@ class _GwtStartingResourcesScreenState
                     ],
                   ),
                 ),
+                if (setup.workerCards.isNotEmpty) ...[
+                  SizedBox(height: gap),
+                  _SetupPanel(
+                    key: const ValueKey('gwt-worker-cards-panel'),
+                    accent: accent,
+                    compact: compact,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _PanelTitle(text: l10n.t('gwt.workerCards.title')),
+                        SizedBox(height: compact ? 10 : 12),
+                        Text(
+                          l10n.t('gwt.workerCards.note'),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: const Color(0xFF2A2620),
+                                height: 1.35,
+                              ),
+                        ),
+                        SizedBox(height: compact ? 16 : 20),
+                        _WorkerCards(setup: setup),
+                      ],
+                    ),
+                  ),
+                ],
                 if (setup.hasCards) ...[
                   SizedBox(height: gap),
                   _SetupPanel(
@@ -294,6 +376,72 @@ class _GwtStartingResourcesScreenState
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The worker cards every player starts with, side by side.
+class _WorkerCards extends StatelessWidget {
+  const _WorkerCards({required this.setup});
+
+  final GwtStartingSetup setup;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final cards = setup.workerCards;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = 10.0;
+        final cardWidth =
+            ((constraints.maxWidth - gap * (cards.length - 1)) / cards.length)
+                .clamp(0.0, 130.0);
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var i = 0; i < cards.length; i++) ...[
+              if (i > 0) const SizedBox(width: gap),
+              SizedBox(
+                width: cardWidth,
+                child: Column(
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(cardWidth * 0.05),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x33000000),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        cards[i].asset,
+                        width: cardWidth,
+                        height: cardWidth / setup.workerCardAspect,
+                        fit: BoxFit.fill,
+                        filterQuality: FilterQuality.medium,
+                        excludeFromSemantics: true,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.t(cards[i].labelKey),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: const Color(0xFF1C1A17),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 }
@@ -613,8 +761,9 @@ class _PlayerResourceRow extends StatelessWidget {
                   _coinCount(setup.dollarsFor(s)),
                 );
               }
-              final fixed = widestCoins * spacing + groupGap + 1;
-              final units = widestCoins + setup.token.aspectRatio;
+              final tokens = setup.maxTokens;
+              final fixed = (widestCoins + tokens - 1) * spacing + groupGap + 1;
+              final units = widestCoins + tokens * setup.token.aspectRatio;
               final fitted = (constraints.maxWidth - fixed) / units;
               final iconSize = fitted.clamp(14.0, compact ? 30.0 : 36.0);
 
@@ -635,9 +784,15 @@ class _PlayerResourceRow extends StatelessWidget {
                       size: iconSize,
                       label: l10n.t(setup.coinKey, {'n': '1'}),
                     ),
-                  if (exchangeToken)
+                  for (
+                    var i = 0;
+                    exchangeToken && i < setup.tokensFor(seat);
+                    i++
+                  )
                     Padding(
-                      padding: EdgeInsetsDirectional.only(start: groupGap),
+                      padding: EdgeInsetsDirectional.only(
+                        start: i == 0 ? groupGap : 0,
+                      ),
                       child: _ExchangeToken(
                         art: setup.token,
                         height: iconSize,
