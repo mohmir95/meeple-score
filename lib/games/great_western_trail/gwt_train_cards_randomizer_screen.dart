@@ -6,6 +6,7 @@ import '../../domain/board_game.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// El Paso's train: 1 locomotive and 3 wagons, each with a front side and a
 /// reverse side marked with a star.
@@ -71,14 +72,7 @@ class _GwtTrainCardsRandomizerScreenState
     });
   }
 
-  void _flip(int index) {
-    setState(() {
-      _stars = [..._stars]..[index] = !_stars[index];
-      _firstGame = !_stars.contains(true);
-    });
-  }
-
-  /// Loads both sides of every card up front, so flips swap instantly.
+  /// Loads both sides of every card up front, so draws swap instantly.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -174,20 +168,11 @@ class _GwtTrainCardsRandomizerScreenState
                                 key: ValueKey('gwt-train-card-${i + 1}'),
                                 engineers: i + 1,
                                 star: _stars[i],
-                                onTap: () => _flip(i),
                               ),
                             ),
                         ],
                       );
                     },
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  l10n.t('gwt.trainCards.tapHint'),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -199,18 +184,12 @@ class _GwtTrainCardsRandomizerScreenState
   }
 }
 
-/// One train card; tapping turns it over.
+/// One train card, showing the side in play.
 class _TrainCard extends StatelessWidget {
-  const _TrainCard({
-    super.key,
-    required this.engineers,
-    required this.star,
-    required this.onTap,
-  });
+  const _TrainCard({super.key, required this.engineers, required this.star});
 
   final int engineers;
   final bool star;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -227,66 +206,61 @@ class _TrainCard extends StatelessWidget {
       'kind': kind,
     });
     return Semantics(
-      button: true,
       label: '$title, $side',
       excludeSemantics: true,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AspectRatio(
-              aspectRatio: GwtTrainCards.aspect,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) => ScaleTransition(
-                  scale: Tween(begin: 0.9, end: 1.0).animate(animation),
-                  child: FadeTransition(opacity: animation, child: child),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AspectRatio(
+            aspectRatio: GwtTrainCards.aspect,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: Tween(begin: 0.9, end: 1.0).animate(animation),
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+              child: DecoratedBox(
+                key: ValueKey('gwt-train-$engineers-$star'),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x40000000),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: DecoratedBox(
-                  key: ValueKey('gwt-train-$engineers-$star'),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x40000000),
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Image.asset(
-                    GwtTrainCards.asset(engineers, star: star),
-                    fit: BoxFit.fill,
-                    filterQuality: FilterQuality.medium,
-                    excludeFromSemantics: true,
-                  ),
+                child: loadingImage(
+                  GwtTrainCards.asset(engineers, star: star),
+                  fit: BoxFit.fill,
+                  filterQuality: FilterQuality.medium,
+                  excludeFromSemantics: true,
                 ),
               ),
             ),
-            const SizedBox(height: 6),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                title,
-                maxLines: 1,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+          ),
+          const SizedBox(height: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              title,
+              maxLines: 1,
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w800,
               ),
             ),
-            Text(
-              side,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: star
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant,
-                fontWeight: star ? FontWeight.w800 : FontWeight.w500,
-              ),
+          ),
+          Text(
+            side,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: star
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+              fontWeight: star ? FontWeight.w800 : FontWeight.w500,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

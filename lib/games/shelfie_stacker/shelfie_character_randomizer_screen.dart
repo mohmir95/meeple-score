@@ -9,6 +9,7 @@ import '../../shared/widgets/app_page.dart';
 import '../../shared/widgets/player_color_roster.dart';
 import 'shelfie_characters.dart';
 import 'shelfie_game.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// Deals each player 8 of their 16 Character Cards.
 class ShelfieCharacterRandomizerScreen extends StatefulWidget {
@@ -359,7 +360,7 @@ class _CharacterTile extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
+                  loadingImage(
                     character.asset,
                     fit: BoxFit.cover,
                     filterQuality: FilterQuality.high,
@@ -429,7 +430,7 @@ Future<void> showShelfieCharacterDialog(
                 Center(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
+                    child: loadingImage(
                       character.asset,
                       width: 220,
                       height: 220,

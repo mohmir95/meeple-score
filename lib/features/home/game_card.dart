@@ -5,6 +5,7 @@ import '../../domain/models/game_session.dart';
 import '../../domain/models/game_status.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
+import '../../shared/widgets/loading_image.dart';
 
 class GameCard extends StatelessWidget {
   const GameCard({
@@ -39,21 +40,25 @@ class GameCard extends StatelessWidget {
     final inset = compact ? 10.0 : 16.0;
     const gold = Color(0xFFF8E5B0);
 
-    return Material(
-      color: Colors.transparent,
-      child: Ink(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: game.accentColor.withValues(alpha: 0.28),
-              blurRadius: compact ? 16 : 24,
-              offset: Offset(0, compact ? 8 : 12),
-            ),
-          ],
-        ),
+    // The shadow sits outside the clip, so it never fills the corners.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: BannerStyle.gold.withValues(alpha: 0.35),
+            blurRadius: compact ? 18 : 28,
+            offset: Offset(0, compact ? 8 : 12),
+          ),
+        ],
+      ),
+      child: Material(
+        type: MaterialType.transparency,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(BannerStyle.radius),
+          // A layer of its own keeps the cover inside the rounded corners on
+          // every renderer.
+          clipBehavior: Clip.antiAliasWithSaveLayer,
           child: AspectRatio(
             aspectRatio: 1,
             child: Stack(
@@ -67,7 +72,7 @@ class GameCard extends StatelessWidget {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          _Cover(game: game),
+                          GameCover(game: game),
                           const DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -99,27 +104,19 @@ class GameCard extends StatelessWidget {
                                       color: Colors.white,
                                       fontWeight: FontWeight.w800,
                                       height: 1.15,
-                                      shadows: const [
-                                        Shadow(
-                                          blurRadius: 12,
-                                          color: Colors.black54,
-                                        ),
-                                      ],
+                                      shadows: BannerStyle.titleShadows,
                                     ),
                                   ),
                                   SizedBox(height: compact ? 2 : 4),
                                   Text(
-                                    context.l10n.t('${game.l10nPrefix}.edition'),
+                                    context.l10n.t(
+                                      '${game.l10nPrefix}.edition',
+                                    ),
                                     style: editionStyle?.copyWith(
                                       color: gold,
                                       fontWeight: FontWeight.w800,
                                       height: 1.15,
-                                      shadows: const [
-                                        Shadow(
-                                          blurRadius: 12,
-                                          color: Colors.black54,
-                                        ),
-                                      ],
+                                      shadows: BannerStyle.titleShadows,
                                     ),
                                   ),
                                 ] else
@@ -132,12 +129,7 @@ class GameCard extends StatelessWidget {
                                       color: gold,
                                       fontWeight: FontWeight.w800,
                                       height: 1.15,
-                                      shadows: const [
-                                        Shadow(
-                                          blurRadius: 12,
-                                          color: Colors.black54,
-                                        ),
-                                      ],
+                                      shadows: BannerStyle.titleShadows,
                                     ),
                                   ),
                               ],
@@ -148,10 +140,11 @@ class GameCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                const BannerFrame(),
                 PositionedDirectional(
                   top: compact ? 8 : 12,
                   end: compact ? 8 : 12,
-                  child: _StatusPill(
+                  child: GameStatusPill(
                     key: ValueKey('home-saved-${game.id}'),
                     inProgress: inProgress,
                     finished: finished,
@@ -167,8 +160,42 @@ class GameCard extends StatelessWidget {
   }
 }
 
-class _Cover extends StatelessWidget {
-  const _Cover({required this.game});
+/// The look every home banner shares: rounded corners, a thin white frame,
+/// a warm gold glow, and titles with a faint gold halo.
+abstract final class BannerStyle {
+  static const radius = 24.0;
+  static const gold = Color(0xFFE8B84A);
+  static const paleGold = Color(0xFFF8E5B0);
+
+  static const titleShadows = [
+    Shadow(blurRadius: 12, color: Colors.black54),
+    Shadow(blurRadius: 18, color: Color(0x66E8B84A)),
+  ];
+}
+
+/// The thin white frame drawn over a banner's edge.
+class BannerFrame extends StatelessWidget {
+  const BannerFrame({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(BannerStyle.radius),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.7),
+            width: 1.5,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A game's box art, or its icon on the accent colour when it has none.
+class GameCover extends StatelessWidget {
+  const GameCover({super.key, required this.game});
 
   final BoardGame game;
 
@@ -180,7 +207,7 @@ class _Cover extends StatelessWidget {
         child: Icon(game.icon, color: Colors.white, size: 72),
       );
     }
-    return Image.asset(
+    return loadingImage(
       game.coverImageAsset!,
       fit: BoxFit.cover,
       alignment: Alignment.center,
@@ -195,8 +222,8 @@ class _Cover extends StatelessWidget {
   }
 }
 
-class _StatusPill extends StatelessWidget {
-  const _StatusPill({
+class GameStatusPill extends StatelessWidget {
+  const GameStatusPill({
     super.key,
     required this.inProgress,
     required this.finished,

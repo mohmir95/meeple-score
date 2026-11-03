@@ -4,6 +4,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import 'shelfie_game.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// Setup numbers from the rulebook that change with the player count.
 class ShelfieSetup {
@@ -124,7 +125,7 @@ class _ShelfieSetupHintsScreenState extends State<ShelfieSetupHintsScreen> {
         runSpacing: 8,
         children: [
           for (var i = 0; i < boxes; i++)
-            Image.asset(
+            loadingImage(
               ShelfieSetupHintsScreen.boxAssets[i],
               width: boxSize,
               height: boxSize,

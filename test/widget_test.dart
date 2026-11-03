@@ -4,6 +4,8 @@ import 'package:board_game_score_sheet/domain/models/game_session.dart';
 import 'package:board_game_score_sheet/domain/models/game_status.dart';
 import 'package:board_game_score_sheet/domain/models/player.dart';
 import 'package:board_game_score_sheet/features/home/game_card.dart';
+import 'package:board_game_score_sheet/features/home/game_series_card.dart';
+import 'package:board_game_score_sheet/features/play/play_screen.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_argentina_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_new_zealand_game.dart';
@@ -41,6 +43,16 @@ String _publicTileOn(WidgetTester tester, String location) {
   return name.split('/').last.replaceAll('.jpg', '').toUpperCase();
 }
 
+/// A Semantics widget with exactly [label], without turning semantics on.
+Finder _semanticsLabel(String label) => find.byWidgetPredicate(
+  (widget) => widget is Semantics && widget.properties.label == label,
+);
+
+/// Every home banner: single games and series alike.
+final _homeBanners = find.byWidgetPredicate(
+  (widget) => widget is GameCard || widget is GameSeriesCard,
+);
+
 void main() {
   testWidgets('home lists Great Western Trail and can start a game', (
     tester,
@@ -54,7 +66,23 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
     expect(find.text('Meeple Score'), findsOneWidget);
-    expect(find.text('Great Western Trail'), findsNWidgets(5));
+    // Every edition sits behind one Great Western Trail banner.
+    expect(gwtSeriesCard, findsOneWidget);
+    expect(find.text('Great Western Trail'), findsOneWidget);
+    // A gold badge counts the editions; screen readers hear "5 editions".
+    final badge = find.byKey(const ValueKey('home-series-badge'));
+    expect(find.descendant(of: badge, matching: find.text('5')), findsOneWidget);
+    expect(_semanticsLabel('5 editions'), findsOneWidget);
+    expect(find.text('Second Edition'), findsNothing);
+    expect(find.text('Simple Tally'), findsNothing);
+    expect(find.text('فارسی'), findsOneWidget);
+
+    await openGwtSeries(tester);
+    expect(inGwtSeries(find.byType(GameCard)), findsNWidgets(5));
+    expect(inGwtSeries(find.text('Second Edition')), findsOneWidget);
+    expect(inGwtSeries(find.text('Argentina')), findsOneWidget);
+    expect(inGwtSeries(find.text('New Zealand')), findsOneWidget);
+    expect(inGwtSeries(find.text('El Paso')), findsOneWidget);
     expect(find.text('Great Western Trail First Edition'), findsNothing);
     expect(find.text('Great Western Trail Second Edition'), findsNothing);
     expect(find.text('Great Western Trail Argentina'), findsNothing);
@@ -63,10 +91,8 @@ void main() {
     expect(find.text('Second Edition'), findsOneWidget);
     expect(find.text('Argentina'), findsOneWidget);
     expect(find.text('New Zealand'), findsOneWidget);
-    expect(find.text('Simple Tally'), findsNothing);
-    expect(find.text('فارسی'), findsOneWidget);
 
-    await tester.tap(find.byType(GameCard).first);
+    await tester.tap(inGwtSeries(find.byType(GameCard)).first);
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Scoresheet'), findsOneWidget);
@@ -160,13 +186,11 @@ void main() {
     await pumpScoreSheetApp(tester);
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
-    final cards = find.byType(GameCard);
-    expect(cards, findsNWidgets(8));
+    final cards = _homeBanners;
+    expect(cards, findsNWidgets(4));
     final first = tester.getRect(cards.first);
-    final secondRow = tester.getRect(cards.at(3));
-    final rowStart = tester.getRect(cards.at(6));
-    expect(secondRow.left, closeTo(first.left, 1));
-    expect(rowStart.top, greaterThan(secondRow.bottom));
+    final rowStart = tester.getRect(cards.at(3));
+    expect(rowStart.top, greaterThan(first.bottom));
     expect(rowStart.left, closeTo(first.left, 1));
 
     // The grid as a whole stays centered on the page.
@@ -189,8 +213,8 @@ void main() {
     expect(find.text('Great Western Trail'), findsWidgets);
     expect(find.text('First Edition'), findsNothing);
 
-    final first = tester.getRect(find.byType(GameCard).at(0));
-    final second = tester.getRect(find.byType(GameCard).at(1));
+    final first = tester.getRect(_homeBanners.at(0));
+    final second = tester.getRect(_homeBanners.at(1));
     expect(first.top, closeTo(second.top, 1));
     expect(first.right, lessThanOrEqualTo(second.left + 1));
     expect(first.width, closeTo(first.height, 2));
@@ -225,9 +249,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
 
     await pumpScoreSheetApp(tester, localeController: await createTestLocale());
-    await pumpUntilFound(tester, find.text('New Zealand'));
-    await tester.tap(find.text('New Zealand'));
-    await pumpFor(tester);
+    await openGwtEdition(tester, find.text('New Zealand'));
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Buildings Randomizer'), findsOneWidget);
     expect(find.text('Starting Resources'), findsOneWidget);
@@ -278,9 +300,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
 
     await pumpScoreSheetApp(tester, localeController: await createTestLocale());
-    await pumpUntilFound(tester, find.text('Argentina'));
-    await tester.tap(find.text('Argentina'));
-    await pumpFor(tester);
+    await openGwtEdition(tester, find.text('Argentina'));
     await pumpUntilFound(tester, find.text('Scoresheet'));
     expect(find.text('Buildings Randomizer'), findsOneWidget);
     expect(find.text('Starting Resources'), findsOneWidget);
@@ -345,9 +365,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
 
     await pumpScoreSheetApp(tester, localeController: await createTestLocale());
-    await pumpUntilFound(tester, find.text('Great Western Trail'));
-    await tester.tap(find.byType(GameCard).first);
-    await pumpFor(tester);
+    await openGwtEdition(tester, inGwtSeries(find.byType(GameCard)).first);
     await pumpUntilFound(tester, find.text('Buildings Randomizer'));
     expect(find.text('Starting Resources'), findsOneWidget);
     expect(find.text('Coming Soon'), findsNothing);
@@ -944,9 +962,7 @@ void main() {
 
     final locale = await createTestLocale();
     await pumpScoreSheetApp(tester, localeController: locale);
-    await pumpUntilFound(tester, find.text('Second Edition'));
-    await tester.tap(find.text('Second Edition'));
-    await pumpFor(tester);
+    await openGwtEdition(tester, find.text('Second Edition'));
     await pumpUntilFound(tester, find.byKey(const ValueKey('hub-scoresheet')));
     final gwt = tester.getRect(find.byKey(const ValueKey('hub-scoresheet')));
     expect(
@@ -1078,8 +1094,9 @@ void main() {
     });
 
     await pumpScoreSheetApp(tester, repository: repository);
-    await pumpUntilFound(tester, find.text('Last game'));
-    await tester.tap(find.text('Last game'));
+    await openGwtSeries(tester);
+    await pumpUntilFound(tester, inGwtSeries(find.text('Last game')));
+    await tester.tap(inGwtSeries(find.text('Last game')));
     await pumpFor(tester);
     await pumpUntilFound(tester, find.text('Save image'));
     expect(find.text('Save image'), findsWidgets);
@@ -1165,21 +1182,26 @@ void main() {
 
     await pumpScoreSheetApp(tester, repository: repository);
     await pumpUntilFound(tester, find.text('Last game'));
-    expect(find.text('Last game'), findsNWidgets(4));
+    // Finished GWT games show on their edition, behind the series banner.
+    expect(find.text('Last game'), findsOneWidget);
 
     const titles = [
+      'Lost Ruins of Arnak',
       'Great Western Trail',
       'Great Western Trail Second Edition',
       'Great Western Trail Argentina',
-      'Lost Ruins of Arnak',
     ];
     const savedKeys = [
+      'home-saved-lost_ruins_of_arnak',
       'home-saved-great_western_trail_1e',
       'home-saved-great_western_trail_2e',
       'home-saved-great_western_trail_argentina',
-      'home-saved-lost_ruins_of_arnak',
     ];
     for (var i = 0; i < titles.length; i++) {
+      if (i == 1) {
+        await openGwtSeries(tester);
+        expect(inGwtSeries(find.text('Last game')), findsNWidgets(3));
+      }
       await tester.tap(find.byKey(ValueKey(savedKeys[i])));
       await pumpFor(tester);
       await pumpUntilFound(tester, find.text('Score pad'));
@@ -1188,7 +1210,14 @@ void main() {
         find.text('This game is finished. You can still review the sheet.'),
         findsOneWidget,
       );
-      expect(find.widgetWithText(AppBar, titles[i]), findsOneWidget);
+      // The series page under it shares the Great Western Trail title.
+      expect(
+        find.descendant(
+          of: find.byType(PlayScreen),
+          matching: find.widgetWithText(AppBar, titles[i]),
+        ),
+        findsOneWidget,
+      );
       expect(find.text('Scoresheet'), findsNothing);
       Navigator.of(tester.element(find.text('Score pad'))).pop();
       await pumpFor(tester);
@@ -1308,8 +1337,8 @@ void main() {
     await pumpUntilFound(tester, find.text('میپل اسکور'));
     expect(find.text('English'), findsWidgets);
     expect(find.text('گریت وسترن تریل'), findsWidgets);
-    expect(find.text('نسخه دوم'), findsOneWidget);
-    expect(find.text('آرژانتین'), findsOneWidget);
+    // GWT editions sit behind one banner on the home page.
+    expect(_semanticsLabel('5 نسخه'), findsOneWidget);
     expect(find.text('ویرانه‌های گمشده آرناک'), findsOneWidget);
     expect(find.text('قلعه‌های بورگوندی'), findsOneWidget);
     expect(find.text('نسخه ویژه'), findsOneWidget);

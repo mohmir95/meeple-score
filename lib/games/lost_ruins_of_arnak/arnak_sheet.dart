@@ -15,6 +15,7 @@ import 'arnak_leaders_setup.dart';
 import 'arnak_player_line.dart';
 import 'arnak_scoring.dart';
 import 'arnak_state.dart';
+import '../../shared/widgets/loading_image.dart';
 
 typedef _LineUpdate = ArnakPlayerLine Function(ArnakPlayerLine line, int value);
 
@@ -539,7 +540,7 @@ class ArnakSheet extends StatelessWidget {
         ),
         _optionToggle(
           switchKey: const ValueKey('arnak-spider-temple'),
-          icon: Image.asset(darkTabletAsset, height: 28),
+          icon: loadingImage(darkTabletAsset, height: 28),
           label: l10n.t('arnak.spiderTemple'),
           value: state.spiderTemple,
           onChanged: (on) => onChanged(state.copyWith(spiderTemple: on)),
@@ -548,7 +549,7 @@ class ArnakSheet extends StatelessWidget {
           FilledButton.tonalIcon(
             key: const ValueKey('arnak-altars-button'),
             onPressed: () => _openAltars(context),
-            icon: Image.asset(darkTabletAsset, height: 20),
+            icon: loadingImage(darkTabletAsset, height: 20),
             label: Text(l10n.t('arnak.altarsButton')),
           ),
       ],
@@ -658,7 +659,7 @@ class ArnakSheet extends StatelessWidget {
     }
     final height = wide ? size - 6 : size;
     final width = wide ? height * 2.1 : size;
-    return Image.asset(
+    return loadingImage(
       iconAsset,
       width: width,
       height: height,

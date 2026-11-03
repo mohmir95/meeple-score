@@ -26,6 +26,9 @@ abstract class BoardGame {
 
   String get l10nPrefix => 'game.$id';
 
+  /// Editions of one game share a series and a single home page banner.
+  String? get seriesId => null;
+
   String? get designer => null;
 
   String? get publisher => null;

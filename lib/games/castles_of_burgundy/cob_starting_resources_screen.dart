@@ -4,6 +4,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import 'cob_game.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// Setup chart for Castles of Burgundy Special Edition starting resources.
 ///
@@ -271,7 +272,7 @@ class _ResourceIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
+    return loadingImage(
       asset,
       width: size * aspectRatio,
       height: size,

@@ -24,6 +24,9 @@ abstract class GwtEditionGame extends BoardGame {
   String get name => 'Great Western Trail';
 
   @override
+  String? get seriesId => 'great_western_trail';
+
+  @override
   String get description =>
       'You are ranchers driving cattle from Texas to Kansas City, then shipping '
       'them west by train. Each loop around the trail you hire cowboys, craftsmen, '

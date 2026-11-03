@@ -13,9 +13,7 @@ Future<void> _openStartingResources(
 }) async {
   final locale = await createTestLocale();
   await pumpScoreSheetApp(tester, localeController: locale);
-  await pumpUntilFound(tester, gameCard);
-  await tester.tap(gameCard);
-  await pumpFor(tester);
+  await openGwtEdition(tester, gameCard);
   await pumpUntilFound(tester, find.text('Starting Resources'));
   await tester.tap(find.text('Starting Resources'));
   await pumpFor(tester);
@@ -25,7 +23,7 @@ Future<void> _openStartingResources(
   );
 }
 
-final _firstEdition = find.byType(GameCard).first;
+final _firstEdition = inGwtSeries(find.byType(GameCard)).first;
 final _secondEdition = find.text('Second Edition');
 final _argentina = find.text('Argentina');
 final _newZealand = find.text('New Zealand');

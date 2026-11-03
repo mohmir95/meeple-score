@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../layout/breakpoints.dart';
 import 'language_toggle.dart';
+import 'loading_image.dart';
 
 class AppPage extends StatelessWidget {
   const AppPage({
@@ -81,7 +82,7 @@ class _AppBarCover extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child: Image.asset(
+      child: loadingImage(
         asset,
         width: size,
         height: size,

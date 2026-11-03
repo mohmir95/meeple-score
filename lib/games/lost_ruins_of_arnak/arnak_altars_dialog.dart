@@ -7,6 +7,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/player_colors.dart';
 import 'arnak_dark_tablets.dart';
+import '../../shared/widgets/loading_image.dart';
 
 const darkTabletAsset =
     'assets/games/lost_ruins_of_arnak/icons/dark_tablet.png';
@@ -95,7 +96,7 @@ class _AltarsEditorState extends State<_AltarsEditor> {
             ),
             child: Row(
               children: [
-                Image.asset(darkTabletAsset, height: 32),
+                loadingImage(darkTabletAsset, height: 32),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -590,7 +591,7 @@ class ArnakVpGem extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
+            loadingImage(
               asset,
               fit: BoxFit.contain,
               filterQuality: FilterQuality.medium,

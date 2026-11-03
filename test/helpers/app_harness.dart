@@ -1,6 +1,7 @@
 import 'package:board_game_score_sheet/app/app.dart';
 import 'package:board_game_score_sheet/domain/game_registry.dart';
 import 'package:board_game_score_sheet/features/home/game_card.dart';
+import 'package:board_game_score_sheet/features/home/game_series_screen.dart';
 import 'package:board_game_score_sheet/l10n/app_localizations.dart';
 import 'package:board_game_score_sheet/l10n/l10n_scope.dart';
 import 'package:board_game_score_sheet/l10n/locale_controller.dart';
@@ -94,9 +95,36 @@ Future<void> pumpUntilGone(
   fail('Timed out waiting for $finder to disappear');
 }
 
+/// The home page groups every Great Western Trail edition into one banner.
+final gwtSeriesCard = find.byKey(
+  const ValueKey('home-series-great_western_trail'),
+);
+
+/// Limits [finder] to the series page, since the home page cards stay in
+/// the tree underneath it.
+Finder inGwtSeries(Finder finder) =>
+    find.descendant(of: find.byType(GameSeriesScreen), matching: finder);
+
+/// Opens the Great Western Trail page that lists every edition.
+Future<void> openGwtSeries(WidgetTester tester) async {
+  await pumpUntilFound(tester, gwtSeriesCard);
+  await tester.tap(gwtSeriesCard);
+  // Lets the covers finish flying into the edition cards.
+  await pumpFor(tester, duration: const Duration(milliseconds: 800));
+  await pumpUntilFound(tester, inGwtSeries(find.byType(GameCard)));
+}
+
+/// Opens one GWT edition's hub from the home page.
+Future<void> openGwtEdition(WidgetTester tester, Finder edition) async {
+  await openGwtSeries(tester);
+  await pumpUntilFound(tester, edition);
+  await tester.tap(edition);
+  await pumpFor(tester);
+}
+
 Future<void> openGwtSetup(WidgetTester tester) async {
-  await pumpUntilFound(tester, find.byType(GameCard));
-  await tester.tap(find.byType(GameCard).first);
+  await openGwtSeries(tester);
+  await tester.tap(inGwtSeries(find.byType(GameCard)).first);
   await pumpFor(tester);
   await pumpUntilFound(tester, find.text('Scoresheet'));
   final sheet = tester.getRect(find.text('Scoresheet'));

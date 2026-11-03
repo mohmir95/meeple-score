@@ -7,6 +7,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import 'gwt_bonus_cards.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// Builds the New Zealand bonus cards supply for 2–4 players.
 class GwtBonusCardsRandomizerScreen extends StatefulWidget {
@@ -267,12 +268,16 @@ class _BonusStack extends StatelessWidget {
         padding: EdgeInsets.all(compact ? 5 : 10),
         child: Column(
           children: [
-            // The sorting tile sits above its stack, as on the table.
-            Image.asset(
-              tile.asset,
-              fit: BoxFit.contain,
-              filterQuality: FilterQuality.medium,
-              semanticLabel: l10n.t('gwt.bonusCards.${tile.key}'),
+            // The sorting tile sits above its stack, as on the table. A fixed
+            // shape keeps room for it while it loads.
+            AspectRatio(
+              aspectRatio: GwtBonusCardsSupply.tileAspectRatio,
+              child: loadingImage(
+                tile.asset,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.medium,
+                semanticLabel: l10n.t('gwt.bonusCards.${tile.key}'),
+              ),
             ),
             SizedBox(height: gap),
             AnimatedSwitcher(
@@ -285,7 +290,7 @@ class _BonusStack extends StatelessWidget {
                     borderRadius: BorderRadius.circular(
                       constraints.maxWidth * 0.045,
                     ),
-                    child: Image.asset(
+                    child: loadingImage(
                       GwtBonusCardsSupply.cardAsset(set),
                       fit: BoxFit.cover,
                       filterQuality: FilterQuality.medium,

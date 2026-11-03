@@ -8,6 +8,7 @@ import '../../domain/board_game.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// Exchange token artwork. Photos taken on the board keep their source bounds
 /// and are clipped to the token's D shape; pre-cut PNGs are drawn as-is.
@@ -417,7 +418,7 @@ class _WorkerCards extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: Image.asset(
+                      child: loadingImage(
                         cards[i].asset,
                         width: cardWidth,
                         height: cardWidth / setup.workerCardAspect,
@@ -497,7 +498,7 @@ class _ExhaustionCardCallout extends StatelessWidget {
                 ),
               ],
             ),
-            child: Image.asset(
+            child: loadingImage(
               asset,
               height: cardHeight,
               width: cardHeight * aspect,
@@ -549,7 +550,7 @@ class _DiscardCallout extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (iconAsset case final asset?)
-            Image.asset(
+            loadingImage(
               asset,
               width: 20,
               height: 20,
@@ -1023,7 +1024,7 @@ class _CardFan extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Image.asset(
+                    child: loadingImage(
                       asset,
                       width: cardWidth,
                       height: cardHeight,
@@ -1065,7 +1066,7 @@ class _ExchangeToken extends StatelessWidget {
   }
 
   Widget _image({required double width, required double height}) {
-    return Image.asset(
+    return loadingImage(
       art.asset,
       width: width,
       height: height,
@@ -1175,7 +1176,7 @@ class _Coin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipOval(
-      child: Image.asset(
+      child: loadingImage(
         asset,
         width: size,
         height: size,

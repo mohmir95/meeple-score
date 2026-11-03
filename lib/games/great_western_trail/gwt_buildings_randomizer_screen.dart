@@ -10,6 +10,7 @@ import 'gwt_building_art.dart';
 import 'gwt_buildings_layout.dart';
 import 'gwt_edition.dart';
 import 'gwt_public_buildings_layout.dart';
+import '../../shared/widgets/loading_image.dart';
 
 class GwtBuildingsRandomizerScreen extends StatefulWidget {
   const GwtBuildingsRandomizerScreen({
@@ -639,7 +640,7 @@ class _ArtTile extends StatelessWidget {
       title: title,
       child: ColoredBox(
         color: scheme.surfaceContainerLow,
-        child: Image.asset(
+        child: loadingImage(
           asset,
           key: imageKey,
           fit: BoxFit.cover,

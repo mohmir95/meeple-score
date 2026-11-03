@@ -16,6 +16,7 @@ import '../../shared/widgets/player_editor.dart';
 import '../../shared/widgets/primary_button.dart';
 import '../play/play_screen.dart';
 import '../play/play_session.dart';
+import '../../shared/widgets/loading_image.dart';
 
 class SetupScreen extends StatefulWidget {
   const SetupScreen({super.key, required this.game, required this.repository});
@@ -403,7 +404,7 @@ class _CoverThumb extends StatelessWidget {
   Widget build(BuildContext context) {
     final child = game.coverImageAsset == null
         ? GameIconBadge(icon: game.icon, color: game.accentColor, size: size)
-        : Image.asset(
+        : loadingImage(
             game.coverImageAsset!,
             width: size,
             height: size,

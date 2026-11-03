@@ -4,6 +4,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import 'arnak_game.dart';
+import '../../shared/widgets/loading_image.dart';
 
 class ArnakStartingResourcesScreen extends StatelessWidget {
   const ArnakStartingResourcesScreen({super.key});
@@ -327,7 +328,7 @@ class _DeckGroup extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: Image.asset(
+                          child: loadingImage(
                             assets[index],
                             fit: BoxFit.contain,
                             filterQuality: FilterQuality.medium,
@@ -371,7 +372,7 @@ class _ResourceIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
+    return loadingImage(
       asset,
       width: size,
       height: size,

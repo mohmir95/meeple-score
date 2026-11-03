@@ -6,6 +6,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import 'cob_game.dart';
+import '../../shared/widgets/loading_image.dart';
 
 class CobReferenceSheet {
   const CobReferenceSheet({
@@ -73,6 +74,22 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
       vsync: this,
       duration: const Duration(milliseconds: 160),
     );
+  }
+
+  String? _precachedLanguage;
+
+  /// Loads both sides up front, so the back is ready before the first flip.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final language = context.l10n.language.id;
+    if (_precachedLanguage == language) {
+      return;
+    }
+    _precachedLanguage = language;
+    final sheet = CobQuickReferenceScreen.sheetFor(language);
+    precacheImage(AssetImage(sheet.frontAsset), context);
+    precacheImage(AssetImage(sheet.backAsset), context);
   }
 
   @override
@@ -382,8 +399,12 @@ class _ReferenceFace extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Image.asset(
+        // Fills the card box from the start, so the loading placeholder has
+        // room before the image's own size is known.
+        child: loadingImage(
           asset,
+          width: double.infinity,
+          height: double.infinity,
           fit: BoxFit.cover,
           filterQuality: FilterQuality.high,
           semanticLabel: label,
@@ -513,7 +534,7 @@ class _MagnifierLens extends StatelessWidget {
                         top: diameter / 2 - focal.dy * _magnification,
                         width: cardSize.width * _magnification,
                         height: cardSize.height * _magnification,
-                        child: Image.asset(
+                        child: loadingImage(
                           asset,
                           fit: BoxFit.fill,
                           filterQuality: FilterQuality.high,

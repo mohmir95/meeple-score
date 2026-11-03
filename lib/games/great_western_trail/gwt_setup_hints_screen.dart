@@ -4,6 +4,7 @@ import '../../domain/board_game.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// A tile placement rule, shown as a card under the board tiles.
 class GwtSetupRule {
@@ -345,7 +346,7 @@ class _GwtSetupHintsScreenState extends State<GwtSetupHintsScreen> {
   Widget _kansasCityRules(BuildContext context, bool compact) {
     final l10n = context.l10n;
     final art = widget.art;
-    Widget tileIcon(String asset) => Image.asset(
+    Widget tileIcon(String asset) => loadingImage(
       asset,
       width: 34,
       height: 40,
@@ -461,7 +462,7 @@ class _PanelState extends State<_Panel> {
                   ),
                   child: Row(
                     children: [
-                      Image.asset(
+                      loadingImage(
                         widget.tileBack,
                         width: tileSize * widget.tileBackAspect,
                         height: tileSize,
@@ -673,7 +674,7 @@ class _JobMarket extends StatelessWidget {
       return Stack(
         clipBehavior: Clip.none,
         children: [
-          Image.asset(
+          loadingImage(
             art.tileBack2,
             width: (cell - 6) * art.tileBackAspect,
             height: cell - 6,
@@ -762,7 +763,7 @@ class _JobMarket extends StatelessWidget {
                       if (r == rows - 1 && c == columns - 1)
                         space(
                           ClipOval(
-                            child: Image.asset(
+                            child: loadingImage(
                               art.jobMarketToken,
                               width: cell * 0.7,
                               height: cell * 0.7,
@@ -799,7 +800,7 @@ class _Ships extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    Widget ship(String name) => Image.asset(
+    Widget ship(String name) => loadingImage(
       '$_argentinaIcons/$name.png',
       fit: BoxFit.contain,
       filterQuality: FilterQuality.medium,
@@ -923,7 +924,7 @@ class _Cities extends StatelessWidget {
                     key: ValueKey('gwt-setup-city-$city'),
                     children: [
                       ClipOval(
-                        child: Image.asset(
+                        child: loadingImage(
                           // A placed cover tile shows its compass side.
                           '$_argentinaIcons/${GwtSetupHints.cityCovered(city, players) ? 'city-center' : _covers[city]}.png',
                           width: compact ? 76 : 104,

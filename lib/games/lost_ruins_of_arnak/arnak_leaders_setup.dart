@@ -5,6 +5,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/player_colors.dart';
 import 'arnak_config.dart';
 import 'arnak_leaders.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// A leader token, ringed in the player's color.
 class ArnakLeaderPortrait extends StatelessWidget {
@@ -35,7 +36,7 @@ class ArnakLeaderPortrait extends StatelessWidget {
           color: ring == null ? null : playerColor(ring),
         ),
         child: ClipOval(
-          child: Image.asset(
+          child: loadingImage(
             leader.asset,
             fit: BoxFit.cover,
             filterQuality: FilterQuality.medium,

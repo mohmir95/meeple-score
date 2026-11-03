@@ -51,5 +51,8 @@ class GwtBonusCardsSupply {
   /// Card photo size; the corners are rounded when drawn.
   static const cardAspectRatio = 360 / 545;
 
+  /// The sorting tiles are all about 400 by 192 pixels.
+  static const tileAspectRatio = 400 / 192;
+
   int setFor(GwtBonusTile tile) => sets[tile.index];
 }

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../data/game_session_repository.dart';
 import '../../domain/board_game.dart';
 import '../../domain/game_registry.dart';
+import '../../domain/game_series.dart';
 import '../../domain/models/game_session.dart';
+import '../../domain/models/game_status.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
@@ -12,6 +14,9 @@ import '../hub/game_hub_screen.dart';
 import '../play/play_screen.dart';
 import '../play/play_session.dart';
 import 'game_card.dart';
+import 'game_series_card.dart';
+import 'game_series_screen.dart';
+import '../../shared/widgets/loading_image.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -99,6 +104,21 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _openSeries(SeriesEntry entry) async {
+    await Navigator.of(context).push(
+      SeriesPageRoute(
+        builder: (context) => GameSeriesScreen(
+          series: entry.series,
+          games: entry.games,
+          repository: widget.repository,
+          onOpenGame: _openGame,
+          onOpenSaved: _openSaved,
+        ),
+      ),
+    );
+    await _reload();
+  }
+
   Widget _cardFor(BoardGame game) {
     final session = game.hasScoresheet ? _sessions[game.id] : null;
     return GameCard(
@@ -106,6 +126,33 @@ class _HomeScreenState extends State<HomeScreen> {
       session: session,
       onOpen: () => _openGame(game),
       onOpenSaved: session == null ? null : () => _openSaved(game, session),
+    );
+  }
+
+  Widget _seriesCardFor(SeriesEntry entry) {
+    // Resume the most recently played edition that is still in progress.
+    BoardGame? resumeGame;
+    GameSession? resumeSession;
+    for (final game in entry.games) {
+      final session = game.hasScoresheet ? _sessions[game.id] : null;
+      if (session == null ||
+          session.stateJson['status'] == GameStatus.finished.name) {
+        continue;
+      }
+      if (resumeSession == null ||
+          session.updatedAt.isAfter(resumeSession.updatedAt)) {
+        resumeGame = game;
+        resumeSession = session;
+      }
+    }
+    return GameSeriesCard(
+      key: ValueKey('home-series-${entry.series.id}'),
+      series: entry.series,
+      games: entry.games,
+      onOpen: () => _openSeries(entry),
+      onResume: resumeSession == null
+          ? null
+          : () => _openSaved(resumeGame!, resumeSession!),
     );
   }
 
@@ -118,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(10),
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(10)),
-          child: Image.asset(
+          child: loadingImage(
             'assets/branding/app-icon.png',
             semanticLabel: l10n.t('app.iconLabel'),
           ),
@@ -130,7 +177,9 @@ class _HomeScreenState extends State<HomeScreen> {
           tooltip: l10n.t('firstPlayer.button'),
           icon: const Icon(Icons.touch_app_outlined, color: Colors.white),
           onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (context) => const FirstPlayerScreen()),
+            MaterialPageRoute<void>(
+              builder: (context) => const FirstPlayerScreen(),
+            ),
           ),
         ),
       ],
@@ -146,7 +195,11 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 GameGrid(
                   children: [
-                    for (final game in widget.registry.games) _cardFor(game),
+                    for (final entry in HomeEntry.group(widget.registry.games))
+                      switch (entry) {
+                        SingleGameEntry(:final game) => _cardFor(game),
+                        SeriesEntry() => _seriesCardFor(entry),
+                      },
                   ],
                 ),
               ],

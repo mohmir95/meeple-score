@@ -28,7 +28,7 @@ void main() {
     expect(game.buildTrainCardsRandomizer(), isNotNull);
   });
 
-  testWidgets('first game, flips and randomize', (tester) async {
+  testWidgets('first game and randomize', (tester) async {
     tester.view.physicalSize = const Size(412, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -51,15 +51,16 @@ void main() {
     final randomize = find.byKey(const ValueKey('gwt-train-cards-randomize'));
     expect(tester.widget<FilledButton>(randomize).onPressed, isNull);
 
-    // Turning a card over leaves first-game mode.
+    // Tapping a card does nothing.
     await tester.tap(find.byKey(const ValueKey('gwt-train-card-3')));
     await pumpFor(tester);
-    expect(find.text('1 of 4 cards on the ★ side'), findsOneWidget);
-    expect(
-      find.image(AssetImage(GwtTrainCards.asset(3, star: true))),
-      findsOneWidget,
-    );
+    expect(find.text('0 of 4 cards on the ★ side'), findsOneWidget);
+
+    // Leaving first-game mode draws again, with at least one star side.
+    await tester.tap(find.byKey(const ValueKey('gwt-train-cards-first-game')));
+    await pumpFor(tester);
     expect(tester.widget<FilledButton>(randomize).onPressed, isNotNull);
+    expect(find.text('0 of 4 cards on the ★ side'), findsNothing);
 
     await tester.tap(randomize);
     await pumpFor(tester);

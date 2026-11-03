@@ -6,6 +6,7 @@ import '../../domain/board_game.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// El Paso's buildings: 6 stacks of common building tiles, each turned to
 /// its a- or b-side, and 6 neutral tiles placed on board spaces B to G next
@@ -397,7 +398,7 @@ class _TileImage extends StatelessWidget {
           ),
         ],
       ),
-      child: Image.asset(
+      child: loadingImage(
         asset,
         width: size,
         height: size,

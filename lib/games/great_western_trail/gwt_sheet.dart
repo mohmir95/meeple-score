@@ -12,6 +12,7 @@ import '../../shared/widgets/score_stepper.dart';
 import 'gwt_player_line.dart';
 import 'gwt_scoring.dart';
 import 'gwt_state.dart';
+import '../../shared/widgets/loading_image.dart';
 
 typedef _LineUpdate = GwtPlayerLine Function(GwtPlayerLine line, int value);
 
@@ -1152,7 +1153,7 @@ class GwtSheet extends StatelessWidget {
     }
     final height = wide ? size - 6 : size;
     final width = wide ? height * 2.1 : size;
-    return Image.asset(
+    return loadingImage(
       iconAsset,
       width: width,
       height: height,

@@ -7,6 +7,7 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import 'gwt_setup_hints_screen.dart';
+import '../../shared/widgets/loading_image.dart';
 
 /// Argentina's city maps: each city is played on its side A or B.
 class GwtCityMaps {
@@ -384,7 +385,7 @@ class _CityMapArt extends StatelessWidget {
           child: Stack(
             children: [
               Positioned.fill(
-                child: Image.asset(
+                child: loadingImage(
                   GwtCityMaps.mapAsset(city, side),
                   fit: BoxFit.cover,
                   filterQuality: FilterQuality.medium,
@@ -409,7 +410,7 @@ class _CityMapArt extends StatelessWidget {
                       ],
                     ),
                     child: ClipOval(
-                      child: Image.asset(
+                      child: loadingImage(
                         GwtCityMaps.coverAsset,
                         width: radius * 2,
                         height: radius * 2,
