@@ -1,6 +1,7 @@
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_argentina_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_game.dart';
+import 'package:board_game_score_sheet/games/great_western_trail/gwt_new_zealand_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_setup_hints_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -116,6 +117,45 @@ void main() {
     final left = tester.getCenter(find.text('Le Havre'));
     final right = tester.getCenter(find.text('Liverpool'));
     expect(left.dx, lessThan(right.dx));
+  });
+
+  test('New Zealand draws 1 more A tile per player', () {
+    const art = GwtSetupHintsArt.newZealand;
+    expect(art.boardTilesFor(2), 12);
+    expect(art.boardTilesFor(3), 13);
+    expect(art.boardTilesFor(4), 14);
+    expect(art.playersFirst, isTrue);
+    expect(GwtSetupHintsArt.argentina.playersFirst, isFalse);
+  });
+
+  testWidgets('New Zealand fills the bonus tiles market', (tester) async {
+    tester.view.physicalSize = const Size(1200, 2000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await pumpWithL10n(
+      tester,
+      const GwtSetupHintsScreen(
+        game: GreatWesternTrailNewZealandGame(),
+        art: GwtSetupHintsArt.newZealand,
+      ),
+    );
+
+    // The selector comes first, since it changes both sections.
+    expect(
+      tester.getTopLeft(find.byKey(const ValueKey('gwt-setup-players'))).dy,
+      lessThan(tester.getTopLeft(find.text('14 Worker & Hazard Tiles')).dy),
+    );
+    expect(find.text('Worker'), findsOneWidget);
+    expect(find.text('Hazard (flood or rockfall)'), findsOneWidget);
+    expect(find.text('7 Bonus Tiles in the Market'), findsOneWidget);
+    expect(find.byKey(const ValueKey('gwt-setup-worker-7')), findsOneWidget);
+
+    await tester.tap(find.text('2 players'));
+    await pumpFor(tester);
+    expect(find.text('12 Worker & Hazard Tiles'), findsOneWidget);
+    expect(find.text('3 Bonus Tiles in the Market'), findsOneWidget);
   });
 
   testWidgets('Second Edition places outlaws and skips solo', (tester) async {

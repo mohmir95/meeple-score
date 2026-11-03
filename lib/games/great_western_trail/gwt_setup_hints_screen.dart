@@ -34,6 +34,9 @@ class GwtSetupHintsArt {
     this.jobMarketBodyKey = 'gwt.setup.jobMarketBody',
     this.jobMarketRows = 2,
     this.shipsAndCities = false,
+    this.boardTilesPerPlayer = 0,
+    this.marketTitleKey = 'gwt.setup.jobMarketTitle',
+    this.marketTokenKey = 'gwt.setup.jobMarketToken',
   });
 
   final String tileBack1;
@@ -51,6 +54,20 @@ class GwtSetupHintsArt {
 
   /// Argentina also lays out ships and city maps.
   final bool shipsAndCities;
+
+  /// New Zealand draws 1 more board tile per player above 2.
+  final int boardTilesPerPlayer;
+
+  /// New Zealand fills a bonus tiles market instead of the job market.
+  final String marketTitleKey;
+  final String marketTokenKey;
+
+  int boardTilesFor(int players) =>
+      boardTiles +
+      boardTilesPerPlayer * (players - GwtSetupHintsScreen.minPlayers);
+
+  /// The player count changes the first section, so it is picked first.
+  bool get playersFirst => boardTilesPerPlayer != 0;
 
   static const firstEdition = GwtSetupHintsArt(
     tileBack1: 'assets/games/great_western_trail/icons/tile-back-1.png',
@@ -113,9 +130,36 @@ class GwtSetupHintsArt {
     jobMarketRows: 3,
     shipsAndCities: true,
   );
+
+  static const newZealand = GwtSetupHintsArt(
+    tileBack1: '$_newZealandIcons/tile-back-a.png',
+    tileBack2: '$_newZealandIcons/tile-back-b.png',
+    tileBackAspect: 132 / 153,
+    jobMarketToken: '$_newZealandIcons/bonus-token.png',
+    rules: [
+      GwtSetupRule(
+        titleKey: 'gwt.setup.nzWorkerTitle',
+        bodyKey: 'gwt.setup.nzWorkerBody',
+        asset: '$_newZealandIcons/worker.png',
+      ),
+      GwtSetupRule(
+        titleKey: 'gwt.setup.nzHazardTitle',
+        bodyKey: 'gwt.setup.nzHazardBody',
+        asset: '$_newZealandIcons/hazard.png',
+      ),
+    ],
+    boardTiles: GwtSetupHints.newZealandTiles,
+    boardTilesPerPlayer: 1,
+    boardTitleKey: 'gwt.setup.nzTilesTitle',
+    boardBodyKey: 'gwt.setup.nzTilesBody',
+    jobMarketBodyKey: 'gwt.setup.bonusMarketBody',
+    marketTitleKey: 'gwt.setup.bonusMarketTitle',
+    marketTokenKey: 'gwt.setup.bonusMarketToken',
+  );
 }
 
 const _argentinaIcons = 'assets/games/great_western_trail_argentina/icons';
+const _newZealandIcons = 'assets/games/great_western_trail_new_zealand/icons';
 
 /// Setup numbers from the rulebooks, shared by the editions.
 class GwtSetupHints {
@@ -126,6 +170,9 @@ class GwtSetupHints {
 
   /// Argentina: tiles with an "A" back placed on the board.
   static const farmerTiles = 5;
+
+  /// New Zealand: "A" tiles drawn with 2 players, after 1 of each worker.
+  static const newZealandTiles = 12;
 
   /// The job market rows are this many spaces wide.
   static const jobMarketColumns = 4;
@@ -191,6 +238,26 @@ class _GwtSetupHintsScreenState extends State<GwtSetupHintsScreen> {
       _ => 'gwt.setup.citiesTitleAll',
     };
 
+    final selector = SegmentedButton<int>(
+      key: const ValueKey('gwt-setup-players'),
+      showSelectedIcon: false,
+      segments: [
+        for (
+          var n = GwtSetupHintsScreen.minPlayers;
+          n <= widget.game.maxPlayers;
+          n++
+        )
+          ButtonSegment(
+            value: n,
+            label: Text(l10n.t('gwt.setup.players', {'n': '$n'})),
+          ),
+      ],
+      selected: {_players},
+      onSelectionChanged: (selection) {
+        setState(() => _players = selection.first);
+      },
+    );
+
     return AppPage(
       title: l10n.t('hub.setupHints'),
       coverImageAsset: widget.game.coverImageAsset,
@@ -202,15 +269,20 @@ class _GwtSetupHintsScreenState extends State<GwtSetupHintsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (art.playersFirst) ...[selector, SizedBox(height: gap)],
                 _Panel(
                   key: const ValueKey('gwt-setup-kansas-city'),
                   accent: accent,
                   compact: compact,
                   initiallyExpanded: true,
-                  title: l10n.t(art.boardTitleKey, {'n': '${art.boardTiles}'}),
+                  title: l10n.t(art.boardTitleKey, {
+                    'n': '${art.boardTilesFor(_players)}',
+                  }),
                   tileBack: art.tileBack1,
                   tileBackAspect: art.tileBackAspect,
-                  body: l10n.t(art.boardBodyKey, {'n': '${art.boardTiles}'}),
+                  body: l10n.t(art.boardBodyKey, {
+                    'n': '${art.boardTilesFor(_players)}',
+                  }),
                   child: _kansasCityRules(context, compact),
                 ),
                 if (art.shipsAndCities) ...[
@@ -228,26 +300,7 @@ class _GwtSetupHintsScreenState extends State<GwtSetupHintsScreen> {
                     child: const _Ships(),
                   ),
                 ],
-                SizedBox(height: gap),
-                SegmentedButton<int>(
-                  key: const ValueKey('gwt-setup-players'),
-                  showSelectedIcon: false,
-                  segments: [
-                    for (
-                      var n = GwtSetupHintsScreen.minPlayers;
-                      n <= widget.game.maxPlayers;
-                      n++
-                    )
-                      ButtonSegment(
-                        value: n,
-                        label: Text(l10n.t('gwt.setup.players', {'n': '$n'})),
-                      ),
-                  ],
-                  selected: {_players},
-                  onSelectionChanged: (selection) {
-                    setState(() => _players = selection.first);
-                  },
-                ),
+                if (!art.playersFirst) ...[SizedBox(height: gap), selector],
                 SizedBox(height: gap),
                 _Panel(
                   key: const ValueKey('gwt-setup-job-market'),
@@ -255,7 +308,7 @@ class _GwtSetupHintsScreenState extends State<GwtSetupHintsScreen> {
                   compact: compact,
                   // With only two sections, both fit open.
                   initiallyExpanded: !art.shipsAndCities,
-                  title: l10n.t('gwt.setup.jobMarketTitle', {
+                  title: l10n.t(art.marketTitleKey, {
                     'n':
                         '${GwtSetupHints.workerTiles(_players, rows: art.jobMarketRows)}',
                   }),
@@ -689,7 +742,7 @@ class _JobMarket extends StatelessWidget {
     );
 
     return Semantics(
-      label: l10n.t('gwt.setup.jobMarketTitle', {
+      label: l10n.t(art.marketTitleKey, {
         'n': '${GwtSetupHints.workerTiles(players, rows: rows)}',
       }),
       // The board reads left to right in every language.
@@ -715,7 +768,7 @@ class _JobMarket extends StatelessWidget {
                               height: cell * 0.7,
                               fit: BoxFit.contain,
                               filterQuality: FilterQuality.medium,
-                              semanticLabel: l10n.t('gwt.setup.jobMarketToken'),
+                              semanticLabel: l10n.t(art.marketTokenKey),
                             ),
                           ),
                         )

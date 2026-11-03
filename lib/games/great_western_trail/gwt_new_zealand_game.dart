@@ -9,6 +9,7 @@ import 'gwt_buildings_randomizer_screen.dart';
 import 'gwt_edition.dart';
 import 'gwt_public_buildings_layout.dart';
 import 'gwt_scoring.dart';
+import 'gwt_setup_hints_screen.dart';
 import 'gwt_sheet.dart';
 import 'gwt_starting_resources_screen.dart';
 import 'gwt_state.dart';
@@ -83,6 +84,13 @@ class GreatWesternTrailNewZealandGame extends GwtEditionGame {
       setup: GwtStartingSetup.newZealand,
     );
   }
+
+  @override
+  bool get showSetupHints => true;
+
+  @override
+  Widget? buildSetupHints() =>
+      GwtSetupHintsScreen(game: this, art: GwtSetupHintsArt.newZealand);
 
   @override
   Widget buildScoreSheet({
