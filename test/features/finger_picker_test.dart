@@ -6,10 +6,21 @@ import 'package:board_game_score_sheet/shared/widgets/language_toggle.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/app_harness.dart';
 
 Duration ms(int value) => Duration(milliseconds: value);
+
+/// The final message starting with [prefix]: it names the winner's color,
+/// one of the two fingers' colors in these tests.
+Finder pickedMessage(String prefix) => find.byWidgetPredicate(
+  (widget) =>
+      widget is Text &&
+      RegExp(
+        '^${RegExp.escape(prefix)} (Red|Blue), you go first!\$',
+      ).hasMatch(widget.data ?? ''),
+);
 
 void main() {
   test('one finger never starts the countdown', () {
@@ -176,13 +187,13 @@ void main() {
     await tester.pump(ms(2100));
     expect(find.text(choosing), findsOneWidget);
     await tester.pump(theme.decideTime + ms(100));
-    expect(find.text(picked), findsOneWidget);
+    expect(pickedMessage(picked), findsOneWidget);
 
     // The result stays after everyone lets go.
     await a.up();
     await b.up();
     await tester.pump(ms(2000));
-    expect(find.text(picked), findsOneWidget);
+    expect(pickedMessage(picked), findsOneWidget);
   }
 
   testWidgets('the magician octopus reveals the first player', (tester) async {
@@ -192,18 +203,18 @@ void main() {
       title: "The Octopus's Magic Show",
       needMore: 'Waiting for more volunteers…',
       choosing: 'Abracadabra…',
-      picked: 'Ta-da! You go first!',
+      picked: 'Ta-da!',
     );
   });
 
-  testWidgets('the magnet pulls a meeple onto the pedestal', (tester) async {
+  testWidgets('the cauldron brews and reveals one color', (tester) async {
     await playRound(
       tester,
-      FirstPlayerTheme.meeples,
-      title: 'Magnetic Meeples',
-      needMore: 'Waiting for more meeples…',
-      choosing: 'The magnet is pulling…',
-      picked: 'On the pedestal! You go first.',
+      FirstPlayerTheme.cauldron,
+      title: 'The Mysterious Cauldron',
+      needMore: 'Waiting for more ingredients…',
+      choosing: 'Bubble, bubble… the potion is brewing…',
+      picked: 'The potion has chosen!',
     );
   });
 
@@ -216,18 +227,18 @@ void main() {
       title: 'Pass the Bomb',
       needMore: 'Waiting for more daredevils…',
       choosing: "Tick… tock… who's left?",
-      picked: 'Boom! You go first!',
+      picked: 'Boom!',
     );
   });
 
-  testWidgets('a trail reaches the treasure first', (tester) async {
+  testWidgets('the UFO scans and beams one meeple up', (tester) async {
     await playRound(
       tester,
-      FirstPlayerTheme.treasure,
-      title: 'The Treasure Hunt',
-      needMore: 'Waiting for more treasure hunters…',
-      choosing: 'The race to the treasure is on…',
-      picked: 'Treasure found! You go first!',
+      FirstPlayerTheme.ufo,
+      title: 'The UFO Abduction',
+      needMore: 'Waiting for more earthlings…',
+      choosing: 'Scanning for earthlings…',
+      picked: 'Beamed up!',
     );
   });
 
@@ -238,7 +249,7 @@ void main() {
       title: 'Finger Arena',
       needMore: 'Waiting for a challenger…',
       choosing: 'Ding ding! Fight!',
-      picked: 'Champion! You go first!',
+      picked: 'Champion!',
     );
   });
 
@@ -264,7 +275,7 @@ void main() {
   ) async {
     await pumpWithL10n(
       tester,
-      FirstPlayerScreen(random: math.Random(3), theme: FirstPlayerTheme.meeples),
+      FirstPlayerScreen(random: math.Random(3), theme: FirstPlayerTheme.cauldron),
     );
     expect(find.byKey(const ValueKey('first-player-pin-hint')), findsOneWidget);
     final surface = tester.getRect(
@@ -276,7 +287,7 @@ void main() {
     // Pins stay down after the click is released.
     await tester.tapAt(left, kind: PointerDeviceKind.mouse);
     await tester.pump(ms(100));
-    expect(find.text('Waiting for more meeples…'), findsOneWidget);
+    expect(find.text('Waiting for more ingredients…'), findsOneWidget);
     await tester.tapAt(right, kind: PointerDeviceKind.mouse);
     await tester.pump(ms(100));
     expect(find.text('Hold still…'), findsOneWidget);
@@ -284,12 +295,12 @@ void main() {
     // Clicking a pin lifts it again.
     await tester.tapAt(right, kind: PointerDeviceKind.mouse);
     await tester.pump(ms(100));
-    expect(find.text('Waiting for more meeples…'), findsOneWidget);
+    expect(find.text('Waiting for more ingredients…'), findsOneWidget);
 
     await tester.tapAt(right, kind: PointerDeviceKind.mouse);
     await tester.pump(ms(2100));
-    await tester.pump(FirstPlayerTheme.meeples.decideTime + ms(100));
-    expect(find.text('On the pedestal! You go first.'), findsOneWidget);
+    await tester.pump(FirstPlayerTheme.cauldron.decideTime + ms(100));
+    expect(pickedMessage('The potion has chosen!'), findsOneWidget);
 
     // Lift both pins. After a pick a quick click does nothing…
     await tester.tapAt(left, kind: PointerDeviceKind.mouse);
@@ -297,8 +308,8 @@ void main() {
     await tester.pump(ms(100));
     await tester.tapAt(left, kind: PointerDeviceKind.mouse);
     await tester.pump(ms(100));
-    expect(find.text('On the pedestal! You go first.'), findsOneWidget);
-    expect(find.text('Magnetic Meeples'), findsOneWidget);
+    expect(pickedMessage('The potion has chosen!'), findsOneWidget);
+    expect(find.text('The Mysterious Cauldron'), findsOneWidget);
 
     // …but a touch and hold starts a fresh round on the same scenery.
     final hold = await tester.startGesture(
@@ -311,7 +322,7 @@ void main() {
     await tester.pump(ms(100));
     await hold.up();
     await tester.pump(ms(100));
-    expect(find.text('Magnetic Meeples'), findsOneWidget);
+    expect(find.text('The Mysterious Cauldron'), findsOneWidget);
     expect(find.text('Everyone, put a finger on the screen'), findsOneWidget);
   });
 
@@ -351,9 +362,9 @@ void main() {
   ) async {
     const titles = {
       "The Octopus's Magic Show": 'magic',
-      'Magnetic Meeples': 'meeples',
+      'The Mysterious Cauldron': 'cauldron',
       'Pass the Bomb': 'bomb',
-      'The Treasure Hunt': 'treasure',
+      'The UFO Abduction': 'ufo',
       'Finger Arena': 'arena',
     };
     String shown() => titles.entries
@@ -380,5 +391,58 @@ void main() {
       const FirstPlayerScreen(theme: FirstPlayerTheme.magic),
     );
     expect(find.byType(LanguageToggle), findsOneWidget);
+  });
+
+  testWidgets('the pager switches sceneries between rounds', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await pumpWithL10n(
+      tester,
+      FirstPlayerScreen(random: math.Random(3), theme: FirstPlayerTheme.magic),
+    );
+    expect(find.text("The Octopus's Magic Show"), findsOneWidget);
+
+    // Arrows step through and wrap around.
+    await tester.tap(find.byKey(const ValueKey('first-player-next')));
+    await tester.pump(ms(400));
+    expect(find.text('The Mysterious Cauldron'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('first-player-previous')));
+    await tester.pump(ms(400));
+    await tester.tap(find.byKey(const ValueKey('first-player-previous')));
+    await tester.pump(ms(400));
+    expect(find.text('Finger Arena'), findsOneWidget);
+
+    // An icon jumps straight to its scenery, which is remembered.
+    await tester.tap(find.byKey(const ValueKey('first-player-scenery-bomb')));
+    await tester.pump(ms(400));
+    expect(find.text('Pass the Bomb'), findsOneWidget);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString(FirstPlayerThemeRotation.storageKey), 'bomb');
+
+    // A swipe on the strip brings in the next one.
+    await tester.fling(
+      find.byKey(const ValueKey('first-player-pager')),
+      const Offset(-200, 0),
+      1000,
+    );
+    await tester.pump(ms(400));
+    expect(find.text('The UFO Abduction'), findsOneWidget);
+
+    // During a round the strip is locked.
+    final surface = tester.getRect(
+      find.byKey(const ValueKey('first-player-surface')).last,
+    );
+    final finger = await tester.startGesture(surface.center);
+    await tester.pump(ms(100));
+    await tester.tap(
+      find.byKey(const ValueKey('first-player-next')),
+      warnIfMissed: false,
+    );
+    await tester.pump(ms(400));
+    expect(find.text('The UFO Abduction'), findsOneWidget);
+    await finger.up();
+    await tester.pump(ms(100));
+    await tester.tap(find.byKey(const ValueKey('first-player-next')));
+    await tester.pump(ms(400));
+    expect(find.text('Finger Arena'), findsOneWidget);
   });
 }

@@ -11,10 +11,11 @@ import '../../l10n/l10n_scope.dart';
 import '../../shared/widgets/language_toggle.dart';
 import 'arena_painter.dart';
 import 'bomb_painter.dart';
+import 'cauldron_painter.dart';
 import 'finger_picker.dart';
 import 'magic_painter.dart';
-import 'meeples_painter.dart';
-import 'treasure_painter.dart';
+import 'scenery_icon.dart';
+import 'ufo_painter.dart';
 
 /// The looks the page can wear. The rules are the same for every theme.
 enum FirstPlayerTheme {
@@ -24,19 +25,20 @@ enum FirstPlayerTheme {
     maxFingers: MagicPainter.arms,
     decideTime: Duration(milliseconds: 3000),
   ),
-  // A slower pull so the race can be followed.
-  meeples(
-    Color(0xFF7A4F2A),
-    decideTime: Duration(milliseconds: 4000),
+  // Long enough for every ingredient to drop in and the potion to brew.
+  cauldron(
+    Color(0xFF1B1530),
+    decideTime: Duration(milliseconds: 5000),
   ),
   // Short suspense: the point is to pick a player, not to wait.
   bomb(
     Color(0xFF2B2D42),
     decideTime: Duration(milliseconds: 2600),
   ),
-  treasure(
-    Color(0xFF3E2A18),
-    decideTime: Duration(milliseconds: 3500),
+  // Long enough for several scanning stops before the lock.
+  ufo(
+    Color(0xFF0B1033),
+    decideTime: Duration(milliseconds: 5000),
   ),
   // Kept to a few seconds so the bout doesn't drag, with a calm entrance.
   arena(
@@ -61,9 +63,9 @@ enum FirstPlayerTheme {
 
   CustomPainter painter(FingerPicker picker, Duration now) => switch (this) {
     FirstPlayerTheme.magic => MagicPainter(picker: picker, now: now),
-    FirstPlayerTheme.meeples => MeeplesPainter(picker: picker, now: now),
+    FirstPlayerTheme.cauldron => CauldronPainter(picker: picker, now: now),
     FirstPlayerTheme.bomb => BombPainter(picker: picker, now: now),
-    FirstPlayerTheme.treasure => TreasurePainter(picker: picker, now: now),
+    FirstPlayerTheme.ufo => UfoPainter(picker: picker, now: now),
     FirstPlayerTheme.arena => ArenaPainter(picker: picker, now: now),
   };
 }
@@ -93,6 +95,17 @@ class FirstPlayerThemeRotation {
       // Not remembering only means the next pick may repeat.
     }
     return theme;
+  }
+
+  /// Remembers [theme] as the last one shown, so the next visit picks
+  /// another.
+  static Future<void> remember(FirstPlayerTheme theme) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(storageKey, theme.name);
+    } catch (_) {
+      // Not remembering only means the next pick may repeat.
+    }
   }
 
   /// A random theme, leaving out the one named [last].
@@ -203,6 +216,27 @@ class _FirstPlayerScreenState extends State<FirstPlayerScreen>
     HapticFeedback.mediumImpact();
     _start(_theme!);
   }
+
+  /// The scenery can be changed only between rounds, so nobody's finger is
+  /// lost to a switch.
+  bool get _canSwitch => _picker.touches.isEmpty || _canPlayAgain;
+
+  /// Moves [step] sceneries along, wrapping at either end.
+  void _switchBy(int step) {
+    final themes = FirstPlayerTheme.values;
+    _switchTo(themes[(_theme!.index + step) % themes.length]);
+  }
+
+  void _switchTo(FirstPlayerTheme theme) {
+    if (!_canSwitch || theme == _theme) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    _clearHold();
+    setState(() => _start(theme));
+    FirstPlayerThemeRotation.remember(theme);
+  }
+
   void _clearHold() {
     _holdPointer = null;
     _holdAt = null;
@@ -279,7 +313,12 @@ class _FirstPlayerScreenState extends State<FirstPlayerScreen>
       FingerPhase.waiting => l10n.t('firstPlayer.prompt'),
       FingerPhase.arming => l10n.t('firstPlayer.hold'),
       FingerPhase.deciding => l10n.t('$name.choosing'),
-      FingerPhase.picked => l10n.t('$name.picked'),
+      // Names the winner's color, so it's clear who it is.
+      FingerPhase.picked => l10n.t('$name.picked', {
+        'color': l10n.t(
+          'firstPlayer.color.${_picker.winner?.colorIndex ?? 0}',
+        ),
+      }),
     };
   }
 
@@ -297,7 +336,26 @@ class _FirstPlayerScreenState extends State<FirstPlayerScreen>
       ),
       body: theme == null
           ? const SizedBox.expand()
-          : _buildSurface(context, theme),
+          : Column(
+              children: [
+                _ThemePager(
+                  current: theme,
+                  enabled: _canSwitch,
+                  onStep: _switchBy,
+                  onSelect: _switchTo,
+                ),
+                Expanded(
+                  // Fades between sceneries when one is picked.
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: KeyedSubtree(
+                      key: ValueKey(theme),
+                      child: _buildSurface(context, theme),
+                    ),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 
@@ -386,6 +444,149 @@ class _FirstPlayerScreenState extends State<FirstPlayerScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// A strip above the scene for choosing another scenery: arrows, an icon per
+/// scenery, and a sideways swipe. It sits outside the touch surface, so using
+/// it never counts as a finger.
+class _ThemePager extends StatelessWidget {
+  const _ThemePager({
+    required this.current,
+    required this.enabled,
+    required this.onStep,
+    required this.onSelect,
+  });
+
+  final FirstPlayerTheme current;
+
+  /// False during a round, when the strip dims and ignores input.
+  final bool enabled;
+  final ValueChanged<int> onStep;
+  final ValueChanged<FirstPlayerTheme> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    return AnimatedOpacity(
+      opacity: enabled ? 1 : 0.35,
+      duration: const Duration(milliseconds: 200),
+      child: IgnorePointer(
+        ignoring: !enabled,
+        child: GestureDetector(
+          key: const ValueKey('first-player-pager'),
+          behavior: HitTestBehavior.opaque,
+          onHorizontalDragEnd: (details) {
+            final velocity = details.primaryVelocity ?? 0;
+            if (velocity.abs() < 200) {
+              return;
+            }
+            // A swipe toward the start brings the next scenery in.
+            final towardStart = rtl ? velocity > 0 : velocity < 0;
+            onStep(towardStart ? 1 : -1);
+          },
+          child: SizedBox(
+            height: 52,
+            child: Row(
+              children: [
+                IconButton(
+                  key: const ValueKey('first-player-previous'),
+                  onPressed: () => onStep(-1),
+                  tooltip: l10n.t('firstPlayer.previous'),
+                  color: Colors.white,
+                  icon: const Icon(Icons.chevron_left),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (final theme in FirstPlayerTheme.values)
+                        _SceneryTab(
+                          key: ValueKey('first-player-scenery-${theme.name}'),
+                          theme: theme,
+                          label: l10n.t('${theme.name}.title'),
+                          selected: theme == current,
+                          onTap: () => onSelect(theme),
+                        ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  key: const ValueKey('first-player-next'),
+                  onPressed: () => onStep(1),
+                  tooltip: l10n.t('firstPlayer.next'),
+                  color: Colors.white,
+                  icon: const Icon(Icons.chevron_right),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// One scenery's icon. The current one sits larger in a soft frame; the
+/// others are smaller and faded.
+class _SceneryTab extends StatelessWidget {
+  const _SceneryTab({
+    super.key,
+    required this.theme,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final FirstPlayerTheme theme;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  static const _duration = Duration(milliseconds: 200);
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      excludeSemantics: true,
+      child: Tooltip(
+        message: label,
+        child: InkResponse(
+          onTap: onTap,
+          radius: 24,
+          child: AnimatedContainer(
+            duration: _duration,
+            curve: Curves.easeOut,
+            width: 46,
+            height: 42,
+            margin: const EdgeInsets.symmetric(horizontal: 2),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: selected ? 0.18 : 0),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: selected ? 0.7 : 0),
+                width: 1.5,
+              ),
+            ),
+            alignment: Alignment.center,
+            child: AnimatedOpacity(
+              duration: _duration,
+              opacity: selected ? 1 : 0.6,
+              child: AnimatedScale(
+                duration: _duration,
+                curve: Curves.easeOut,
+                scale: selected ? 1 : 0.82,
+                child: SceneryIcon(theme, size: 32),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

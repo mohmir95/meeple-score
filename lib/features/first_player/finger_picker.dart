@@ -58,7 +58,7 @@ class FingerPicker {
   static const defaultDecideTime = Duration(milliseconds: 1500);
 
   /// How long the suspense lasts before the pick. Themes that tell a longer
-  /// story, like the meeples' race, ask for more.
+  /// story, like the cauldron's brew, ask for more.
   final Duration decideTime;
 
   final math.Random _random;
