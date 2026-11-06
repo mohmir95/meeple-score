@@ -86,6 +86,21 @@ class GameHubScreen extends StatelessWidget {
                   );
                 },
               ),
+            if (game.buildPuzzles() != null)
+              _HubBanner(
+                key: const ValueKey('hub-puzzles'),
+                title: l10n.t('hub.puzzles'),
+                icon: Icons.extension_outlined,
+                color: game.accentColor,
+                compact: compact,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) => game.buildPuzzles()!,
+                    ),
+                  );
+                },
+              ),
             if (game.onlineUrl != null)
               _HubBanner(
                 key: const ValueKey('hub-online'),

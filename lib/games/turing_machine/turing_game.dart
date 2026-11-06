@@ -8,6 +8,7 @@ import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
 import 'turing_note_sheet_screen.dart';
+import 'turing_puzzles_screen.dart';
 
 /// Turing Machine has no scores: the hub offers a deduction note sheet only.
 class TuringMachineGame extends BoardGame {
@@ -64,6 +65,9 @@ class TuringMachineGame extends BoardGame {
 
   @override
   Widget buildNoteSheet() => const TuringNoteSheetScreen();
+
+  @override
+  Widget? buildPuzzles() => const TuringPuzzlesScreen();
 
   /// Online problems, beyond the 20 in the rulebook.
   @override

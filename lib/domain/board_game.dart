@@ -111,6 +111,9 @@ abstract class BoardGame {
 
   Widget buildNoteSheet() => const SizedBox.shrink();
 
+  /// Ready-made puzzles or scenarios to set up. Null hides the hub tile.
+  Widget? buildPuzzles() => null;
+
   /// Website with more puzzles or play aids. Null hides the hub tile.
   String? get onlineUrl => null;
 
