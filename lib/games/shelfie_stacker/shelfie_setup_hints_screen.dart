@@ -309,9 +309,15 @@ class _Die extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [Color.lerp(color, Colors.white, 0.15)!, color],
         ),
-        border: Border(bottom: BorderSide(color: shade, width: size * 0.07)),
+        border: Border(
+          bottom: BorderSide(color: shade, width: size * 0.07),
+        ),
         boxShadow: const [
-          BoxShadow(color: Color(0x33000000), blurRadius: 6, offset: Offset(0, 3)),
+          BoxShadow(
+            color: Color(0x33000000),
+            blurRadius: 6,
+            offset: Offset(0, 3),
+          ),
         ],
       ),
       child: Column(

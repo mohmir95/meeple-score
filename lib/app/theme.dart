@@ -9,43 +9,45 @@ class AppTheme {
   static const terracotta = Color(0xFFE67E22);
 
   static ThemeData light() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: brand,
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: brand,
-      onPrimary: Colors.white,
-      primaryContainer: const Color(0xFFD6EAF8),
-      onPrimaryContainer: brandDeep,
-      secondary: terracotta,
-      onSecondary: Colors.white,
-      secondaryContainer: const Color(0xFFFDEBD0),
-      onSecondaryContainer: const Color(0xFF6E2C00),
-      tertiary: gold,
-      onTertiary: const Color(0xFF3D2A08),
-      tertiaryContainer: const Color(0xFFF8E5B0),
-      onTertiaryContainer: const Color(0xFF3D2A08),
-      surface: canvas,
-      surfaceContainerLowest: Colors.white,
-      surfaceContainerLow: const Color(0xFFEAF3FA),
-      outline: const Color(0xFF8AA4B5),
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: brand,
+          brightness: Brightness.light,
+        ).copyWith(
+          primary: brand,
+          onPrimary: Colors.white,
+          primaryContainer: const Color(0xFFD6EAF8),
+          onPrimaryContainer: brandDeep,
+          secondary: terracotta,
+          onSecondary: Colors.white,
+          secondaryContainer: const Color(0xFFFDEBD0),
+          onSecondaryContainer: const Color(0xFF6E2C00),
+          tertiary: gold,
+          onTertiary: const Color(0xFF3D2A08),
+          tertiaryContainer: const Color(0xFFF8E5B0),
+          onTertiaryContainer: const Color(0xFF3D2A08),
+          surface: canvas,
+          surfaceContainerLowest: Colors.white,
+          surfaceContainerLow: const Color(0xFFEAF3FA),
+          outline: const Color(0xFF8AA4B5),
+        );
     return _fromScheme(scheme);
   }
 
   static ThemeData dark() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: brand,
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: const Color(0xFF5DADE2),
-      onPrimary: brandDeep,
-      secondary: terracotta,
-      onSecondary: Colors.white,
-      tertiary: gold,
-      onTertiary: const Color(0xFF3D2A08),
-      surface: const Color(0xFF10212C),
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: brand,
+          brightness: Brightness.dark,
+        ).copyWith(
+          primary: const Color(0xFF5DADE2),
+          onPrimary: brandDeep,
+          secondary: terracotta,
+          onSecondary: Colors.white,
+          tertiary: gold,
+          onTertiary: const Color(0xFF3D2A08),
+          surface: const Color(0xFF10212C),
+        );
     return _fromScheme(scheme);
   }
 
@@ -72,14 +74,10 @@ class AppTheme {
         elevation: 2,
         shadowColor: brand.withValues(alpha: 0.16),
         color: scheme.surfaceContainerLowest,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       chipTheme: ChipThemeData(
-        shape: StadiumBorder(
-          side: BorderSide(color: scheme.outlineVariant),
-        ),
+        shape: StadiumBorder(side: BorderSide(color: scheme.outlineVariant)),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -95,9 +93,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: scheme.surfaceContainerLowest,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       ),
     );
   }

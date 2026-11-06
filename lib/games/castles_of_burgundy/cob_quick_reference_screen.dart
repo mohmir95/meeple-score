@@ -186,8 +186,7 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
 
   void _track(Offset cardLocal) {
     final cardBox = _cardKey.currentContext?.findRenderObject() as RenderBox?;
-    final stackBox =
-        _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    final stackBox = _stackKey.currentContext?.findRenderObject() as RenderBox?;
     if (cardBox == null || stackBox == null || !cardBox.hasSize) {
       return;
     }
@@ -257,43 +256,43 @@ class _CobQuickReferenceScreenState extends State<CobQuickReferenceScreen>
                             width: card.width,
                             height: card.height,
                             child: Stack(
-                            children: [
-                              _FlippingSheet(
-                                turns: _turn,
-                                front: _ReferenceFace(
-                                  key: const ValueKey('cob-reference-front'),
-                                  asset: sheet.frontAsset,
-                                  labelKey: 'cob.quickReference.front',
-                                ),
-                                back: _ReferenceFace(
-                                  key: const ValueKey('cob-reference-back'),
-                                  asset: sheet.backAsset,
-                                  labelKey: 'cob.quickReference.back',
-                                ),
-                              ),
-                              Positioned.fill(
-                                child: Listener(
-                                  behavior: HitTestBehavior.opaque,
-                                  onPointerDown: _onPointerDown,
-                                  onPointerMove: _onPointerMove,
-                                  onPointerUp: _onPointerUp,
-                                  onPointerCancel: _onPointerUp,
-                                  child: const SizedBox.expand(),
-                                ),
-                              ),
-                              if (_focal != null)
-                                Positioned(
-                                  left: _focal!.dx - 7,
-                                  top: _focal!.dy - 7,
-                                  child: const IgnorePointer(
-                                    child: _FocalDot(),
+                              children: [
+                                _FlippingSheet(
+                                  turns: _turn,
+                                  front: _ReferenceFace(
+                                    key: const ValueKey('cob-reference-front'),
+                                    asset: sheet.frontAsset,
+                                    labelKey: 'cob.quickReference.front',
+                                  ),
+                                  back: _ReferenceFace(
+                                    key: const ValueKey('cob-reference-back'),
+                                    asset: sheet.backAsset,
+                                    labelKey: 'cob.quickReference.back',
                                   ),
                                 ),
-                            ],
+                                Positioned.fill(
+                                  child: Listener(
+                                    behavior: HitTestBehavior.opaque,
+                                    onPointerDown: _onPointerDown,
+                                    onPointerMove: _onPointerMove,
+                                    onPointerUp: _onPointerUp,
+                                    onPointerCancel: _onPointerUp,
+                                    child: const SizedBox.expand(),
+                                  ),
+                                ),
+                                if (_focal != null)
+                                  Positioned(
+                                    left: _focal!.dx - 7,
+                                    top: _focal!.dy - 7,
+                                    child: const IgnorePointer(
+                                      child: _FocalDot(),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
+                      );
                     },
                   ),
                 ),
@@ -448,9 +447,7 @@ class _FocalDot extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2),
         color: const Color(0xFF7A2E3B).withValues(alpha: 0.85),
-        boxShadow: const [
-          BoxShadow(color: Color(0x66000000), blurRadius: 4),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
       ),
     );
   }
@@ -489,7 +486,10 @@ class _MagnifierLens extends StatelessWidget {
         ? focalOnPage.dy - (diameter / 2 + gap)
         : focalOnPage.dy + (diameter / 2 + gap);
     final maxX = math.max(diameter / 2 + 8, stackSize.width - diameter / 2 - 8);
-    final maxY = math.max(diameter / 2 + 8, stackSize.height - diameter / 2 - 8);
+    final maxY = math.max(
+      diameter / 2 + 8,
+      stackSize.height - diameter / 2 - 8,
+    );
     final center = Offset(
       focalOnPage.dx.clamp(diameter / 2 + 8, maxX),
       preferredY.clamp(diameter / 2 + 8, maxY),

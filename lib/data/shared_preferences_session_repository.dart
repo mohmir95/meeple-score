@@ -105,8 +105,12 @@ class SharedPreferencesSessionRepository implements GameSessionRepository {
   @override
   Future<void> saveRoster(String gameId, List<Player> players) async {
     final raw = _prefs.getString(_rosterKey);
-    final decoded = raw == null || raw.isEmpty ? <String, dynamic>{} : jsonDecode(raw);
-    final map = decoded is Map ? Map<String, dynamic>.from(decoded) : <String, dynamic>{};
+    final decoded = raw == null || raw.isEmpty
+        ? <String, dynamic>{}
+        : jsonDecode(raw);
+    final map = decoded is Map
+        ? Map<String, dynamic>.from(decoded)
+        : <String, dynamic>{};
     map[gameId] = [for (final player in players) player.toJson()];
     await _prefs.setString(_rosterKey, jsonEncode(map));
   }

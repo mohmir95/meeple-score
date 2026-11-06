@@ -84,28 +84,20 @@ class _GwtBuildingsRandomizerScreenState
   @override
   void initState() {
     super.initState();
-    _layout = widget.initialLayout ??
-        GwtBuildingsLayout.random(
-          random: widget.random,
-          baseCount: _baseCount,
-        );
-    if (!_includeThirteenthBuilding &&
-        _layout.includesThirteenthBuilding) {
+    _layout =
+        widget.initialLayout ??
+        GwtBuildingsLayout.random(random: widget.random, baseCount: _baseCount);
+    if (!_includeThirteenthBuilding && _layout.includesThirteenthBuilding) {
       _layout = _layout.withThirteenthBuilding(false);
     }
     if (!_includeRailsToTheNorth && _layout.includesRailsToTheNorth) {
       _layout = _layout.withRailsToTheNorth(false);
     }
-    _publicLayout = widget.initialPublicLayout ??
+    _publicLayout =
+        widget.initialPublicLayout ??
         GwtPublicBuildingsLayout.random(widget.random, _publicLocations);
-    _privateFade = AnimationController(
-      vsync: this,
-      duration: _appearDuration,
-    );
-    _publicFade = AnimationController(
-      vsync: this,
-      duration: _appearDuration,
-    );
+    _privateFade = AnimationController(vsync: this, duration: _appearDuration);
+    _publicFade = AnimationController(vsync: this, duration: _appearDuration);
     _privateVisibility = CurvedAnimation(
       parent: _privateFade,
       curve: Curves.easeOutCubic,
@@ -144,10 +136,10 @@ class _GwtBuildingsRandomizerScreenState
         _layout = GwtBuildingsLayout.random(
           random: widget.random,
           baseCount: _baseCount,
-          railsToTheNorth: _includeRailsToTheNorth &&
-              _layout.includesRailsToTheNorth,
-          thirteenthBuilding: _includeThirteenthBuilding &&
-              _layout.includesThirteenthBuilding,
+          railsToTheNorth:
+              _includeRailsToTheNorth && _layout.includesRailsToTheNorth,
+          thirteenthBuilding:
+              _includeThirteenthBuilding && _layout.includesThirteenthBuilding,
         );
       });
       _privateFade.duration = _fadeInDuration;
@@ -473,10 +465,7 @@ class _PublicBuildingsPanel extends StatelessWidget {
 }
 
 class _RandomizeButton extends StatelessWidget {
-  const _RandomizeButton({
-    super.key,
-    required this.onPressed,
-  });
+  const _RandomizeButton({super.key, required this.onPressed});
 
   final VoidCallback onPressed;
 

@@ -115,16 +115,16 @@ class _PlayScreenState extends State<PlayScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.t('play.saveImageSaved'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.t('play.saveImageSaved'))));
     } catch (_) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.t('play.saveImageFailed'))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.t('play.saveImageFailed'))));
     } finally {
       if (mounted) {
         setState(() => _savingImage = false);

@@ -71,9 +71,7 @@ class ScoreHistoryList extends StatelessWidget {
         itemBuilder: (context, index) {
           final entry = entries[index];
           return ListTile(
-            leading: CircleAvatar(
-              child: Text('${entries.length - index}'),
-            ),
+            leading: CircleAvatar(child: Text('${entries.length - index}')),
             title: Text(entry.title),
             subtitle: Text(entry.details),
             trailing: entry.onEdit == null && entry.onDelete == null

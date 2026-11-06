@@ -9,10 +9,7 @@ typedef CapturePngHook =
 
 CapturePngHook? capturePngOverride;
 
-Future<Uint8List> capturePng(
-  GlobalKey key, {
-  double pixelRatio = 2,
-}) {
+Future<Uint8List> capturePng(GlobalKey key, {double pixelRatio = 2}) {
   final override = capturePngOverride;
   if (override != null) {
     return override(key, pixelRatio: pixelRatio);

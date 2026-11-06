@@ -6,6 +6,7 @@ import '../../data/game_session_repository.dart';
 import '../../domain/board_game.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
+import '../../shared/links/open_url.dart';
 import '../../shared/widgets/app_page.dart';
 import '../setup/setup_screen.dart';
 
@@ -39,7 +40,22 @@ class GameHubScreen extends StatelessWidget {
           final cityMaps = game.buildCityMapsRandomizer();
           final trainCards = game.buildTrainCardsRandomizer();
           final tiles = <Widget>[
-            if (game.showQuickReference)
+            if (game.showNoteSheet)
+              _HubBanner(
+                key: const ValueKey('hub-note-sheet'),
+                title: l10n.t('hub.noteSheet'),
+                icon: Icons.edit_note_rounded,
+                color: game.accentColor,
+                compact: compact,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) => game.buildNoteSheet(),
+                    ),
+                  );
+                },
+              )
+            else if (game.showQuickReference)
               _HubBanner(
                 key: const ValueKey('hub-quick-reference'),
                 title: l10n.t(game.quickReferenceTitleKey),
@@ -69,6 +85,15 @@ class GameHubScreen extends StatelessWidget {
                     ),
                   );
                 },
+              ),
+            if (game.onlineUrl != null)
+              _HubBanner(
+                key: const ValueKey('hub-online'),
+                title: l10n.t(game.onlineTitleKey),
+                icon: Icons.public_rounded,
+                color: game.accentColor,
+                compact: compact,
+                onTap: () => openUrl(game.onlineUrl!),
               ),
             if (game.showBuildingsRandomizer)
               _HubBanner(

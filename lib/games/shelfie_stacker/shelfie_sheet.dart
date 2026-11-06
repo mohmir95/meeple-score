@@ -53,7 +53,9 @@ class ShelfieSheet extends StatelessWidget {
     var draft = value.clamp(0, max ?? value);
     Widget preview(BuildContext context) {
       return Text(
-        context.l10n.t('shelfie.pointsPreview', {'points': '${pointsOf(draft)}'}),
+        context.l10n.t('shelfie.pointsPreview', {
+          'points': '${pointsOf(draft)}',
+        }),
         textAlign: TextAlign.center,
         style: Theme.of(
           context,

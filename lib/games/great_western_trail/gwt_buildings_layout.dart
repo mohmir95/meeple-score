@@ -125,8 +125,7 @@ class GwtBuildingsLayout {
       side11: side11,
       side12: side12,
       side13: enabled
-          ? (side13 ??
-                (rng.nextBool() ? GwtBuildingSide.a : GwtBuildingSide.b))
+          ? (side13 ?? (rng.nextBool() ? GwtBuildingSide.a : GwtBuildingSide.b))
           : side13,
     );
   }

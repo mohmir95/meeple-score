@@ -9,10 +9,7 @@ class Player {
   final String name;
   final int colorValue;
 
-  Player copyWith({
-    String? name,
-    int? colorValue,
-  }) {
+  Player copyWith({String? name, int? colorValue}) {
     return Player(
       id: id,
       name: name ?? this.name,
@@ -21,11 +18,7 @@ class Player {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'colorValue': colorValue,
-    };
+    return {'id': id, 'name': name, 'colorValue': colorValue};
   }
 
   factory Player.fromJson(Map<String, dynamic> json) {

@@ -59,5 +59,6 @@ class GwtPublicBuildingsLayout {
   }
 
   @override
-  int get hashCode => Object.hash(Object.hashAll(locations), Object.hashAll(tiles));
+  int get hashCode =>
+      Object.hash(Object.hashAll(locations), Object.hashAll(tiles));
 }

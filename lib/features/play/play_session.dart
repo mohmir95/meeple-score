@@ -60,10 +60,7 @@ class PlaySession extends ChangeNotifier {
 
   Future<void> reset() {
     return update(
-      game.createInitialState(
-        players: _state.players,
-        config: _state.config,
-      ),
+      game.createInitialState(players: _state.players, config: _state.config),
     );
   }
 

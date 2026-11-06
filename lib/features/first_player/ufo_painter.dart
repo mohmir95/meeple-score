@@ -164,8 +164,8 @@ class UfoPainter extends CustomPainter {
     final pauses = [
       for (var j = 0; j < count - 1; j++) 0.6 + random.nextDouble() * 0.9,
     ];
-    final total = moves.fold(0.0, (a, b) => a + b) +
-        pauses.fold(0.0, (a, b) => a + b);
+    final total =
+        moves.fold(0.0, (a, b) => a + b) + pauses.fold(0.0, (a, b) => a + b);
     const from = 0.04;
     final scale = (_lastStop - from) / total;
     var at = from;
@@ -190,9 +190,7 @@ class UfoPainter extends CustomPainter {
     for (final (touch, arrive, leave) in route) {
       final spot = touch.position;
       if (_p < arrive) {
-        final e = Curves.easeInOutCubic.transform(
-          _ramp(_p, leftAt, arrive),
-        );
+        final e = Curves.easeInOutCubic.transform(_ramp(_p, leftAt, arrive));
         return Offset.lerp(from, spot, e)!;
       }
       if (_p < leave || leave >= 1) {
@@ -421,7 +419,8 @@ class UfoPainter extends CustomPainter {
           _flightPoint(start, size, u, s) +
           Offset(math.sin(i * 2.3) * u * 0.3, math.cos(i * 1.7) * u * 0.3);
       final age = _since - (_retracted + s * (_gone - _retracted));
-      final alpha = (0.35 + 0.65 * math.exp(-age * 1.5)) *
+      final alpha =
+          (0.35 + 0.65 * math.exp(-age * 1.5)) *
           (0.6 + 0.4 * math.sin(_t * 4 + i));
       _sparkle(
         canvas,
@@ -477,11 +476,7 @@ class UfoPainter extends CustomPainter {
       true,
       Paint()..color = _dome.withValues(alpha: 0.5),
     );
-    canvas.drawCircle(
-      Offset(0, -u * 0.25),
-      u * 0.2,
-      Paint()..color = _alien,
-    );
+    canvas.drawCircle(Offset(0, -u * 0.25), u * 0.2, Paint()..color = _alien);
     for (final side in const [-1.0, 1.0]) {
       canvas.drawOval(
         Rect.fromCenter(
@@ -646,9 +641,8 @@ class UfoPainter extends CustomPainter {
   /// The classic meeple, one unit tall, feet on y = 0.5.
   static final Path _meeple = Path.combine(
     PathOperation.union,
-    Path()..addOval(
-      Rect.fromCircle(center: const Offset(0, -0.32), radius: 0.17),
-    ),
+    Path()
+      ..addOval(Rect.fromCircle(center: const Offset(0, -0.32), radius: 0.17)),
     Path()
       ..moveTo(-0.11, -0.2)
       ..lineTo(-0.4, -0.1)

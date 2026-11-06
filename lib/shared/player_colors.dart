@@ -4,10 +4,7 @@ import '../domain/models/player.dart';
 import 'ids.dart';
 
 class PlayerColorOption {
-  const PlayerColorOption({
-    required this.name,
-    required this.color,
-  });
+  const PlayerColorOption({required this.name, required this.color});
 
   final String name;
   final Color color;

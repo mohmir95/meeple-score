@@ -26,25 +26,13 @@ enum FirstPlayerTheme {
     decideTime: Duration(milliseconds: 3000),
   ),
   // Long enough for every ingredient to drop in and the potion to brew.
-  cauldron(
-    Color(0xFF1B1530),
-    decideTime: Duration(milliseconds: 5000),
-  ),
+  cauldron(Color(0xFF1B1530), decideTime: Duration(milliseconds: 5000)),
   // Short suspense: the point is to pick a player, not to wait.
-  bomb(
-    Color(0xFF2B2D42),
-    decideTime: Duration(milliseconds: 2600),
-  ),
+  bomb(Color(0xFF2B2D42), decideTime: Duration(milliseconds: 2600)),
   // Long enough for several scanning stops before the lock.
-  ufo(
-    Color(0xFF0B1033),
-    decideTime: Duration(milliseconds: 5000),
-  ),
+  ufo(Color(0xFF0B1033), decideTime: Duration(milliseconds: 5000)),
   // Kept to a few seconds so the bout doesn't drag, with a calm entrance.
-  arena(
-    Color(0xFF1E1E28),
-    decideTime: Duration(milliseconds: 4200),
-  );
+  arena(Color(0xFF1E1E28), decideTime: Duration(milliseconds: 4200));
 
   const FirstPlayerTheme(
     this.barColor, {
@@ -315,9 +303,7 @@ class _FirstPlayerScreenState extends State<FirstPlayerScreen>
       FingerPhase.deciding => l10n.t('$name.choosing'),
       // Names the winner's color, so it's clear who it is.
       FingerPhase.picked => l10n.t('$name.picked', {
-        'color': l10n.t(
-          'firstPlayer.color.${_picker.winner?.colorIndex ?? 0}',
-        ),
+        'color': l10n.t('firstPlayer.color.${_picker.winner?.colorIndex ?? 0}'),
       }),
     };
   }
@@ -435,8 +421,9 @@ class _FirstPlayerScreenState extends State<FirstPlayerScreen>
                     Text(
                       l10n.t('firstPlayer.again'),
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium
-                          ?.copyWith(color: Colors.white70),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
                     ),
                   ],
                 ],

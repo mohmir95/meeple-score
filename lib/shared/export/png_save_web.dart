@@ -7,10 +7,7 @@ Future<void> savePng(Uint8List bytes, String filename) async {
   if (bytes.isEmpty || filename.isEmpty) {
     throw StateError('Missing score sheet image');
   }
-  final blob = Blob(
-    [bytes.toJS].toJS,
-    BlobPropertyBag(type: 'image/png'),
-  );
+  final blob = Blob([bytes.toJS].toJS, BlobPropertyBag(type: 'image/png'));
   final url = URL.createObjectURL(blob);
   final anchor = HTMLAnchorElement()
     ..href = url

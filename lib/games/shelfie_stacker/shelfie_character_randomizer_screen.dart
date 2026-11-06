@@ -33,6 +33,7 @@ class _ShelfieCharacterRandomizerScreenState
   late List<int> _colors = [
     for (final option in _game.playerColors.take(2)) option.value,
   ];
+
   /// On by default: the rulebook recommends cards 1–8 to start with.
   var _firstGame = true;
   late List<List<ShelfieCharacter>> _hands = _dealHands();

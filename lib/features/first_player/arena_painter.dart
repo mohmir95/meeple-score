@@ -83,7 +83,12 @@ class ArenaPainter extends CustomPainter {
 
     for (final touch in all) {
       final isWinner = _picked && touch.pointer == winner!.pointer;
-      _paintFingerRing(canvas, touch, dim: _picked && !isWinner, glow: isWinner);
+      _paintFingerRing(
+        canvas,
+        touch,
+        dim: _picked && !isWinner,
+        glow: isWinner,
+      );
     }
     _paintBell(canvas, center, f);
 
@@ -106,8 +111,9 @@ class ArenaPainter extends CustomPainter {
     for (final touch in all) {
       final down = ko[touch.pointer];
       if (down == null || bout < down) {
-        standing[touch.pointer] =
-            bout == 0 ? _home(touch, f) : base(touch.pointer, bout);
+        standing[touch.pointer] = bout == 0
+            ? _home(touch, f)
+            : base(touch.pointer, bout);
       }
     }
 
@@ -131,7 +137,9 @@ class ArenaPainter extends CustomPainter {
           ? _ease((bout - start) / (_approach * 0.7))
           : 1 - _ease((bout - down) / _stepBack);
       final away = from - rival;
-      final side = away.distance < 1 ? const Offset(1, 0) : away / away.distance;
+      final side = away.distance < 1
+          ? const Offset(1, 0)
+          : away / away.distance;
       standing[attacker] = Offset.lerp(from, rival + side * f * 2.2, weight)!;
       if (bout <= down) {
         flurries[attacker] = rival;
@@ -151,7 +159,8 @@ class ArenaPainter extends CustomPainter {
         // Bopped: flies back to its own corner and lands flat.
         final k = ((bout - down) / _flight).clamp(0.0, 1.0);
         final from = base(touch.pointer, down);
-        final at = Offset.lerp(from, home, _ease(k))! -
+        final at =
+            Offset.lerp(from, home, _ease(k))! -
             Offset(0, math.sin(math.pi * k) * f * 2.2);
         final side = from.dx < home.dx ? 1.0 : -1.0;
         fighters.add((touch, at, side * 1.5 * k, k >= 1));
@@ -160,7 +169,8 @@ class ArenaPainter extends CustomPainter {
       var at = standing[touch.pointer]!;
       if (_picked && touch.pointer == winner!.pointer) {
         // The champion bounces to the middle of the ring.
-        at = Offset.lerp(at, center, _ease(cheer))! -
+        at =
+            Offset.lerp(at, center, _ease(cheer))! -
             Offset(0, (math.sin(_t * 9).abs()) * f * 0.5 * cheer);
       } else {
         // Light on its feet.
@@ -300,8 +310,7 @@ class ArenaPainter extends CustomPainter {
         loser: () {
           final candidates = [
             for (final touch in all)
-              if (touch.pointer != loser &&
-                  (ko[touch.pointer] ?? 2) > down)
+              if (touch.pointer != loser && (ko[touch.pointer] ?? 2) > down)
                 touch.pointer,
           ];
           return candidates[_hash(loser, seed + 7) % candidates.length];
@@ -346,12 +355,13 @@ class ArenaPainter extends CustomPainter {
         ).createShader(rect),
     );
     final half = ringR * 1.25;
-    final mat = Rect.fromCenter(center: center, width: half * 2, height: half * 2);
-    // Apron, then the canvas mat.
-    canvas.drawRect(
-      mat.inflate(14),
-      Paint()..color = const Color(0xFF7A1F2B),
+    final mat = Rect.fromCenter(
+      center: center,
+      width: half * 2,
+      height: half * 2,
     );
+    // Apron, then the canvas mat.
+    canvas.drawRect(mat.inflate(14), Paint()..color = const Color(0xFF7A1F2B));
     canvas.drawRect(
       mat,
       Paint()
@@ -434,7 +444,11 @@ class ArenaPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
-    canvas.drawCircle(Offset(0, f * 0.55), f * 0.18, Paint()..color = _goldDark);
+    canvas.drawCircle(
+      Offset(0, f * 0.55),
+      f * 0.18,
+      Paint()..color = _goldDark,
+    );
     canvas.restore();
   }
 
@@ -516,8 +530,9 @@ class ArenaPainter extends CustomPainter {
       } else {
         final guard = Offset(side * f * 0.85, -f * 0.1);
         // In a flurry both gloves take turns; otherwise the lead hand jabs.
-        final punching =
-            flurry ? (side > 0) == (math.sin(_t * 11) > 0) : side > 0;
+        final punching = flurry
+            ? (side > 0) == (math.sin(_t * 11) > 0)
+            : side > 0;
         hand = punching && target != null
             ? guard + aim * reach * jab
             : guard + aim * f * 0.25;
@@ -636,7 +651,11 @@ class ArenaPainter extends CustomPainter {
         final angle = _t * 4 + i * math.pi * 2 / 3;
         _paintStar(
           canvas,
-          at + Offset(math.cos(angle) * f * 0.9, -f * 0.9 + math.sin(angle) * f * 0.3),
+          at +
+              Offset(
+                math.cos(angle) * f * 0.9,
+                -f * 0.9 + math.sin(angle) * f * 0.3,
+              ),
           f * 0.22,
           Paint()..color = _pow,
         );
@@ -654,7 +673,9 @@ class ArenaPainter extends CustomPainter {
       final angle = i * math.pi / points;
       final d = (i.isEven ? f * 1.6 : f * 0.95) * (0.6 + 0.6 * scale);
       final point = at + Offset(math.cos(angle), math.sin(angle)) * d;
-      i == 0 ? burst.moveTo(point.dx, point.dy) : burst.lineTo(point.dx, point.dy);
+      i == 0
+          ? burst.moveTo(point.dx, point.dy)
+          : burst.lineTo(point.dx, point.dy);
     }
     burst.close();
     canvas.drawPath(burst, Paint()..color = _pow.withValues(alpha: fade));

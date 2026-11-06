@@ -7,11 +7,7 @@ import '../layout/breakpoints.dart';
 import '../player_colors.dart';
 
 class ScoreBoard extends StatelessWidget {
-  const ScoreBoard({
-    super.key,
-    required this.scores,
-    this.footnote,
-  });
+  const ScoreBoard({super.key, required this.scores, this.footnote});
 
   final List<PlayerScore> scores;
   final String? footnote;
@@ -34,22 +30,19 @@ class ScoreBoard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(context.l10n.t('score.scores'), style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              context.l10n.t('score.scores'),
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: [
-                for (final score in scores)
-                  _ScoreChip(score: score),
-              ],
+              children: [for (final score in scores) _ScoreChip(score: score)],
             ),
             if (footnote != null) ...[
               const SizedBox(height: 8),
-              Text(
-                footnote!,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              Text(footnote!, style: Theme.of(context).textTheme.bodySmall),
             ],
             const SizedBox(height: 8),
           ],
@@ -85,7 +78,10 @@ class _ScoreChip extends StatelessWidget {
         ),
       ),
       side: score.isLeader
-          ? BorderSide(color: playerColorOutline(score.player.colorValue), width: 1.5)
+          ? BorderSide(
+              color: playerColorOutline(score.player.colorValue),
+              width: 1.5,
+            )
           : BorderSide(
               color: isLightPlayerColor(score.player.colorValue)
                   ? playerColorOutline(score.player.colorValue)
@@ -103,5 +99,6 @@ String _initials(Player player) {
   if (parts.length == 1) {
     return parts.first.substring(0, 1).toUpperCase();
   }
-  return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}'.toUpperCase();
+  return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}'
+      .toUpperCase();
 }

@@ -33,7 +33,9 @@ class ShelfieCharacterDeal {
   }) {
     return [
       for (var p = 0; p < players; p++)
-        firstGame ? ShelfieCharacter.all.take(handSize).toList() : _hand(random),
+        firstGame
+            ? ShelfieCharacter.all.take(handSize).toList()
+            : _hand(random),
     ];
   }
 

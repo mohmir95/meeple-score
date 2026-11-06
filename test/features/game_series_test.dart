@@ -17,7 +17,7 @@ import '../helpers/memory_session_repository.dart';
 void main() {
   test('home groups every GWT edition into one entry, in place', () {
     final entries = HomeEntry.group(GameRegistry().games);
-    expect(entries, hasLength(4));
+    expect(entries, hasLength(5));
 
     final gwt = entries.first as SeriesEntry;
     expect(gwt.series, GameSeries.greatWesternTrail);

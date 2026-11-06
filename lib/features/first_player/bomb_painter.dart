@@ -329,7 +329,8 @@ class BombPainter extends CustomPainter {
     final root = Offset(r * 0.5, -r * 0.82);
     final tip = Offset(r * 1.0, -r * 1.55);
     final fuseEnd = Offset.lerp(root, tip, fuse.clamp(0.0, 1.0))!;
-    final bend = Offset.lerp(root, fuseEnd, 0.5)! + Offset(-r * 0.25 * fuse, -r * 0.1);
+    final bend =
+        Offset.lerp(root, fuseEnd, 0.5)! + Offset(-r * 0.25 * fuse, -r * 0.1);
     canvas.drawPath(
       Path()
         ..moveTo(root.dx, root.dy)
@@ -461,11 +462,7 @@ class BombPainter extends CustomPainter {
             (Color(0xFF8A9098), 0.78),
             (Color(0xFFC3C8CE), 0.55),
           ]
-        : const [
-            (Color(0xFFFF4D2E), 1.0),
-            (_flame, 0.78),
-            (_spark, 0.55),
-          ];
+        : const [(Color(0xFFFF4D2E), 1.0), (_flame, 0.78), (_spark, 0.55)];
     for (final (color, size) in layers) {
       final burst = Path();
       const points = 12;

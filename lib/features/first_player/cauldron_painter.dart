@@ -197,9 +197,9 @@ class CauldronPainter extends CustomPainter {
         at,
         1.5 + (i % 3),
         Paint()
-          ..color = const Color(0xFFCBB6FF).withValues(
-            alpha: 0.25 * math.sin(math.pi * rise),
-          ),
+          ..color = const Color(
+            0xFFCBB6FF,
+          ).withValues(alpha: 0.25 * math.sin(math.pi * rise)),
       );
     }
   }
@@ -362,13 +362,14 @@ class CauldronPainter extends CustomPainter {
     canvas.drawPath(
       body,
       Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [_ironLight, _iron, Color(0xFF15131A)],
-        ).createShader(
-          Rect.fromLTWH(rim.dx - k * 1.2, rim.dy, k * 2.4, k * 1.25),
-        ),
+        ..shader =
+            const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [_ironLight, _iron, Color(0xFF15131A)],
+            ).createShader(
+              Rect.fromLTWH(rim.dx - k * 1.2, rim.dy, k * 2.4, k * 1.25),
+            ),
     );
     // A shine and the potion's light on the iron.
     canvas.drawArc(
@@ -429,7 +430,8 @@ class CauldronPainter extends CustomPainter {
       final life = (_t * rate + j * 0.37) % 1;
       final x = math.sin(j * 2.7 + (_t * rate + j * 0.37).floor() * 1.3);
       final at = rim + Offset(x * k * 0.75, -life * k * 0.12 * (1 + violent));
-      final r = k * (0.05 + 0.06 * ((j * 7) % 3) / 2) * math.sin(math.pi * life);
+      final r =
+          k * (0.05 + 0.06 * ((j * 7) % 3) / 2) * math.sin(math.pi * life);
       if (r <= 0.5) {
         continue;
       }
@@ -460,9 +462,11 @@ class CauldronPainter extends CustomPainter {
           at,
           2.5,
           Paint()
-            ..color = Color.lerp(potion, Colors.white, 0.5)!.withValues(
-              alpha: violent * (1 - life),
-            ),
+            ..color = Color.lerp(
+              potion,
+              Colors.white,
+              0.5,
+            )!.withValues(alpha: violent * (1 - life)),
         );
       }
     }
@@ -564,7 +568,8 @@ class CauldronPainter extends CustomPainter {
     final Path shape;
     switch (kind % 4) {
       case 0:
-        shape = Path()..addOval(Rect.fromCircle(center: Offset.zero, radius: r));
+        shape = Path()
+          ..addOval(Rect.fromCircle(center: Offset.zero, radius: r));
       case 1:
         shape = Path()
           ..moveTo(0, -r * 1.3)
@@ -679,7 +684,8 @@ class CauldronPainter extends CustomPainter {
     final drift = _ramp(s, _billow, _cleared);
     for (var i = 0; i < 16; i++) {
       final a = i / 16 * math.pi * 2 + i * 0.3;
-      final reach = k * (0.4 + 0.9 * grow + 1.2 * drift) * (0.7 + 0.3 * (i % 3));
+      final reach =
+          k * (0.4 + 0.9 * grow + 1.2 * drift) * (0.7 + 0.3 * (i % 3));
       final at =
           rim -
           Offset(0, k * 0.9) +

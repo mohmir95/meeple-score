@@ -192,8 +192,7 @@ class MagicPainter extends CustomPainter {
     if (since > 0) {
       canvas.drawRect(
         rect,
-        Paint()
-          ..color = _gold.withValues(alpha: 0.08 * _seg(since, 0, 0.4)),
+        Paint()..color = _gold.withValues(alpha: 0.08 * _seg(since, 0, 0.4)),
       );
     }
 
@@ -222,10 +221,7 @@ class MagicPainter extends CustomPainter {
     final valance = Rect.fromLTWH(0, 0, size.width, 26);
     canvas.drawRect(valance, Paint()..color = _curtain);
     for (var x = 0.0; x < size.width; x += 30) {
-      canvas.drawOval(
-        Rect.fromLTWH(x, 14, 30, 22),
-        Paint()..color = _curtain,
-      );
+      canvas.drawOval(Rect.fromLTWH(x, 14, 30, 22), Paint()..color = _curtain);
     }
     final fringe = Paint()
       ..color = _gold
@@ -277,7 +273,8 @@ class MagicPainter extends CustomPainter {
     final pop = Curves.elasticOut.transform(
       ((now - touch.since).inMilliseconds / 500).clamp(0.0, 1.0),
     );
-    final at = touch.position - Offset(0, 54 + math.sin(_t * 3 + touch.pointer) * 4);
+    final at =
+        touch.position - Offset(0, 54 + math.sin(_t * 3 + touch.pointer) * 4);
     // The winner's star moves into the big gold star instead.
     _paintStar(
       canvas,
@@ -340,14 +337,22 @@ class MagicPainter extends CustomPainter {
 
     // Seven curly arms below; the eighth holds the wand.
     for (var i = 0; i < 7; i++) {
-      final angle = math.pi * (0.12 + 0.76 * i / 6) + math.sin(_t * 1.6 + i) * 0.1;
-      final tip = at + Offset(math.cos(angle) * r * 1.4, math.sin(angle) * r * 1.25 + r * 0.4);
+      final angle =
+          math.pi * (0.12 + 0.76 * i / 6) + math.sin(_t * 1.6 + i) * 0.1;
+      final tip =
+          at +
+          Offset(
+            math.cos(angle) * r * 1.4,
+            math.sin(angle) * r * 1.25 + r * 0.4,
+          );
       _paintArm(canvas, at + Offset(0, r * 0.4), tip, r, i * 1.3);
     }
 
     // The wand arm and wand.
     final shoulder = at + Offset(r * 0.75, r * 0.15);
-    final hand = shoulder + Offset(math.cos(wandAngle) * r * 0.9, math.sin(wandAngle) * r * 0.9);
+    final hand =
+        shoulder +
+        Offset(math.cos(wandAngle) * r * 0.9, math.sin(wandAngle) * r * 0.9);
     _paintArm(canvas, shoulder, hand, r, 9, width: 0.8);
     _paintWand(canvas, hand, wandAngle, r, bend, sparks);
 
@@ -661,8 +666,7 @@ class MagicPainter extends CustomPainter {
     final cloud = _seg(since, 0, 0.6);
     if (cloud < 1) {
       final fade = 1 - cloud;
-      final paint = Paint()
-        ..color = Colors.white.withValues(alpha: 0.7 * fade);
+      final paint = Paint()..color = Colors.white.withValues(alpha: 0.7 * fade);
       for (var i = 0; i < 8; i++) {
         final a = i / 8 * math.pi * 2;
         canvas.drawCircle(
@@ -721,9 +725,11 @@ class MagicPainter extends CustomPainter {
       at,
       radius - 3,
       Paint()
-        ..color = Color.lerp(color, Colors.white, 0.25)!.withValues(
-          alpha: 0.55 * g,
-        ),
+        ..color = Color.lerp(
+          color,
+          Colors.white,
+          0.25,
+        )!.withValues(alpha: 0.55 * g),
     );
     canvas.drawCircle(
       at,

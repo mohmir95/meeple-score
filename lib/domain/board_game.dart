@@ -105,8 +105,19 @@ abstract class BoardGame {
 
   Widget buildQuickReference() => const SizedBox.shrink();
 
+  /// Replaces the scoresheet hub tile with a note sheet, for games without
+  /// scores (e.g. deduction games).
+  bool get showNoteSheet => false;
+
+  Widget buildNoteSheet() => const SizedBox.shrink();
+
+  /// Website with more puzzles or play aids. Null hides the hub tile.
+  String? get onlineUrl => null;
+
+  String get onlineTitleKey => 'hub.online';
+
   /// False when the hub has no playable score sheet to resume.
-  bool get hasScoresheet => !showQuickReference;
+  bool get hasScoresheet => !showQuickReference && !showNoteSheet;
 
   GameConfig createDefaultConfig();
 
