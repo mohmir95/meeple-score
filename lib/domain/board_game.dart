@@ -48,6 +48,11 @@ abstract class BoardGame {
   /// Optional box art shown on the home screen.
   String? get coverImageAsset => null;
 
+  /// The artwork part of the cover as 0–1 fractions, without the title.
+  /// Series banners zoom their narrow strip into it. Null shows the whole
+  /// cover.
+  Rect? get seriesCoverArt => null;
+
   /// Hub tile for the Great Western Trail buildings randomizer.
   bool get showBuildingsRandomizer => false;
 

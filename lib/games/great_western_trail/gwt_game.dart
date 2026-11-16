@@ -27,6 +27,10 @@ class GreatWesternTrailGame extends GwtEditionGame {
   @override
   String? get coverImageAsset => coverAsset;
 
+  /// Title across the top; the three faces below.
+  @override
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.31, 1, 0.97);
+
   @override
   bool get includeThirteenthBuildingExpansion => true;
 

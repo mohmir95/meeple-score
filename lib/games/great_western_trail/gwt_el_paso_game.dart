@@ -57,6 +57,10 @@ class GreatWesternTrailElPasoGame extends GwtEditionGame {
   @override
   String? get coverImageAsset => coverAsset;
 
+  /// El Paso title over the top 40%; centred on the rider.
+  @override
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.42, 0.8, 1);
+
   @override
   Widget? buildBuildingsRandomizer() => GwtElPasoBuildingsScreen(game: this);
 

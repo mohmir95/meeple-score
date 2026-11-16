@@ -51,6 +51,10 @@ class GreatWesternTrailArgentinaGame extends GwtEditionGame {
   @override
   String? get coverImageAsset => coverAsset;
 
+  /// Title band above and name band below the artwork; centred on the rider.
+  @override
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.36, 0.84, 0.83);
+
   @override
   GwtBuildingArtSet get buildingArtSet => GwtBuildingArtSet.argentina;
 

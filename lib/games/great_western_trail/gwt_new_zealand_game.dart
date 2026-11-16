@@ -51,6 +51,10 @@ class GreatWesternTrailNewZealandGame extends GwtEditionGame {
   @override
   String? get coverImageAsset => coverAsset;
 
+  /// Title band above the artwork; centred on the rider.
+  @override
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0.24, 0.36, 1, 0.83);
+
   @override
   GwtBuildingArtSet get buildingArtSet => GwtBuildingArtSet.newZealand;
 

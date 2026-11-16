@@ -240,11 +240,44 @@ class _Strip extends StatelessWidget {
               width: boxWidth,
               top: 0,
               bottom: 0,
-              child: GameCover(game: game),
+              child: game.seriesCoverArt == null
+                  ? GameCover(game: game)
+                  : _ArtCrop(game: game, art: game.seriesCoverArt!),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The cover zoomed so its [art] area fills the strip's height, leaving the
+/// title band outside the strip. Covers are square, so the image is laid out
+/// as a square.
+class _ArtCrop extends StatelessWidget {
+  const _ArtCrop({required this.game, required this.art});
+
+  final BoardGame game;
+  final Rect art;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, box) {
+        final side = box.maxHeight / art.height;
+        return Stack(
+          clipBehavior: Clip.hardEdge,
+          children: [
+            Positioned(
+              left: box.maxWidth / 2 - side * art.center.dx,
+              top: -side * art.top,
+              width: side,
+              height: side,
+              child: GameCover(game: game),
+            ),
+          ],
+        );
+      },
     );
   }
 }

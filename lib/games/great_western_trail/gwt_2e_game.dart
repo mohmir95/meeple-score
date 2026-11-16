@@ -39,6 +39,10 @@ class GreatWesternTrailSecondEditionGame extends GwtEditionGame {
   @override
   String? get coverImageAsset => coverAsset;
 
+  /// Title band above and name band below the artwork.
+  @override
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.36, 1, 0.83);
+
   @override
   GwtBuildingArtSet get buildingArtSet => GwtBuildingArtSet.secondEdition;
 
