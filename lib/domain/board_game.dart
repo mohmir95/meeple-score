@@ -119,8 +119,13 @@ abstract class BoardGame {
 
   String get onlineTitleKey => 'hub.online';
 
+  /// False for games the app only helps set up: the hub drops the
+  /// scoresheet tile.
+  bool get showScoresheet => true;
+
   /// False when the hub has no playable score sheet to resume.
-  bool get hasScoresheet => !showQuickReference && !showNoteSheet;
+  bool get hasScoresheet =>
+      showScoresheet && !showQuickReference && !showNoteSheet;
 
   GameConfig createDefaultConfig();
 

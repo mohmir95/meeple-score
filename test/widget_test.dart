@@ -175,7 +175,7 @@ void main() {
     expect(find.widgetWithText(AppBar, 'Great Western Trail'), findsOneWidget);
   });
 
-  testWidgets('desktop home starts a short last row under the first card', (
+  testWidgets('desktop home starts the second row under the first card', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1600, 900);
@@ -187,7 +187,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail'));
 
     final cards = _homeBanners;
-    expect(cards, findsNWidgets(5));
+    expect(cards, findsNWidgets(6));
     final first = tester.getRect(cards.first);
     final rowStart = tester.getRect(cards.at(3));
     expect(rowStart.top, greaterThan(first.bottom));

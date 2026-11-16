@@ -70,7 +70,7 @@ class GameHubScreen extends StatelessWidget {
                   );
                 },
               )
-            else
+            else if (game.showScoresheet)
               _HubBanner(
                 key: const ValueKey('hub-scoresheet'),
                 title: l10n.t('hub.scoresheet'),
