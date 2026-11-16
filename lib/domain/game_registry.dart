@@ -6,6 +6,7 @@ import '../games/great_western_trail/gwt_el_paso_game.dart';
 import '../games/great_western_trail/gwt_game.dart';
 import '../games/great_western_trail/gwt_new_zealand_game.dart';
 import '../games/lost_ruins_of_arnak/arnak_game.dart';
+import '../games/project_l/project_l_game.dart';
 import '../games/shelfie_stacker/shelfie_game.dart';
 import '../games/splendor/splendor_game.dart';
 import '../games/turing_machine/turing_game.dart';
@@ -26,6 +27,7 @@ class GameRegistry {
               ShelfieStackerGame(),
               TuringMachineGame(),
               SplendorGame(),
+              ProjectLGame(),
             ],
       );
 
