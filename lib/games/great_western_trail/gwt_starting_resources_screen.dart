@@ -57,7 +57,17 @@ class GwtStartingSetup {
     this.tokensBySeat,
     this.workerCards = const [],
     this.workerCardAspect = 1,
+    this.sameHandForAll,
+    this.objectiveTileAsset,
   });
+
+  /// El Paso: every player, the start player included, draws this many
+  /// cards. Other editions add 1 card per seat instead.
+  final int? sameHandForAll;
+
+  /// El Paso: starting with the start player, each player picks a face-up
+  /// objective tile.
+  final String? objectiveTileAsset;
 
   /// El Paso hands out money and tokens per seat instead of 1 more per seat.
   final List<int>? moneyBySeat;
@@ -188,6 +198,8 @@ class GwtStartingSetup {
       ),
     ],
     workerCardAspect: 320 / 496,
+    sameHandForAll: 4,
+    objectiveTileAsset: '$_elPasoIcons/objectives.png',
   );
 
   /// Hand size players discard down to at the start of their first turn.
@@ -314,6 +326,56 @@ class _GwtStartingResourcesScreenState
                     ),
                   ),
                 ],
+                if (setup.sameHandForAll != null ||
+                    setup.objectiveTileAsset != null) ...[
+                  SizedBox(height: gap),
+                  _SetupPanel(
+                    key: const ValueKey('gwt-before-start-panel'),
+                    accent: accent,
+                    compact: compact,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _PanelTitle(
+                          text: l10n.t('gwt.elPaso.beforeStart.title'),
+                        ),
+                        if (setup.sameHandForAll case final cards?) ...[
+                          SizedBox(height: compact ? 14 : 18),
+                          _CompactStep(
+                            key: const ValueKey('gwt-same-hand-panel'),
+                            compact: compact,
+                            picture: _FlatHand(cards: cards, compact: true),
+                            title: l10n.t('gwt.elPaso.hand.everyPlayer', {
+                              'n': '$cards',
+                            }),
+                            body: l10n.t('gwt.elPaso.hand.note', {
+                              'n': '$cards',
+                            }),
+                          ),
+                        ],
+                        if (setup.objectiveTileAsset case final asset?) ...[
+                          SizedBox(height: compact ? 14 : 18),
+                          _CompactStep(
+                            key: const ValueKey('gwt-objective-tile-panel'),
+                            compact: compact,
+                            picture: loadingImage(
+                              asset,
+                              width: 44,
+                              height: 44,
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.high,
+                              semanticLabel: l10n.t(
+                                'gwt.elPaso.objective.title',
+                              ),
+                            ),
+                            title: l10n.t('gwt.elPaso.objective.title'),
+                            body: l10n.t('gwt.elPaso.objective.body'),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
                 if (setup.hasCards) ...[
                   SizedBox(height: gap),
                   _SetupPanel(
@@ -396,7 +458,7 @@ class _WorkerCards extends StatelessWidget {
         const gap = 10.0;
         final cardWidth =
             ((constraints.maxWidth - gap * (cards.length - 1)) / cards.length)
-                .clamp(0.0, 130.0);
+                .clamp(0.0, 76.0);
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1184,6 +1246,108 @@ class _Coin extends StatelessWidget {
         filterQuality: FilterQuality.medium,
         semanticLabel: label,
       ),
+    );
+  }
+}
+
+/// A small fan of plain cards, for editions without card-back art.
+class _FlatHand extends StatelessWidget {
+  const _FlatHand({required this.cards, required this.compact});
+
+  final int cards;
+  final bool compact;
+
+  static const _back = Color(0xFF8A6A44);
+
+  @override
+  Widget build(BuildContext context) {
+    final height = compact ? 52.0 : 62.0;
+    final width = height * 0.68;
+    final step = width * 0.55;
+    return Center(
+      child: SizedBox(
+        key: const ValueKey('gwt-flat-hand'),
+        width: width + step * (cards - 1),
+        height: height,
+        child: Stack(
+          children: [
+            for (var i = 0; i < cards; i++)
+              Positioned(
+                left: step * i,
+                child: Container(
+                  width: width,
+                  height: height,
+                  decoration: BoxDecoration(
+                    color: _back,
+                    borderRadius: BorderRadius.circular(height * 0.1),
+                    border: Border.all(
+                      color: Color.lerp(_back, Colors.black, 0.35)!,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x33000000),
+                        blurRadius: 3,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// One setup step on a single row: a small picture, a bold line and a
+/// short note.
+class _CompactStep extends StatelessWidget {
+  const _CompactStep({
+    super.key,
+    required this.compact,
+    required this.picture,
+    required this.title,
+    required this.body,
+  });
+
+  final bool compact;
+  final Widget picture;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: compact ? 76 : 88,
+          child: FittedBox(fit: BoxFit.scaleDown, child: picture),
+        ),
+        SizedBox(width: compact ? 12 : 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: const Color(0xFF1C1A17),
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                body,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFF4A4238),
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -397,6 +397,16 @@ void main() {
     for (final card in setup.workerCards) {
       expect(find.image(AssetImage(card.asset)), findsOneWidget);
     }
+
+    // Everyone draws the same 4-card hand, then picks an objective tile.
+    expect(setup.sameHandForAll, 4);
+    final hand = find.byKey(const ValueKey('gwt-same-hand-panel'));
+    await tester.ensureVisible(hand);
+    expect(find.text('Every player: 4 cards'), findsOneWidget);
+    final objective = find.byKey(const ValueKey('gwt-objective-tile-panel'));
+    await tester.ensureVisible(objective);
+    expect(find.text('Objective Tile'), findsOneWidget);
+    expect(find.image(AssetImage(setup.objectiveTileAsset!)), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

@@ -5,6 +5,7 @@ import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
 import 'gwt_edition.dart';
 import 'gwt_el_paso_buildings_screen.dart';
+import 'gwt_el_paso_setup_hints_screen.dart';
 import 'gwt_scoring.dart';
 import 'gwt_sheet.dart';
 import 'gwt_starting_resources_screen.dart';
@@ -71,6 +72,12 @@ class GreatWesternTrailElPasoGame extends GwtEditionGame {
       setup: GwtStartingSetup.elPaso,
     );
   }
+
+  @override
+  bool get showSetupHints => true;
+
+  @override
+  Widget? buildSetupHints() => GwtElPasoSetupHintsScreen(game: this);
 
   @override
   bool get includeRailsToTheNorthExpansion => false;
