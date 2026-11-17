@@ -86,6 +86,12 @@ abstract class BoardGame {
   /// Ready setup hints UI. Null keeps the hub tile disabled as Coming Soon.
   Widget? buildSetupHints() => null;
 
+  /// Hub tile listing how many of each component the box holds.
+  bool get showTileCounts => false;
+
+  /// Ready tile counts UI. Null keeps the hub tile disabled as Coming Soon.
+  Widget? buildTileCounts() => null;
+
   /// Hub tile for randomizing the city map sides.
   bool get showCityMapsRandomizer => false;
 

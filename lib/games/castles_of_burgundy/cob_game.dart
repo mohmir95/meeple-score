@@ -14,6 +14,7 @@ import 'cob_player_line.dart';
 import 'cob_quick_reference_screen.dart';
 import 'cob_scoring.dart';
 import 'cob_starting_resources_screen.dart';
+import 'cob_tile_counts_screen.dart';
 import 'cob_state.dart';
 
 class CastlesOfBurgundySpecialEditionGame extends BoardGame {
@@ -78,6 +79,12 @@ class CastlesOfBurgundySpecialEditionGame extends BoardGame {
 
   @override
   Widget? buildStartingResources() => const CobStartingResourcesScreen();
+
+  @override
+  bool get showTileCounts => true;
+
+  @override
+  Widget? buildTileCounts() => const CobTileCountsScreen();
 
   @override
   bool get showDuchyBoardRandomizer => true;
