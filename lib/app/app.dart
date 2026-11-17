@@ -6,6 +6,7 @@ import '../domain/game_registry.dart';
 import '../features/home/home_screen.dart';
 import '../l10n/l10n_scope.dart';
 import '../l10n/locale_controller.dart';
+import '../shared/navigation/browser_back_sync.dart';
 import '../shared/update/app_update.dart';
 import '../shared/update/update_banner.dart';
 import 'theme.dart';
@@ -32,6 +33,9 @@ class BoardGameScoreSheetApp extends StatefulWidget {
 
 class _BoardGameScoreSheetAppState extends State<BoardGameScoreSheetApp> {
   final _navigatorKey = GlobalKey<NavigatorState>();
+
+  /// Makes the browser back button and edge swipe close the top page.
+  final _browserBack = BrowserBackSync();
 
   @override
   void initState() {
@@ -68,6 +72,7 @@ class _BoardGameScoreSheetAppState extends State<BoardGameScoreSheetApp> {
       controller: widget.localeController,
       child: MaterialApp(
         navigatorKey: _navigatorKey,
+        navigatorObservers: [_browserBack],
         title: strings.t('app.title'),
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light(),
