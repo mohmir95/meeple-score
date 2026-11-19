@@ -49,7 +49,7 @@ class FingerPicker {
   static const minFingers = 2;
   static final colorCount = fingerPalette.length;
 
-  /// Fingers beyond this are ignored, e.g. an octopus has only eight arms.
+  /// Fingers beyond this are ignored, for themes with only so many pieces.
   final int maxFingers;
 
   /// How long the fingers must hold still before the pick starts.
@@ -160,6 +160,19 @@ class FingerPicker {
     }
     final held = (now - _changedAt).inMicroseconds / armDelay.inMicroseconds;
     return held.clamp(0.0, 1.0);
+  }
+
+  /// Ends the suspense early and reveals the finger already drawn, for a
+  /// tap that skips the animation. Returns true when it did.
+  bool skip(Duration now) {
+    if (phase != FingerPhase.deciding) {
+      return false;
+    }
+    winner = chosen;
+    chosen = null;
+    pickedAt = now;
+    phase = FingerPhase.picked;
+    return true;
   }
 
   /// Advances the round. Returns true when the phase changed.

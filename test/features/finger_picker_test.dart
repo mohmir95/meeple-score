@@ -177,7 +177,9 @@ void main() {
     final surface = tester.getRect(
       find.byKey(const ValueKey('first-player-surface')),
     );
-    final a = await tester.startGesture(surface.center + const Offset(-80, 120));
+    final a = await tester.startGesture(
+      surface.center + const Offset(-80, 120),
+    );
     await tester.pump(ms(100));
     expect(find.text(needMore), findsOneWidget);
     final b = await tester.startGesture(surface.center + const Offset(80, 120));
@@ -196,14 +198,14 @@ void main() {
     expect(pickedMessage(picked), findsOneWidget);
   }
 
-  testWidgets('the magician octopus reveals the first player', (tester) async {
+  testWidgets('one piece completes the platinum puzzle', (tester) async {
     await playRound(
       tester,
-      FirstPlayerTheme.magic,
-      title: "The Octopus's Magic Show",
-      needMore: 'Waiting for more volunteers…',
-      choosing: 'Abracadabra…',
-      picked: 'Ta-da!',
+      FirstPlayerTheme.puzzle,
+      title: 'The Puzzle Factory',
+      needMore: 'Waiting for more puzzlers…',
+      choosing: 'Click, clack… the puzzle is taking shape…',
+      picked: 'Perfect fit!',
     );
   });
 
@@ -218,17 +220,40 @@ void main() {
     );
   });
 
-  testWidgets('one bomb is left and goes off over the first player', (
-    tester,
-  ) async {
+  testWidgets('the quantum box collapses to one particle', (tester) async {
     await playRound(
       tester,
-      FirstPlayerTheme.bomb,
-      title: 'Pass the Bomb',
-      needMore: 'Waiting for more daredevils…',
-      choosing: "Tick… tock… who's left?",
-      picked: 'Boom!',
+      FirstPlayerTheme.quantum,
+      title: 'The Quantum Box',
+      needMore: 'Waiting for more particles…',
+      choosing: 'Quantum chaos… tap to collapse it!',
+      picked: 'Collapsed!',
     );
+  });
+
+  testWidgets('a tap skips the quantum box straight to the reveal', (
+    tester,
+  ) async {
+    await pumpWithL10n(
+      tester,
+      FirstPlayerScreen(
+        random: math.Random(3),
+        theme: FirstPlayerTheme.quantum,
+      ),
+    );
+    final surface = tester.getRect(
+      find.byKey(const ValueKey('first-player-surface')),
+    );
+    await tester.startGesture(surface.center + const Offset(-80, 120));
+    await tester.startGesture(surface.center + const Offset(80, 120));
+    await tester.pump(ms(2100));
+    expect(find.text('Quantum chaos… tap to collapse it!'), findsOneWidget);
+
+    // A tap partway through reveals the winner at once.
+    await tester.pump(ms(500));
+    await tester.tapAt(surface.center + const Offset(0, -150));
+    await tester.pump(ms(50));
+    expect(pickedMessage('Collapsed!'), findsOneWidget);
   });
 
   testWidgets('the UFO scans and beams one meeple up', (tester) async {
@@ -253,7 +278,7 @@ void main() {
     );
   });
 
-  test('fingers past the limit are ignored, like an octopus with 8 arms', () {
+  test('fingers past the limit are ignored', () {
     final picker = FingerPicker(maxFingers: 8);
     for (var i = 0; i < 10; i++) {
       picker.down(i, Offset(i * 10.0, 0), Duration.zero);
@@ -275,7 +300,10 @@ void main() {
   ) async {
     await pumpWithL10n(
       tester,
-      FirstPlayerScreen(random: math.Random(3), theme: FirstPlayerTheme.cauldron),
+      FirstPlayerScreen(
+        random: math.Random(3),
+        theme: FirstPlayerTheme.cauldron,
+      ),
     );
     expect(find.byKey(const ValueKey('first-player-pin-hint')), findsOneWidget);
     final surface = tester.getRect(
@@ -312,10 +340,7 @@ void main() {
     expect(find.text('The Mysterious Cauldron'), findsOneWidget);
 
     // …but a touch and hold starts a fresh round on the same scenery.
-    final hold = await tester.startGesture(
-      left,
-      kind: PointerDeviceKind.mouse,
-    );
+    final hold = await tester.startGesture(left, kind: PointerDeviceKind.mouse);
     await tester.pump(ms(300));
     expect(find.byKey(const ValueKey('first-player-hold')), findsOneWidget);
     await tester.pump(ms(400));
@@ -329,14 +354,14 @@ void main() {
   testWidgets('holding a finger mid-round never resets it', (tester) async {
     await pumpWithL10n(
       tester,
-      FirstPlayerScreen(random: math.Random(3), theme: FirstPlayerTheme.magic),
+      FirstPlayerScreen(random: math.Random(3), theme: FirstPlayerTheme.puzzle),
     );
     final surface = tester.getRect(
       find.byKey(const ValueKey('first-player-surface')),
     );
     await tester.startGesture(surface.center);
     await tester.pump(ms(1500));
-    expect(find.text('Waiting for more volunteers…'), findsOneWidget);
+    expect(find.text('Waiting for more puzzlers…'), findsOneWidget);
     expect(find.byKey(const ValueKey('first-player-hold')), findsNothing);
   });
 
@@ -361,9 +386,9 @@ void main() {
     tester,
   ) async {
     const titles = {
-      "The Octopus's Magic Show": 'magic',
+      'The Puzzle Factory': 'puzzle',
       'The Mysterious Cauldron': 'cauldron',
-      'Pass the Bomb': 'bomb',
+      'The Quantum Box': 'quantum',
       'The UFO Abduction': 'ufo',
       'Finger Arena': 'arena',
     };
@@ -388,7 +413,7 @@ void main() {
   testWidgets('the page has the language toggle', (tester) async {
     await pumpWithL10n(
       tester,
-      const FirstPlayerScreen(theme: FirstPlayerTheme.magic),
+      const FirstPlayerScreen(theme: FirstPlayerTheme.puzzle),
     );
     expect(find.byType(LanguageToggle), findsOneWidget);
   });
@@ -397,9 +422,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     await pumpWithL10n(
       tester,
-      FirstPlayerScreen(random: math.Random(3), theme: FirstPlayerTheme.magic),
+      FirstPlayerScreen(random: math.Random(3), theme: FirstPlayerTheme.puzzle),
     );
-    expect(find.text("The Octopus's Magic Show"), findsOneWidget);
+    expect(find.text('The Puzzle Factory'), findsOneWidget);
 
     // Arrows step through and wrap around.
     await tester.tap(find.byKey(const ValueKey('first-player-next')));
@@ -412,11 +437,13 @@ void main() {
     expect(find.text('Finger Arena'), findsOneWidget);
 
     // An icon jumps straight to its scenery, which is remembered.
-    await tester.tap(find.byKey(const ValueKey('first-player-scenery-bomb')));
+    await tester.tap(
+      find.byKey(const ValueKey('first-player-scenery-quantum')),
+    );
     await tester.pump(ms(400));
-    expect(find.text('Pass the Bomb'), findsOneWidget);
+    expect(find.text('The Quantum Box'), findsOneWidget);
     final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getString(FirstPlayerThemeRotation.storageKey), 'bomb');
+    expect(prefs.getString(FirstPlayerThemeRotation.storageKey), 'quantum');
 
     // A swipe on the strip brings in the next one.
     await tester.fling(

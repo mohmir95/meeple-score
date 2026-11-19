@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'first_player_screen.dart';
 
-/// A small picture of a scenery for the scenery switcher: a magician's hat,
-/// a bubbling cauldron, a bomb, a UFO and a boxing glove.
+/// A small picture of a scenery for the scenery switcher: a puzzle piece,
+/// a bubbling cauldron, a glass cube, a UFO and a boxing glove.
 ///
 /// Drawn as a one-color silhouette; the details are cut out, so whatever is
 /// behind the icon shows through them.
@@ -54,12 +54,12 @@ class _SceneryIconPainter extends CustomPainter {
     canvas.saveLayer(Offset.zero & size, Paint());
     canvas.scale(size.width, size.height);
     switch (theme) {
-      case FirstPlayerTheme.magic:
-        _hat(canvas);
+      case FirstPlayerTheme.puzzle:
+        _puzzle(canvas);
       case FirstPlayerTheme.cauldron:
         _cauldron(canvas);
-      case FirstPlayerTheme.bomb:
-        _bomb(canvas);
+      case FirstPlayerTheme.quantum:
+        _quantum(canvas);
       case FirstPlayerTheme.ufo:
         _ufo(canvas);
       case FirstPlayerTheme.arena:
@@ -68,41 +68,71 @@ class _SceneryIconPainter extends CustomPainter {
     canvas.restore();
   }
 
-  void _hat(Canvas canvas) {
-    canvas.drawRRect(
-      RRect.fromLTRBR(0.26, 0.24, 0.7, 0.76, const Radius.circular(0.04)),
-      _fill,
-    );
-    canvas.drawOval(const Rect.fromLTRB(0.06, 0.7, 0.9, 0.86), _fill);
-    // The band, and the line where the brim meets the crown.
-    canvas.drawLine(const Offset(0.26, 0.58), const Offset(0.7, 0.58), _cut);
-    canvas.drawLine(const Offset(0.3, 0.71), const Offset(0.66, 0.71), _cut);
-    _sparkle(canvas, const Offset(0.83, 0.2), 0.14);
-    _sparkle(canvas, const Offset(0.12, 0.36), 0.08);
-  }
-
-  void _bomb(Canvas canvas) {
-    canvas.drawCircle(const Offset(0.44, 0.6), 0.3, _fill);
-    canvas.drawRect(const Rect.fromLTRB(0.5, 0.24, 0.66, 0.38), _fill);
-    canvas.drawPath(
-      Path()
-        ..moveTo(0.6, 0.25)
-        ..quadraticBezierTo(0.65, 0.1, 0.77, 0.16),
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 0.06
-        ..strokeCap = StrokeCap.round,
-    );
-    // A shine on the bomb.
-    canvas.drawArc(
-      Rect.fromCircle(center: const Offset(0.44, 0.6), radius: 0.19),
-      math.pi * 1.05,
-      math.pi * 0.4,
-      false,
+  void _puzzle(Canvas canvas) {
+    // An L piece of four blocks, with the joints between them cut out.
+    const cell = 0.2;
+    const left = 0.24;
+    const top = 0.14;
+    final piece = Path()
+      ..addRRect(
+        RRect.fromLTRBR(
+          left,
+          top,
+          left + cell,
+          top + cell * 3,
+          const Radius.circular(0.05),
+        ),
+      )
+      ..addRRect(
+        RRect.fromLTRBR(
+          left,
+          top + cell * 2,
+          left + cell * 2,
+          top + cell * 3,
+          const Radius.circular(0.05),
+        ),
+      );
+    canvas.drawPath(piece, _fill);
+    canvas.drawLine(
+      const Offset(left, top + cell),
+      const Offset(left + cell, top + cell),
       _cut,
     );
-    _sparkle(canvas, const Offset(0.84, 0.14), 0.13);
+    canvas.drawLine(
+      const Offset(left, top + cell * 2),
+      const Offset(left + cell, top + cell * 2),
+      _cut,
+    );
+    canvas.drawLine(
+      const Offset(left + cell, top + cell * 2),
+      const Offset(left + cell, top + cell * 3),
+      _cut,
+    );
+    // A small square block dropping in.
+    canvas.drawRRect(
+      RRect.fromLTRBR(0.62, 0.3, 0.82, 0.5, const Radius.circular(0.05)),
+      _fill,
+    );
+    _sparkle(canvas, const Offset(0.82, 0.14), 0.11);
+  }
+
+  void _quantum(Canvas canvas) {
+    // A glass cube seen from a corner, its edges cut out, with a glowing
+    // particle inside.
+    final cube = Path()
+      ..moveTo(0.5, 0.08)
+      ..lineTo(0.88, 0.28)
+      ..lineTo(0.88, 0.72)
+      ..lineTo(0.5, 0.92)
+      ..lineTo(0.12, 0.72)
+      ..lineTo(0.12, 0.28)
+      ..close();
+    canvas.drawPath(cube, _fill);
+    canvas.drawLine(const Offset(0.12, 0.28), const Offset(0.5, 0.48), _cut);
+    canvas.drawLine(const Offset(0.88, 0.28), const Offset(0.5, 0.48), _cut);
+    canvas.drawLine(const Offset(0.5, 0.48), const Offset(0.5, 0.92), _cut);
+    canvas.drawCircle(const Offset(0.68, 0.64), 0.07, _hole);
+    canvas.drawCircle(const Offset(0.32, 0.6), 0.045, _hole);
   }
 
   void _cauldron(Canvas canvas) {

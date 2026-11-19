@@ -10,25 +10,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/widgets/language_toggle.dart';
 import 'arena_painter.dart';
-import 'bomb_painter.dart';
 import 'cauldron_painter.dart';
 import 'finger_picker.dart';
-import 'magic_painter.dart';
+import 'puzzle_painter.dart';
+import 'quantum_painter.dart';
 import 'scenery_icon.dart';
 import 'ufo_painter.dart';
 
 /// The looks the page can wear. The rules are the same for every theme.
 enum FirstPlayerTheme {
-  // A magician octopus has eight arms, one per volunteer.
-  magic(
-    Color(0xFF1A0F2E),
-    maxFingers: MagicPainter.arms,
-    decideTime: Duration(milliseconds: 3000),
-  ),
+  // Long enough for every piece but the last to fly into the puzzle.
+  puzzle(Color(0xFF232428), decideTime: Duration(milliseconds: 5000)),
   // Long enough for every ingredient to drop in and the potion to brew.
   cauldron(Color(0xFF1B1530), decideTime: Duration(milliseconds: 5000)),
-  // Short suspense: the point is to pick a player, not to wait.
-  bomb(Color(0xFF2B2D42), decideTime: Duration(milliseconds: 2600)),
+  // Arrival, instability and chaos, then the blast; a tap skips to it.
+  quantum(
+    Color(0xFF0A0F22),
+    decideTime: Duration(milliseconds: 7000),
+    skippable: true,
+  ),
   // Long enough for several scanning stops before the lock.
   ufo(Color(0xFF0B1033), decideTime: Duration(milliseconds: 5000)),
   // Kept to a few seconds so the bout doesn't drag, with a calm entrance.
@@ -36,23 +36,23 @@ enum FirstPlayerTheme {
 
   const FirstPlayerTheme(
     this.barColor, {
-    this.maxFingers,
     this.decideTime = FingerPicker.defaultDecideTime,
+    this.skippable = false,
   });
 
   /// App bar color, matching the top of the scene.
   final Color barColor;
 
-  /// Most fingers this theme can show; null means every palette color.
-  final int? maxFingers;
-
   /// How long its suspense lasts before the pick is revealed.
   final Duration decideTime;
 
+  /// Whether a tap during the suspense skips straight to the reveal.
+  final bool skippable;
+
   CustomPainter painter(FingerPicker picker, Duration now) => switch (this) {
-    FirstPlayerTheme.magic => MagicPainter(picker: picker, now: now),
+    FirstPlayerTheme.puzzle => PuzzlePainter(picker: picker, now: now),
     FirstPlayerTheme.cauldron => CauldronPainter(picker: picker, now: now),
-    FirstPlayerTheme.bomb => BombPainter(picker: picker, now: now),
+    FirstPlayerTheme.quantum => QuantumPainter(picker: picker, now: now),
     FirstPlayerTheme.ufo => UfoPainter(picker: picker, now: now),
     FirstPlayerTheme.arena => ArenaPainter(picker: picker, now: now),
   };
@@ -143,6 +143,7 @@ class _FirstPlayerScreenState extends State<FirstPlayerScreen>
   @override
   void initState() {
     super.initState();
+    CauldronIngredients.preload();
     _ticker = createTicker(_onTick)..start();
     final theme = widget.theme;
     if (theme != null) {
@@ -165,11 +166,7 @@ class _FirstPlayerScreenState extends State<FirstPlayerScreen>
   /// A fresh round on [theme].
   void _start(FirstPlayerTheme theme) {
     _theme = theme;
-    _picker = FingerPicker(
-      random: widget.random,
-      maxFingers: theme.maxFingers,
-      decideTime: theme.decideTime,
-    );
+    _picker = FingerPicker(random: widget.random, decideTime: theme.decideTime);
     _pins.clear();
   }
 
@@ -233,6 +230,13 @@ class _FirstPlayerScreenState extends State<FirstPlayerScreen>
 
   void _down(PointerDownEvent event) {
     if (_theme == null) {
+      return;
+    }
+    if (_theme!.skippable && _picker.phase == FingerPhase.deciding) {
+      // A tap mid-suspense skips straight to the reveal.
+      if (_picker.skip(_now)) {
+        HapticFeedback.mediumImpact();
+      }
       return;
     }
     if (_canPlayAgain) {

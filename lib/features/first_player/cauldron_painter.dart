@@ -1,10 +1,58 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'finger_picker.dart';
 
-/// The Mysterious Cauldron: every finger gets a tiny glowing ingredient in
+/// The ingredient art shown on the cauldron's tokens, loaded once and kept.
+class CauldronIngredients {
+  const CauldronIngredients._();
+
+  /// One ingredient per player color, matched where the art suggests it:
+  /// a red scorpion, a blue flower, a yellow claw, a green fern and so on.
+  static const _byColor = [
+    'scorpion',
+    'flower',
+    'claw',
+    'fern',
+    'mushroom',
+    'toad',
+    'mandrake',
+    'feather',
+    'fern',
+    'mandrake',
+  ];
+
+  static final _images = <String, ui.Image>{};
+  static Future<void>? _loading;
+
+  /// Starts loading the art; safe to call again.
+  static Future<void> preload() => _loading ??= _load();
+
+  static Future<void> _load() async {
+    for (final name in _byColor.toSet()) {
+      try {
+        final data = await rootBundle.load(
+          'assets/first_player/ingredients/$name.jpg',
+        );
+        final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+        _images[name] = (await codec.getNextFrame()).image;
+      } catch (_) {
+        // Without the art the token falls back to a drawn gem.
+      }
+    }
+  }
+
+  /// The art for a player color, or null until it has loaded.
+  static ui.Image? forColor(int colorIndex) {
+    preload();
+    return _images[_byColor[colorIndex % _byColor.length]];
+  }
+}
+
+/// The Mysterious Cauldron: every finger gets a glowing ingredient token in
 /// its color. One by one they drop into a bubbling cauldron, the potion
 /// glows and bubbles faster through everyone's colors, the cauldron shakes
 /// violently, and a burst of smoke clears to show one player's color
@@ -122,7 +170,7 @@ class CauldronPainter extends CustomPainter {
 
   /// Where a finger's ingredient floats: just above the fingertip so the
   /// finger doesn't hide it.
-  Offset _home(FingerTouch touch) => touch.position - const Offset(0, 48);
+  Offset _home(FingerTouch touch) => touch.position - const Offset(0, 64);
 
   /// When the [i]th of [n] ingredients sets off, as a share of the suspense.
   double _setOff(int i, int n) {
@@ -541,7 +589,7 @@ class CauldronPainter extends CustomPainter {
     return rim + Offset(spread, 0);
   }
 
-  /// A tiny glowing ingredient: an orb, a crystal, a star or a drop.
+  /// A glowing ingredient token, or a drawn gem until the art has loaded.
   void _paintIngredient(
     Canvas canvas,
     Offset at,
@@ -565,6 +613,12 @@ class CauldronPainter extends CustomPainter {
     canvas.save();
     canvas.translate(at.dx, at.dy);
     canvas.rotate(spin);
+    final art = CauldronIngredients.forColor(kind);
+    if (art != null) {
+      _paintToken(canvas, art, r * 2.2, color);
+      canvas.restore();
+      return;
+    }
     final Path shape;
     switch (kind % 4) {
       case 0:
@@ -609,6 +663,48 @@ class CauldronPainter extends CustomPainter {
         ..strokeWidth = 1.2,
     );
     canvas.restore();
+  }
+
+  /// A round token of ingredient [art] with a rim in the player's [color],
+  /// drawn around the origin.
+  void _paintToken(Canvas canvas, ui.Image art, double r, Color color) {
+    final circle = Rect.fromCircle(center: Offset.zero, radius: r);
+    canvas.save();
+    canvas.clipPath(Path()..addOval(circle));
+    paintImage(
+      canvas: canvas,
+      rect: circle,
+      image: art,
+      fit: BoxFit.cover,
+      filterQuality: FilterQuality.medium,
+    );
+    // A soft shade at the edge so the art sits inside the rim.
+    canvas.drawCircle(
+      Offset.zero,
+      r,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [Colors.transparent, Colors.black.withValues(alpha: 0.35)],
+          stops: const [0.7, 1],
+        ).createShader(circle),
+    );
+    canvas.restore();
+    canvas.drawCircle(
+      Offset.zero,
+      r,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = math.max(2.5, r * 0.14),
+    );
+    canvas.drawCircle(
+      Offset.zero,
+      r + math.max(2.5, r * 0.14) / 2,
+      Paint()
+        ..color = Color.lerp(color, Colors.black, 0.5)!
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2,
+    );
   }
 
   /// The winner's color rising out of the potion as the smoke clears.
