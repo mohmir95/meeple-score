@@ -136,6 +136,7 @@ class _AlchemistsStartingResourcesScreenState
                       lead: _Flat.card(const Color(0xFF8B5E3C), icon),
                       label: l10n.t('alchemists.setup.ingredients'),
                       count: '${AlchemistsSetup.ingredients(master: _master)}',
+                      highlight: true,
                     ),
                     _Row(
                       key: const ValueKey('alchemists-setup-favors'),
@@ -268,6 +269,7 @@ class _Row extends StatelessWidget {
     required this.label,
     required this.count,
     this.leadWidth,
+    this.highlight = false,
   });
 
   final bool compact;
@@ -276,8 +278,17 @@ class _Row extends StatelessWidget {
   final String count;
   final double? leadWidth;
 
+  /// Shows [count] in a coloured pill that pops when it changes, for values
+  /// that depend on the Apprentice/Master switch.
+  final bool highlight;
+
   @override
   Widget build(BuildContext context) {
+    final countStyle = TextStyle(
+      color: highlight ? Colors.white : _ink,
+      fontWeight: FontWeight.w900,
+      fontSize: compact ? 16 : 18,
+    );
     return Padding(
       padding: EdgeInsets.symmetric(vertical: compact ? 6 : 7),
       child: Row(
@@ -288,23 +299,44 @@ class _Row extends StatelessWidget {
           ),
           SizedBox(width: compact ? 10 : 14),
           Expanded(
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: _ink,
-                fontWeight: FontWeight.w700,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: _ink,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            count,
-            style: TextStyle(
-              color: _ink,
-              fontWeight: FontWeight.w900,
-              fontSize: compact ? 16 : 18,
-            ),
-          ),
+          if (highlight)
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: Tween(begin: 0.6, end: 1.0).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+                ),
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+              child: Container(
+                key: ValueKey(count),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: _accent,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(count, style: countStyle),
+              ),
+            )
+          else
+            Text(count, style: countStyle),
         ],
       ),
     );

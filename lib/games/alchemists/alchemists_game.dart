@@ -8,6 +8,7 @@ import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
 import 'alchemists_logic_screen.dart';
+import 'alchemists_master_screen.dart';
 import 'alchemists_starting_resources_screen.dart';
 
 /// Alchemists: so far the hub offers a tutorial for the logic puzzle.
@@ -72,6 +73,13 @@ class AlchemistsGame extends BoardGame {
 
   @override
   Widget buildQuickReference() => const AlchemistsLogicScreen();
+
+  /// The Master variant's rules, gathered from the rulebook.
+  @override
+  Widget? buildGuide() => const AlchemistsMasterScreen();
+
+  @override
+  String get guideTitleKey => 'hub.masterVariant';
 
   @override
   bool get showStartingResources => true;

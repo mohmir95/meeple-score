@@ -125,6 +125,11 @@ abstract class BoardGame {
   /// Ready-made puzzles or scenarios to set up. Null hides the hub tile.
   Widget? buildPuzzles() => null;
 
+  /// An extra text guide page (e.g. variant rules). Null hides the tile.
+  Widget? buildGuide() => null;
+
+  String get guideTitleKey => 'hub.guide';
+
   /// Website with more puzzles or play aids. Null hides the hub tile.
   String? get onlineUrl => null;
 

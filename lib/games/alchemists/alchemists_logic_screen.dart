@@ -59,6 +59,14 @@ class AlchemistsLogic {
           LogicPoint('selling.partialCross', frames: ['4-2-2-1', '4-2-2-2']),
         ],
       ),
+      LogicPoint('selling.neutral'),
+      LogicPoint(
+        'selling.wrongSign',
+        sub: [
+          LogicPoint('selling.wrongSignToken'),
+          LogicPoint('selling.wrongSignCross'),
+        ],
+      ),
     ]),
     LogicSection('thinking', [
       LogicPoint('thinking.sameColour', frames: ['5-1-1', '5-1-3']),
@@ -80,6 +88,13 @@ class AlchemistsLogic {
       LogicPoint('theories.hedged', frames: ['6-1-1', '6-1-2']),
       LogicPoint('theories.confirmed', frames: ['6-2']),
       LogicPoint('theories.debunk', frames: ['6-3-1', '6-3-2', '6-3-3']),
+    ]),
+    LogicSection('debunking', [
+      LogicPoint('debunking.public'),
+      LogicPoint('debunking.masterYes'),
+      LogicPoint('debunking.masterNo'),
+      LogicPoint('debunking.anyIngredients'),
+      LogicPoint('debunking.bothAnswers'),
     ]),
     LogicSection('planning', [
       LogicPoint('planning.predict', frames: ['7-1']),
@@ -122,12 +137,42 @@ class AlchemistsLogicScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return const AlchemistsGuideScreen(
+      titleKey: 'hub.logicPuzzle',
+      prefix: 'alchemists.logic',
+      sections: AlchemistsLogic.sections,
+      showCredit: true,
+    );
+  }
+}
+
+/// A text guide in collapsible sections, closed until tapped so the page
+/// stays short. Texts are translation keys under [prefix]: `intro`, then
+/// `<section>.title`, `<section>.summary` and each point's key.
+class AlchemistsGuideScreen extends StatelessWidget {
+  const AlchemistsGuideScreen({
+    super.key,
+    required this.titleKey,
+    required this.prefix,
+    required this.sections,
+    this.showCredit = false,
+  });
+
+  final String titleKey;
+  final String prefix;
+  final List<LogicSection> sections;
+
+  /// Adds the `<prefix>.credit` line under the intro.
+  final bool showCredit;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = context.l10n;
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
     final padding = compact ? 12.0 : 20.0;
 
     return AppPage(
-      title: l10n.t('hub.logicPuzzle'),
+      title: l10n.t(titleKey),
       coverImageAsset: AlchemistsGame.coverAsset,
       body: SingleChildScrollView(
         padding: EdgeInsets.all(padding),
@@ -138,27 +183,30 @@ class AlchemistsLogicScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  l10n.t('alchemists.logic.intro'),
+                  l10n.t('$prefix.intro'),
                   textAlign: TextAlign.center,
                   style: Theme.of(
                     context,
                   ).textTheme.bodyMedium?.copyWith(height: 1.4),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.t('alchemists.logic.credit'),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
-                ),
+                if (showCredit) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.t('$prefix.credit'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
                 SizedBox(height: compact ? 12 : 16),
-                for (var i = 0; i < AlchemistsLogic.sections.length; i++)
+                for (var i = 0; i < sections.length; i++)
                   Padding(
                     padding: EdgeInsets.only(bottom: compact ? 10 : 12),
                     child: _SectionCard(
                       number: i + 1,
-                      section: AlchemistsLogic.sections[i],
+                      section: sections[i],
+                      prefix: prefix,
                       compact: compact,
                     ),
                   ),
@@ -176,11 +224,13 @@ class _SectionCard extends StatelessWidget {
   const _SectionCard({
     required this.number,
     required this.section,
+    required this.prefix,
     required this.compact,
   });
 
   final int number;
   final LogicSection section;
+  final String prefix;
   final bool compact;
 
   @override
@@ -188,7 +238,7 @@ class _SectionCard extends StatelessWidget {
     final l10n = context.l10n;
     const accent = AlchemistsGame.purple;
     return Card(
-      key: ValueKey('alchemists-logic-${section.key}'),
+      key: ValueKey('$prefix-${section.key}'),
       margin: EdgeInsets.zero,
       color: _paper,
       elevation: 0,
@@ -198,7 +248,7 @@ class _SectionCard extends StatelessWidget {
         side: BorderSide(color: accent.withValues(alpha: 0.3)),
       ),
       child: ExpansionTile(
-        key: ValueKey('alchemists-logic-tile-${section.key}'),
+        key: ValueKey('$prefix-tile-${section.key}'),
         shape: const Border(),
         collapsedShape: const Border(),
         iconColor: accent,
@@ -223,19 +273,19 @@ class _SectionCard extends StatelessWidget {
           ),
         ),
         title: Text(
-          l10n.t('alchemists.logic.${section.key}.title'),
+          l10n.t('$prefix.${section.key}.title'),
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: _ink,
             fontWeight: FontWeight.w800,
           ),
         ),
         subtitle: Text(
-          l10n.t('alchemists.logic.${section.key}.summary'),
+          l10n.t('$prefix.${section.key}.summary'),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(color: _muted),
         ),
         children: [
           for (final point in section.points)
-            _Point(point: point, compact: compact),
+            _Point(point: point, prefix: prefix, compact: compact),
         ],
       ),
     );
@@ -243,9 +293,15 @@ class _SectionCard extends StatelessWidget {
 }
 
 class _Point extends StatelessWidget {
-  const _Point({required this.point, required this.compact, this.depth = 0});
+  const _Point({
+    required this.point,
+    required this.prefix,
+    required this.compact,
+    this.depth = 0,
+  });
 
   final LogicPoint point;
+  final String prefix;
   final bool compact;
   final int depth;
 
@@ -277,7 +333,7 @@ class _Point extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text.rich(
-                  boldMarkup(l10n.t('alchemists.logic.${point.key}'), style),
+                  boldMarkup(l10n.t('$prefix.${point.key}'), style),
                 ),
               ),
             ],
@@ -293,7 +349,12 @@ class _Point extends StatelessWidget {
             ),
           ],
           for (final sub in point.sub)
-            _Point(point: sub, compact: compact, depth: depth + 1),
+            _Point(
+              point: sub,
+              prefix: prefix,
+              compact: compact,
+              depth: depth + 1,
+            ),
         ],
       ),
     );

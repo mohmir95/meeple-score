@@ -52,6 +52,9 @@ void main() {
       await tester.tap(find.text('Master'));
       await pumpFor(tester);
       expect(_in('ingredients', '2'), findsOneWidget);
+      // The old value animates out; after it settles only the new one shows.
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(_in('ingredients', '3'), findsNothing);
       expect(tester.takeException(), isNull);
     });
   }

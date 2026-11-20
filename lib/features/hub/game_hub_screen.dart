@@ -102,6 +102,21 @@ class GameHubScreen extends StatelessWidget {
                   );
                 },
               ),
+            if (game.buildGuide() != null)
+              _HubBanner(
+                key: const ValueKey('hub-guide'),
+                title: l10n.t(game.guideTitleKey),
+                icon: Icons.workspace_premium_outlined,
+                color: game.accentColor,
+                compact: compact,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) => game.buildGuide()!,
+                    ),
+                  );
+                },
+              ),
             if (game.onlineUrl != null)
               _HubBanner(
                 key: const ValueKey('hub-online'),

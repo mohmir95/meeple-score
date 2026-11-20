@@ -43,6 +43,7 @@ void main() {
     expect(find.text('Scoresheet'), findsNothing);
     expect(find.text('Logic Puzzle Explained'), findsOneWidget);
     expect(find.text('Card Reader App'), findsOneWidget);
+    expect(find.text('Master Variant'), findsOneWidget);
 
     String? opened;
     openUrlOverride = (url) => opened = url;
