@@ -1,4 +1,5 @@
 import 'board_game.dart';
+import '../games/alchemists/alchemists_game.dart';
 import '../games/castles_of_burgundy/cob_game.dart';
 import '../games/great_western_trail/gwt_2e_game.dart';
 import '../games/great_western_trail/gwt_argentina_game.dart';
@@ -28,6 +29,7 @@ class GameRegistry {
               TuringMachineGame(),
               SplendorGame(),
               ProjectLGame(),
+              AlchemistsGame(),
             ],
       );
 
