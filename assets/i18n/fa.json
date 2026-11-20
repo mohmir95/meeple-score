@@ -712,6 +712,7 @@
   "game.alchemists.description": "مواد را ترکیب کنید، معجون‌ها را آزمایش کنید و ویژگی‌های کیمیایی پنهان هر ماده را کشف کنید. برای کسب اعتبار نظریه منتشر کنید، اما مراقب باشید: نظریه اشتباه ممکن است رد شود.",
   "game.alchemists.playTime": "۱۲۰ دقیقه",
   "hub.logicPuzzle": "توضیح معمای منطقی",
+  "hub.cardReaderApp": "اپ کارت‌خوان",
   "alchemists.logic.intro": "روش‌هایی برای پیگیری و حل معمای استنتاجی بازی کیمیاگران. هر بخش را باز کنید تا بخوانید؛ تصویرها را ورق بزنید و برای بزرگ‌نمایی روی آن‌ها بزنید.",
   "alchemists.logic.credit": "بر اساس آموزش معمای منطقی کیمیاگران از Meeple University.",
   "alchemists.logic.frameLabel": "تصویر {n} از {total}",
@@ -760,5 +761,18 @@
   "alchemists.logic.strategy.worst": "**بدترین حرکت:** برداشتن دو کارت ماده رو و آزمایش فوری آن‌ها. همه می‌فهمند شما برای چه چیزی ۳ اکشن خرج کردید.",
   "alchemists.logic.strategy.bigHand": "**دست بزرگی** از کارت‌های ماده نگه دارید و درباره چیزی که ترکیب می‌کنید بلوف بزنید.",
   "alchemists.logic.strategy.sevenExperiments": "حل کارآمد معما حدود **۷ آزمایش** لازم دارد؛ آن‌ها را مفت به دیگران ندهید.",
-  "alchemists.logic.strategy.trust": "برای پیشرفت سریع‌تر روی **نظریه‌های بازیکنان دیگر** حساب کنید، ولی ممکن است **عمداً پوشش‌دار** باشند."
+  "alchemists.logic.strategy.trust": "برای پیشرفت سریع‌تر روی **نظریه‌های بازیکنان دیگر** حساب کنید، ولی ممکن است **عمداً پوشش‌دار** باشند.",
+  "alchemists.setup.players": "{n} بازیکن",
+  "alchemists.setup.apprentice": "شاگرد",
+  "alchemists.setup.master": "استاد",
+  "alchemists.setup.eachTitle": "هر بازیکن برمی‌دارد",
+  "alchemists.setup.gold": "سکه طلا، روی صفحه بازیکن",
+  "alchemists.setup.cubes": "مکعب اکشن",
+  "alchemists.setup.ingredients": "کارت ماده، از بالای دسته",
+  "alchemists.setup.favors": "کارت لطف: {drawn} بکشید، {kept} نگه دارید",
+  "alchemists.setup.firstRound": "در دور اول همه فقط از {first} مکعب اکشن استفاده می‌کنند. {rest} مکعب دیگر را روی دسته ماجراجوها بگذارید تا یادتان بماند در پایان دور اول همه را بردارید.",
+  "alchemists.setup.sealsTitle": "مهرها",
+  "alchemists.setup.hedgeSeals": "مهر پوشش، از هر رنگ {n} عدد",
+  "alchemists.setup.starSeal.silver": "مهر ستاره نقره‌ای ({points})",
+  "alchemists.setup.starSeal.gold": "مهر ستاره طلایی ({points})"
 }

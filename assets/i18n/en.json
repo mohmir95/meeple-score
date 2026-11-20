@@ -711,6 +711,7 @@
   "game.alchemists.description": "Mix ingredients, test potions and deduce the secret alchemical properties of each ingredient. Publish theories to gain reputation, but beware: a wrong theory can be debunked.",
   "game.alchemists.playTime": "120 min",
   "hub.logicPuzzle": "Logic Puzzle Explained",
+  "hub.cardReaderApp": "Card Reader App",
   "alchemists.logic.intro": "Techniques for tracking and solving the deduction puzzle under Alchemists. Open a section to read it; swipe the pictures and tap one to enlarge it.",
   "alchemists.logic.credit": "Based on Meeple University's Alchemists logic puzzle tutorial.",
   "alchemists.logic.frameLabel": "Picture {n} of {total}",
@@ -759,5 +760,18 @@
   "alchemists.logic.strategy.worst": "**Worst move:** taking two face-up ingredient cards and testing them right away. Everyone learns what you just spent 3 actions on.",
   "alchemists.logic.strategy.bigHand": "Keep a **big hand** of ingredient cards and bluff about what you're mixing.",
   "alchemists.logic.strategy.sevenExperiments": "An efficient solve takes about **7 experiments**, so don't give them away for free.",
-  "alchemists.logic.strategy.trust": "Build on **other players' theories** to move faster, but they may be **deliberately hedged**."
+  "alchemists.logic.strategy.trust": "Build on **other players' theories** to move faster, but they may be **deliberately hedged**.",
+  "alchemists.setup.players": "{n} players",
+  "alchemists.setup.apprentice": "Apprentice",
+  "alchemists.setup.master": "Master",
+  "alchemists.setup.eachTitle": "Each Player Takes",
+  "alchemists.setup.gold": "Gold pieces, on your player board",
+  "alchemists.setup.cubes": "Action cubes",
+  "alchemists.setup.ingredients": "Ingredient cards, from the top of the deck",
+  "alchemists.setup.favors": "Favor cards: draw {drawn}, keep {kept}",
+  "alchemists.setup.firstRound": "In the first round everyone uses only {first} action cubes. Put the other {rest} on the adventurer stack, to remember to take them all at the end of the first round.",
+  "alchemists.setup.sealsTitle": "Seals",
+  "alchemists.setup.hedgeSeals": "Hedge seals, {n} of each colour",
+  "alchemists.setup.starSeal.silver": "Silver star seals ({points})",
+  "alchemists.setup.starSeal.gold": "Gold star seals ({points})"
 }

@@ -8,6 +8,7 @@ import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
 import 'alchemists_logic_screen.dart';
+import 'alchemists_starting_resources_screen.dart';
 
 /// Alchemists: so far the hub offers a tutorial for the logic puzzle.
 class AlchemistsGame extends BoardGame {
@@ -71,6 +72,19 @@ class AlchemistsGame extends BoardGame {
 
   @override
   Widget buildQuickReference() => const AlchemistsLogicScreen();
+
+  @override
+  bool get showStartingResources => true;
+
+  @override
+  Widget? buildStartingResources() => const AlchemistsStartingResourcesScreen();
+
+  /// The official companion app that reads the ingredient cards.
+  @override
+  String? get onlineUrl => 'https://alchemists.czechgames.com/';
+
+  @override
+  String get onlineTitleKey => 'hub.cardReaderApp';
 
   @override
   GameConfig createDefaultConfig() => const _AlchemistsConfig();
