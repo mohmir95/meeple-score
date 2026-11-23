@@ -86,6 +86,12 @@ abstract class BoardGame {
   /// Ready setup hints UI. Null keeps the hub tile disabled as Coming Soon.
   Widget? buildSetupHints() => null;
 
+  /// Hub tile for end-of-game scoring tips.
+  bool get showScoringHints => false;
+
+  /// Ready scoring hints UI. Null keeps the hub tile disabled as Coming Soon.
+  Widget? buildScoringHints() => null;
+
   /// Hub tile listing how many of each component the box holds.
   bool get showTileCounts => false;
 

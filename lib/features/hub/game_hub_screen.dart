@@ -37,6 +37,7 @@ class GameHubScreen extends StatelessWidget {
           final leaders = game.buildLeadersRandomizer();
           final bonusCards = game.buildBonusCardsRandomizer();
           final setupHints = game.buildSetupHints();
+          final scoringHints = game.buildScoringHints();
           final tileCounts = game.buildTileCounts();
           final cityMaps = game.buildCityMapsRandomizer();
           final trainCards = game.buildTrainCardsRandomizer();
@@ -183,6 +184,25 @@ class GameHubScreen extends StatelessWidget {
                         Navigator.of(context).push(
                           MaterialPageRoute<void>(
                             builder: (context) => game.buildSetupHints()!,
+                          ),
+                        );
+                      },
+              ),
+            if (game.showScoringHints)
+              _HubBanner(
+                key: const ValueKey('hub-scoring-hints'),
+                title: l10n.t('hub.scoringHints'),
+                icon: Icons.emoji_events_outlined,
+                color: game.accentColor,
+                compact: compact,
+                enabled: scoringHints != null,
+                badge: scoringHints == null ? l10n.t('hub.comingSoon') : null,
+                onTap: scoringHints == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) => game.buildScoringHints()!,
                           ),
                         );
                       },
