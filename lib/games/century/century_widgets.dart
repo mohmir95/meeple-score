@@ -5,6 +5,7 @@ import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
 import 'century_eastern_wonders_game.dart';
 import 'century_game.dart';
+import 'century_new_world_game.dart';
 import 'century_rules.dart';
 
 const centuryInk = Color(0xFF3A2430);
@@ -42,6 +43,14 @@ class CenturyStyleData {
     accent: CenturySpiceRoadGame.plum,
     dark: Color(0xFF4E1F3A),
     paper: Color(0xFFFBF3E8),
+  );
+
+  /// Forest-green bands on parchment, like the A New World rulebook.
+  static const newWorld = CenturyStyleData(
+    coverAsset: CenturyNewWorldGame.coverAsset,
+    accent: CenturyNewWorldGame.forest,
+    dark: Color(0xFF1C3A24),
+    paper: Color(0xFFF7F1E2),
   );
 
   /// Brick-red bands on pale sea green, like the Eastern Wonders rulebook.
@@ -118,10 +127,12 @@ class CenturyPlayerPicker extends StatelessWidget {
     super.key,
     required this.players,
     required this.onChanged,
+    this.counts = CenturyRules.playerCounts,
   });
 
   final int players;
   final ValueChanged<int> onChanged;
+  final List<int> counts;
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +140,7 @@ class CenturyPlayerPicker extends StatelessWidget {
       key: const ValueKey('century-players'),
       showSelectedIcon: false,
       segments: [
-        for (final n in CenturyRules.playerCounts)
+        for (final n in counts)
           ButtonSegment(
             value: n,
             label: Text(context.l10n.t('century.players', {'n': '$n'})),

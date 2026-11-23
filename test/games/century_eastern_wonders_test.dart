@@ -3,6 +3,7 @@ import 'package:board_game_score_sheet/domain/game_series.dart';
 import 'package:board_game_score_sheet/games/century/century_eastern_wonders_game.dart';
 import 'package:board_game_score_sheet/games/century/century_eastern_wonders_rules.dart';
 import 'package:board_game_score_sheet/games/century/century_game.dart';
+import 'package:board_game_score_sheet/games/century/century_new_world_game.dart';
 import 'package:board_game_score_sheet/games/century/century_rules.dart';
 import 'package:board_game_score_sheet/games/century/eastern_wonders_scoring_hints_screen.dart';
 import 'package:board_game_score_sheet/games/century/eastern_wonders_setup_hints_screen.dart';
@@ -29,7 +30,7 @@ void main() {
     ]);
   });
 
-  test('both Century games share one home banner', () {
+  test('every Century game shares one home banner', () {
     const game = CenturyEasternWondersGame();
     expect(game.hasScoresheet, isFalse);
     expect(game.maxPlayers, 4);
@@ -43,6 +44,7 @@ void main() {
     expect(century.games.map((g) => g.id), [
       CenturySpiceRoadGame.idValue,
       CenturyEasternWondersGame.idValue,
+      CenturyNewWorldGame.idValue,
     ]);
   });
 
