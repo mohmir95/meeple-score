@@ -28,7 +28,13 @@ void main() {
       'great_western_trail_new_zealand',
       'great_western_trail_el_paso',
     ]);
-    expect(entries.skip(1), everyElement(isA<SingleGameEntry>()));
+    // Century is the only other series, in the place of Spice Road.
+    final century = entries.last as SeriesEntry;
+    expect(century.series, GameSeries.century);
+    expect(
+      entries.skip(1).take(entries.length - 2),
+      everyElement(isA<SingleGameEntry>()),
+    );
   });
 
   testWidgets('the GWT banner resumes an edition in progress', (tester) async {

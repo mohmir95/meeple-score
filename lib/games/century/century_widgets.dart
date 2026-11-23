@@ -3,19 +3,69 @@ import 'package:flutter/material.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
+import 'century_eastern_wonders_game.dart';
 import 'century_game.dart';
 import 'century_rules.dart';
 
 const centuryInk = Color(0xFF3A2430);
 const centuryMuted = Color(0xFF6B5560);
-const _paper = Color(0xFFFBF3E8);
-const _accent = CenturySpiceRoadGame.plum;
 const _gold = Color(0xFFF0C674);
 
 /// Card back colours, as printed.
 const centuryPointBack = Color(0xFFE07B2A);
 const centuryMerchantBack = Color(0xFF5B3A78);
 const centuryCaravanBack = Color(0xFF7D7A78);
+
+/// Colours and cover of one Century game's hub pages.
+class CenturyStyleData {
+  const CenturyStyleData({
+    required this.coverAsset,
+    required this.accent,
+    required this.dark,
+    required this.paper,
+  });
+
+  final String coverAsset;
+
+  /// Header bands, pills and icons.
+  final Color accent;
+
+  /// The ends of the header band gradient.
+  final Color dark;
+
+  /// Panel background.
+  final Color paper;
+
+  /// Plum bands on cream, like the Spice Road rulebook.
+  static const spiceRoad = CenturyStyleData(
+    coverAsset: CenturySpiceRoadGame.coverAsset,
+    accent: CenturySpiceRoadGame.plum,
+    dark: Color(0xFF4E1F3A),
+    paper: Color(0xFFFBF3E8),
+  );
+
+  /// Brick-red bands on pale sea green, like the Eastern Wonders rulebook.
+  static const easternWonders = CenturyStyleData(
+    coverAsset: CenturyEasternWondersGame.coverAsset,
+    accent: CenturyEasternWondersGame.brick,
+    dark: Color(0xFF5A1C12),
+    paper: Color(0xFFEFF5F1),
+  );
+}
+
+/// Gives the Century widgets below it their game's colours.
+class CenturyStyle extends InheritedWidget {
+  const CenturyStyle({super.key, required this.data, required super.child});
+
+  final CenturyStyleData data;
+
+  static CenturyStyleData of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<CenturyStyle>()?.data ??
+      CenturyStyleData.spiceRoad;
+
+  @override
+  bool updateShouldNotify(CenturyStyle old) => old.data != data;
+}
 
 /// The page frame shared by the Century hub pages: cover, title and a
 /// centred, scrolling column.
@@ -24,10 +74,12 @@ class CenturyPage extends StatelessWidget {
     super.key,
     required this.titleKey,
     required this.children,
+    this.style = CenturyStyleData.spiceRoad,
   });
 
   final String titleKey;
   final List<Widget> children;
+  final CenturyStyleData style;
 
   @override
   Widget build(BuildContext context) {
@@ -35,21 +87,25 @@ class CenturyPage extends StatelessWidget {
     final gap = SizedBox(height: compact ? 14 : 18);
     return AppPage(
       title: context.l10n.t(titleKey),
-      coverImageAsset: CenturySpiceRoadGame.coverAsset,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(compact ? 12 : 20),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (var i = 0; i < children.length; i++) ...[
-                  if (i > 0) gap,
-                  children[i],
-                ],
+      coverImageAsset: style.coverAsset,
+      body: CenturyStyle(data: style, child: _body(compact, gap)),
+    );
+  }
+
+  Widget _body(bool compact, Widget gap) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(compact ? 12 : 20),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < children.length; i++) ...[
+                if (i > 0) gap,
+                children[i],
               ],
-            ),
+            ],
           ),
         ),
       ),
@@ -101,15 +157,16 @@ class CenturyPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = CenturyStyle.of(context);
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: _paper,
+        color: style.paper,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _accent.withValues(alpha: 0.35)),
+        border: Border.all(color: style.accent.withValues(alpha: 0.35)),
         boxShadow: [
           BoxShadow(
-            color: _accent.withValues(alpha: 0.1),
+            color: style.accent.withValues(alpha: 0.1),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -119,9 +176,9 @@ class CenturyPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF4E1F3A), _accent, Color(0xFF4E1F3A)],
+                colors: [style.dark, style.accent, style.dark],
               ),
               borderRadius: BorderRadius.vertical(top: Radius.circular(17)),
             ),
@@ -191,6 +248,7 @@ class CenturyRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = CenturyStyle.of(context);
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
     final valueStyle = TextStyle(
       color: highlight ? Colors.white : centuryInk,
@@ -247,7 +305,7 @@ class CenturyRow extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: _accent,
+                  color: style.accent,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: valueText,
@@ -269,17 +327,22 @@ class CenturyNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = CenturyStyle.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: _accent.withValues(alpha: 0.07),
+        color: style.accent.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _accent.withValues(alpha: 0.3)),
+        border: Border.all(color: style.accent.withValues(alpha: 0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon ?? Icons.info_outline_rounded, size: 20, color: _accent),
+          Icon(
+            icon ?? Icons.info_outline_rounded,
+            size: 20,
+            color: style.accent,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -540,7 +603,8 @@ class CenturyBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = error ? Theme.of(context).colorScheme.error : _accent;
+    final style = CenturyStyle.of(context);
+    final color = error ? Theme.of(context).colorScheme.error : style.accent;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
@@ -555,6 +619,150 @@ class CenturyBadge extends StatelessWidget {
           fontWeight: FontWeight.w800,
           fontSize: 12,
         ),
+      ),
+    );
+  }
+}
+
+/// A pointy-top hexagonal tile, such as a market, port or VP tile.
+class HexTile extends StatelessWidget {
+  const HexTile({
+    super.key,
+    required this.color,
+    required this.size,
+    this.label,
+    this.labelColor = Colors.white,
+  });
+
+  final Color color;
+
+  /// Width of the tile; the height follows the hexagon.
+  final double size;
+  final String? label;
+  final Color labelColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(size, size * 1.1547),
+      painter: _HexPainter(color),
+      child: SizedBox(
+        width: size,
+        height: size * 1.1547,
+        child: label == null
+            ? null
+            : Center(
+                child: Text(
+                  label!,
+                  style: TextStyle(
+                    color: labelColor,
+                    fontWeight: FontWeight.w900,
+                    fontSize: size * 0.34,
+                    height: 1,
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+class _HexPainter extends CustomPainter {
+  const _HexPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width, h = size.height;
+    final path = Path()
+      ..moveTo(w / 2, 0)
+      ..lineTo(w, h * 0.25)
+      ..lineTo(w, h * 0.75)
+      ..lineTo(w / 2, h)
+      ..lineTo(0, h * 0.75)
+      ..lineTo(0, h * 0.25)
+      ..close();
+    canvas.drawShadow(path, Colors.black, 2, false);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color.lerp(color, Colors.white, 0.2)!, color],
+        ).createShader(Offset.zero & size),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2
+        ..strokeJoin = StrokeJoin.round
+        ..color = Color.lerp(color, Colors.black, 0.4)!,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_HexPainter old) => old.color != color;
+}
+
+/// The four spice colours in upgrade order, each with its name from
+/// [nameKey] and its colour word.
+class CenturySpiceOrder extends StatelessWidget {
+  const CenturySpiceOrder({super.key, required this.nameKey});
+
+  final String Function(CenturySpice spice) nameKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
+    final cube = compact ? 30.0 : 40.0;
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final spice in CenturySpice.values) ...[
+            if (spice.index > 0)
+              Padding(
+                padding: EdgeInsets.only(top: cube * 0.3),
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  size: compact ? 16 : 20,
+                  color: centuryMuted,
+                ),
+              ),
+            Expanded(
+              child: Column(
+                key: ValueKey('century-spice-${spice.name}'),
+                children: [
+                  SpiceCube(spice: spice, size: cube),
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.t(nameKey(spice)),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: centuryInk,
+                      fontWeight: FontWeight.w800,
+                      fontSize: compact ? 12 : 14,
+                    ),
+                  ),
+                  Text(
+                    l10n.t('century.colour.${spice.name}'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: centuryMuted,
+                      fontWeight: FontWeight.w600,
+                      fontSize: compact ? 11 : 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

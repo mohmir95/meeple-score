@@ -105,35 +105,25 @@ class _CenturySetupHintsScreenState extends State<CenturySetupHintsScreen> {
                 ),
               ],
             ),
-            SizedBox(height: compact ? 12 : 16),
-            CenturyRow(
-              key: const ValueKey('century-setup-starting-cards'),
-              lead: CenturyCard(
-                color: centuryMerchantBack,
-                width: compact ? 24 : 28,
-                faceUp: true,
-              ),
-              label: l10n.t('century.setup.startingCards'),
-              hint: l10n.t('century.setup.startingCardsHint'),
-              value: '${CenturyRules.startingCardsPerPlayer * _players}',
-              highlight: true,
-            ),
-            if (toBox > 0)
-              Align(
-                alignment: AlignmentDirectional.centerEnd,
+            if (toBox > 0) ...[
+              SizedBox(height: compact ? 12 : 16),
+              Center(
                 child: CenturyBadge(
                   key: const ValueKey('century-setup-to-box'),
                   text: l10n.t('century.setup.toBox', {'n': '$toBox'}),
                   error: true,
                 ),
               ),
+            ],
           ],
         ),
         CenturyPanel(
           key: const ValueKey('century-setup-spices'),
           title: l10n.t('century.setup.spicesTitle'),
           body: l10n.t('century.setup.spicesBody'),
-          children: [_SpiceOrder(compact: compact)],
+          children: [
+            CenturySpiceOrder(nameKey: (s) => 'century.spice.${s.name}'),
+          ],
         ),
       ],
     );
@@ -200,65 +190,6 @@ class _CoinPile extends StatelessWidget {
               height: 1.3,
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-/// The four bowls in upgrade order, yellow to brown.
-class _SpiceOrder extends StatelessWidget {
-  const _SpiceOrder({required this.compact});
-
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final cube = compact ? 30.0 : 40.0;
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final spice in CenturySpice.values) ...[
-            if (spice.index > 0)
-              Padding(
-                padding: EdgeInsets.only(top: cube * 0.3),
-                child: Icon(
-                  Icons.arrow_forward_rounded,
-                  size: compact ? 16 : 20,
-                  color: centuryMuted,
-                ),
-              ),
-            Expanded(
-              child: Column(
-                key: ValueKey('century-setup-spice-${spice.name}'),
-                children: [
-                  SpiceCube(spice: spice, size: cube),
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.t('century.spice.${spice.name}'),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: centuryInk,
-                      fontWeight: FontWeight.w800,
-                      fontSize: compact ? 12 : 14,
-                    ),
-                  ),
-                  Text(
-                    l10n.t('century.colour.${spice.name}'),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: centuryMuted,
-                      fontWeight: FontWeight.w600,
-                      fontSize: compact ? 11 : 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );

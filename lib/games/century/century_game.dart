@@ -34,6 +34,15 @@ class CenturySpiceRoadGame extends BoardGame {
   @override
   String get l10nPrefix => 'game.century';
 
+  /// Every Century game shares one home page banner.
+  static const seriesIdValue = 'century';
+
+  @override
+  String? get seriesId => seriesIdValue;
+
+  @override
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.4, 1, 1);
+
   @override
   String get description =>
       'Lead a caravan along the Spice Road: play merchant cards to gather, '

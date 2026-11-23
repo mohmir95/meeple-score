@@ -43,7 +43,10 @@ void main() {
 
     // Starts on the first game: one shared hand of cards 1–8.
     expect(find.byKey(const ValueKey('shelfie-chars-hand-0')), findsNothing);
-    expect(find.byKey(const ValueKey('shelfie-chars-hand-all')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('shelfie-chars-hand-all')),
+      findsOneWidget,
+    );
     expect(find.text('All players'), findsOneWidget);
     expect(find.text('1. Bad Lender'), findsOneWidget);
     expect(find.text('8. Shelfie Snapper'), findsOneWidget);

@@ -63,7 +63,6 @@ void main() {
       await pumpWithL10n(tester, const CenturySetupHintsScreen());
       expect(_in('century-setup-gold', '× 8'), findsOneWidget);
       expect(_in('century-setup-silver', '× 8'), findsOneWidget);
-      expect(_in('century-setup-starting-cards', '8'), findsOneWidget);
       expect(find.text('2 starting cards back to the box'), findsOneWidget);
       expect(find.text('Caravans & First Player'), findsNothing);
 

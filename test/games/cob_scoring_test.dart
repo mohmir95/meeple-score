@@ -47,10 +47,7 @@ void main() {
   });
 
   test('negative points are stored as zero', () {
-    expect(
-      const CobPlayerLine().copyWith(victoryPoints: -4).victoryPoints,
-      0,
-    );
+    expect(const CobPlayerLine().copyWith(victoryPoints: -4).victoryPoints, 0);
   });
 
   test('round-trips state through JSON', () {

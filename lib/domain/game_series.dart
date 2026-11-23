@@ -22,7 +22,13 @@ class GameSeries {
     accentColor: Color(0xFF6B4F2A),
   );
 
-  static const all = [greatWesternTrail];
+  static const century = GameSeries(
+    id: 'century',
+    titleKey: 'game.century.series',
+    accentColor: Color(0xFF6A2C4E),
+  );
+
+  static const all = [greatWesternTrail, century];
 
   static GameSeries? byId(String? id) {
     for (final series in all) {

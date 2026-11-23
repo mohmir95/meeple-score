@@ -62,10 +62,9 @@ void main() {
     };
     expect(ShelfieScoring.tiedByTotal(game(lines)), [blue, green]);
     expect(ShelfieScoring.winners(game(lines)), [blue, green]);
-    expect(
-      ShelfieScoring.winners(game(lines, lowestCardPlayerId: 'green')),
-      [green],
-    );
+    expect(ShelfieScoring.winners(game(lines, lowestCardPlayerId: 'green')), [
+      green,
+    ]);
     expect(
       ShelfieScoring.winners(
         game(lines, lowestCardPlayerId: ShelfieState.sharedVictory),

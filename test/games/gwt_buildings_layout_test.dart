@@ -37,49 +37,56 @@ void main() {
     final thirteenth = base.withThirteenthBuilding(true, Random(3));
 
     expect(thirteenth.sides, hasLength(11));
-    expect(thirteenth.visibleNumbers, [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13,
-    ]);
+    expect(thirteenth.visibleNumbers, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13]);
     expect(thirteenth.includesThirteenthBuilding, isTrue);
     expect(thirteenth.includesRailsToTheNorth, isFalse);
     expect(thirteenth.sides.sublist(0, 10), base.sides);
 
     final both = thirteenth.withRailsToTheNorth(true, Random(4));
-    expect(both.visibleNumbers, [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-    ]);
+    expect(both.visibleNumbers, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
     expect(both.sideOf(13), thirteenth.sideOf(13));
-    expect(both.withRailsToTheNorth(false).visibleNumbers, thirteenth.visibleNumbers);
+    expect(
+      both.withRailsToTheNorth(false).visibleNumbers,
+      thirteenth.visibleNumbers,
+    );
   });
 
   test('Second Edition Rails to the North adds building 13', () {
-    final base = GwtBuildingsLayout.random(
-      random: Random(7),
-      baseCount: 12,
-    );
+    final base = GwtBuildingsLayout.random(random: Random(7), baseCount: 12);
     expect(base.sides, hasLength(12));
-    expect(base.visibleNumbers, [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-    ]);
+    expect(base.visibleNumbers, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 
     final expanded = base.withRailsToTheNorth(true, Random(8));
     expect(expanded.includesRailsToTheNorth, isTrue);
     expect(expanded.includesThirteenthBuilding, isFalse);
     expect(expanded.sides, hasLength(13));
     expect(expanded.visibleNumbers, [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
     ]);
     expect(expanded.sides.sublist(0, 12), base.sides);
-    expect(expanded.withRailsToTheNorth(false).visibleNumbers, base.visibleNumbers);
+    expect(
+      expanded.withRailsToTheNorth(false).visibleNumbers,
+      base.visibleNumbers,
+    );
     expect(
       GwtBuildingsLayout.random(
         random: Random(9),
         baseCount: 12,
         railsToTheNorth: true,
       ).visibleNumbers,
-      [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-      ],
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
     );
   });
 }

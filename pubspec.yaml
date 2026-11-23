@@ -87,6 +87,7 @@ flutter:
     - assets/games/alchemists/cover.png
     - assets/games/alchemists/logic/
     - assets/games/century_spice_road/cover.webp
+    - assets/games/century_eastern_wonders/cover.webp
     - assets/games/shelfie_stacker/boxes/
     - assets/games/shelfie_stacker/characters/
     - assets/games/castles_of_burgundy/quick_reference_en_front.png
