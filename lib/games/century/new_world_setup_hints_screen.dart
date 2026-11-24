@@ -11,24 +11,14 @@ const _exploration = Color(0xFF8A6A3E);
 
 /// The A New World rulebook's Game Setup steps, with the changes for the
 /// player count.
-class NewWorldSetupHintsScreen extends StatefulWidget {
+class NewWorldSetupHintsScreen extends StatelessWidget {
   const NewWorldSetupHintsScreen({super.key});
-
-  @override
-  State<NewWorldSetupHintsScreen> createState() =>
-      _NewWorldSetupHintsScreenState();
-}
-
-class _NewWorldSetupHintsScreenState extends State<NewWorldSetupHintsScreen> {
-  var _players = 4;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
     final card = compact ? 40.0 : 56.0;
-    final marks = NewWorldRules.pointCardMarksRemoved(_players);
-    final onTwoThree = NewWorldRules.explorationOnTwoThree(_players);
     final onIcons =
         NewWorldRules.explorationTiles - NewWorldRules.explorationExtra;
 
@@ -36,11 +26,6 @@ class _NewWorldSetupHintsScreenState extends State<NewWorldSetupHintsScreen> {
       titleKey: 'hub.setupHints',
       style: CenturyStyleData.newWorld,
       children: [
-        CenturyPlayerPicker(
-          players: _players,
-          counts: NewWorldRules.playerCounts,
-          onChanged: (n) => setState(() => _players = n),
-        ),
         CenturyPanel(
           key: const ValueKey('nw-setup-board'),
           title: l10n.t('centuryNw.setup.boardTitle'),
@@ -64,22 +49,24 @@ class _NewWorldSetupHintsScreenState extends State<NewWorldSetupHintsScreen> {
           title: l10n.t('centuryNw.setup.pointsTitle'),
           body: l10n.t('centuryNw.setup.pointsBody'),
           children: [
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                CenturyBadge(
-                  key: const ValueKey('nw-setup-remove-star'),
-                  text: l10n.t('centuryNw.setup.removeStar'),
-                  error: true,
+            Center(
+              child: CenturyBadge(
+                key: const ValueKey('nw-setup-remove-star'),
+                icon: Icons.star_rounded,
+                text: l10n.t('centuryNw.setup.removeStar'),
+                error: true,
+              ),
+            ),
+            SizedBox(height: compact ? 8 : 12),
+            CenturyCountTable(
+              key: const ValueKey('nw-setup-remove-marks'),
+              counts: NewWorldRules.playerCounts,
+              rows: [
+                CenturyCountRow(
+                  label: l10n.t('centuryNw.setup.removeMarksRow'),
+                  value: (n) =>
+                      NewWorldRules.pointCardMarksRemoved(n).join(', '),
                 ),
-                for (final mark in marks)
-                  CenturyBadge(
-                    key: ValueKey('nw-setup-remove-$mark'),
-                    text: l10n.t('centuryNw.setup.removeMark', {'mark': mark}),
-                    error: true,
-                  ),
               ],
             ),
             SizedBox(height: compact ? 12 : 16),
@@ -115,16 +102,9 @@ class _NewWorldSetupHintsScreenState extends State<NewWorldSetupHintsScreen> {
           title: l10n.t('centuryNw.setup.bonusTitle'),
           body: l10n.t('centuryNw.setup.bonusBody', {
             'n': '${NewWorldRules.bonusTilesInPlay}',
+            'icons': l10n.t('centuryNw.setup.bonusIcons'),
           }),
-          children: [
-            Center(
-              child: CenturyBadge(
-                key: const ValueKey('nw-setup-bonus-remove'),
-                text: l10n.t('centuryNw.setup.bonusRemove'),
-                error: true,
-              ),
-            ),
-          ],
+          children: const [],
         ),
         CenturyPanel(
           key: const ValueKey('nw-setup-exploration'),
@@ -133,23 +113,32 @@ class _NewWorldSetupHintsScreenState extends State<NewWorldSetupHintsScreen> {
             'n': '${NewWorldRules.explorationTiles}',
           }),
           children: [
-            CenturyRow(
-              key: const ValueKey('nw-setup-exploration-icons'),
-              lead: _ExplorationTile(size: compact ? 24 : 28),
-              label: l10n.t('centuryNw.setup.explorationIcons'),
-              value: '$onIcons',
-            ),
-            CenturyRow(
-              key: const ValueKey('nw-setup-exploration-23'),
-              lead: _ExplorationTile(size: compact ? 24 : 28, label: '2-3'),
-              label: l10n.t('centuryNw.setup.explorationTwoThree'),
-              hint: l10n.t(
-                onTwoThree > 0
-                    ? 'centuryNw.setup.explorationTwoThreeHint'
-                    : 'centuryNw.setup.explorationFourHint',
-              ),
-              value: '$onTwoThree',
-              highlight: true,
+            CenturyCountTable(
+              key: const ValueKey('nw-setup-exploration-table'),
+              counts: NewWorldRules.playerCounts,
+              rows: [
+                CenturyCountRow(
+                  lead: _ExplorationTile(size: compact ? 24 : 28),
+                  label: l10n.t('centuryNw.setup.explorationIcons'),
+                  value: (_) => onIcons,
+                ),
+                CenturyCountRow(
+                  lead: _ExplorationTile(size: compact ? 24 : 28, label: '2-3'),
+                  label: l10n.t('centuryNw.setup.explorationTwoThree'),
+                  value: NewWorldRules.explorationOnTwoThree,
+                ),
+                CenturyCountRow(
+                  lead: Icon(
+                    Icons.inventory_2_outlined,
+                    color: centuryMuted,
+                    size: compact ? 18 : 20,
+                  ),
+                  label: l10n.t('century.setup.toBoxShort'),
+                  value: (n) =>
+                      NewWorldRules.explorationExtra -
+                      NewWorldRules.explorationOnTwoThree(n),
+                ),
+              ],
             ),
           ],
         ),

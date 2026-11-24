@@ -6,19 +6,11 @@ import 'century_rules.dart';
 import 'century_widgets.dart';
 
 /// The rulebook's Game Setup steps, with the numbers for the player count.
-class CenturySetupHintsScreen extends StatefulWidget {
+class CenturySetupHintsScreen extends StatelessWidget {
   const CenturySetupHintsScreen({super.key});
 
-  @override
-  State<CenturySetupHintsScreen> createState() =>
-      _CenturySetupHintsScreenState();
-}
-
-class _CenturySetupHintsScreenState extends State<CenturySetupHintsScreen> {
   /// Point values on the rulebook's setup picture, for flavour.
   static const _samplePoints = [11, 15, 12, 9, 14];
-
-  var _players = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -26,22 +18,15 @@ class _CenturySetupHintsScreenState extends State<CenturySetupHintsScreen> {
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
     final cardWidth = compact ? 40.0 : 56.0;
     final spacing = compact ? 6.0 : 10.0;
-    final coins = CenturyRules.coinsPerPile(_players);
-    final toBox = CenturyRules.startingCardsToBox(_players);
 
     return CenturyPage(
       titleKey: 'hub.setupHints',
       children: [
-        CenturyPlayerPicker(
-          players: _players,
-          onChanged: (n) => setState(() => _players = n),
-        ),
         CenturyPanel(
           key: const ValueKey('century-setup-points'),
           title: l10n.t('century.setup.pointsTitle'),
           body: l10n.t('century.setup.pointsBody', {
             'cards': '${CenturyRules.faceUpPointCards}',
-            'n': '$coins',
           }),
           children: [
             _Table(
@@ -54,13 +39,14 @@ class _CenturySetupHintsScreenState extends State<CenturySetupHintsScreen> {
                       SizedBox(
                         height: cardWidth,
                         child: i < 2
-                            ? _CoinPile(
-                                key: ValueKey(
-                                  'century-setup-${i == 0 ? 'gold' : 'silver'}',
+                            ? Center(
+                                child: CenturyCoin(
+                                  key: ValueKey(
+                                    'century-setup-${i == 0 ? 'gold' : 'silver'}',
+                                  ),
+                                  gold: i == 0,
+                                  size: cardWidth * 0.6,
                                 ),
-                                gold: i == 0,
-                                count: coins,
-                                size: cardWidth * 0.6,
                               )
                             : null,
                       ),
@@ -77,6 +63,17 @@ class _CenturySetupHintsScreenState extends State<CenturySetupHintsScreen> {
                   color: centuryPointBack,
                   width: cardWidth,
                   deck: true,
+                ),
+              ],
+            ),
+            SizedBox(height: compact ? 12 : 16),
+            CenturyCountTable(
+              key: const ValueKey('century-setup-coins'),
+              rows: [
+                CenturyCountRow(
+                  lead: CenturyCoin(gold: true, size: compact ? 20 : 24),
+                  label: l10n.t('century.setup.coinsRow'),
+                  value: CenturyRules.coinsPerPile,
                 ),
               ],
             ),
@@ -105,16 +102,20 @@ class _CenturySetupHintsScreenState extends State<CenturySetupHintsScreen> {
                 ),
               ],
             ),
-            if (toBox > 0) ...[
-              SizedBox(height: compact ? 12 : 16),
-              Center(
-                child: CenturyBadge(
-                  key: const ValueKey('century-setup-to-box'),
-                  text: l10n.t('century.setup.toBox', {'n': '$toBox'}),
-                  error: true,
+            SizedBox(height: compact ? 12 : 16),
+            CenturyCountTable(
+              key: const ValueKey('century-setup-to-box'),
+              rows: [
+                CenturyCountRow(
+                  lead: CenturyCard(
+                    color: centuryMerchantBack,
+                    width: compact ? 16 : 20,
+                  ),
+                  label: l10n.t('century.setup.toBoxRow'),
+                  value: CenturyRules.startingCardsToBox,
                 ),
-              ),
-            ],
+              ],
+            ),
           ],
         ),
         CenturyPanel(
@@ -156,41 +157,6 @@ class _Table extends StatelessWidget {
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _CoinPile extends StatelessWidget {
-  const _CoinPile({
-    super.key,
-    required this.gold,
-    required this.count,
-    required this.size,
-  });
-
-  final bool gold;
-  final int count;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CenturyCoin(gold: gold, size: size),
-          Text(
-            '× $count',
-            style: TextStyle(
-              color: centuryInk,
-              fontWeight: FontWeight.w900,
-              fontSize: size * 0.45,
-              height: 1.3,
-            ),
-          ),
-        ],
       ),
     );
   }

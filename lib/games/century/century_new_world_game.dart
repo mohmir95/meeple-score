@@ -7,7 +7,9 @@ import '../../domain/models/game_state.dart';
 import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
+import 'century_rules.dart';
 import 'century_game.dart';
+import 'new_world_how_to_play_screen.dart';
 import 'new_world_scoring_hints_screen.dart';
 import 'new_world_setup_hints_screen.dart';
 import 'new_world_starting_resources_screen.dart';
@@ -39,7 +41,11 @@ class CenturyNewWorldGame extends BoardGame {
   String? get seriesId => CenturySpiceRoadGame.seriesIdValue;
 
   @override
-  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.45, 1, 1);
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0.15, 0.42, 0.55, 1);
+
+  /// The cover is 414×600.
+  @override
+  double get coverAspectRatio => 414 / 600;
 
   @override
   String get description =>
@@ -75,6 +81,18 @@ class CenturyNewWorldGame extends BoardGame {
 
   @override
   bool get showScoresheet => false;
+
+  @override
+  List<String>? get hubTileOrder => centuryHubTileOrder;
+
+  @override
+  Widget? buildGuide() => const NewWorldHowToPlayScreen();
+
+  @override
+  String get guideTitleKey => 'hub.howToPlay';
+
+  @override
+  IconData get guideIcon => Icons.menu_book_outlined;
 
   @override
   bool get showSetupHints => true;

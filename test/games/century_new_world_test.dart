@@ -49,23 +49,25 @@ void main() {
 
       await pumpWithL10n(tester, const NewWorldSetupHintsScreen());
       expect(find.text('2 location boards back to the box'), findsOneWidget);
+      expect(find.byKey(const ValueKey('century-players')), findsNothing);
       expect(find.text('Cards with a white star'), findsOneWidget);
-      expect(find.text('Cards marked =4'), findsNothing);
-      expect(_in('nw-setup-exploration-icons', '8'), findsOneWidget);
-      expect(_in('nw-setup-exploration-23', '0'), findsOneWidget);
+      expect(
+        find.textContaining(
+          'showing I or III at their bottom',
+          findRichText: true,
+        ),
+        findsOneWidget,
+      );
+      expect(_in('nw-setup-remove-marks', '3+, =4'), findsOneWidget);
+      expect(_in('nw-setup-remove-marks', '=4'), findsOneWidget);
+      expect(_in('nw-setup-remove-marks', '–'), findsOneWidget);
+      expect(_in('nw-setup-exploration-table', '8'), findsNWidgets(3));
+      // 2-3 locations: 2, 2, none; to the box: none, none, 2; plus the
+      // 2-player header.
+      expect(_in('nw-setup-exploration-table', '2'), findsNWidgets(4));
+      expect(_in('nw-setup-exploration-table', '–'), findsNWidgets(3));
       expect(find.text('Corn'), findsOneWidget);
       expect(find.text('Fur'), findsOneWidget);
-
-      await tester.tap(find.text('3 players'));
-      await pumpFor(tester);
-      expect(find.text('Cards marked =4'), findsOneWidget);
-      expect(find.text('Cards marked 3+'), findsNothing);
-      expect(_in('nw-setup-exploration-23', '2'), findsOneWidget);
-
-      await tester.tap(find.text('2 players'));
-      await pumpFor(tester);
-      expect(find.text('Cards marked 3+'), findsOneWidget);
-      expect(find.text('Cards marked =4'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -78,12 +80,14 @@ void main() {
 
       await pumpWithL10n(tester, const NewWorldStartingResourcesScreen());
       expect(find.byKey(const ValueKey('century-players')), findsNothing);
-      expect(_in('nw-start-settlers-board', '6'), findsOneWidget);
+      // On the board: 7, 6, 6. In reserve: 5, 6, 6.
+      expect(_in('nw-start-settlers', '7'), findsOneWidget);
+      expect(_in('nw-start-settlers', '5'), findsOneWidget);
+      expect(_in('nw-start-settlers', '6'), findsNWidgets(4));
       expect(
-        _in('nw-start-settlers-board', '7 in a 2-player game'),
+        _in('nw-start-settlers', 'Left of your board, not available yet'),
         findsOneWidget,
       );
-      expect(_in('nw-start-settlers-reserve', '6'), findsOneWidget);
       expect(_in('nw-start-seat-1', '3 Yellow'), findsOneWidget);
       expect(_in('nw-start-seat-4', '3 Yellow + 1 Red'), findsOneWidget);
       expect(find.byKey(const ValueKey('nw-start-seat-5')), findsNothing);
@@ -99,6 +103,10 @@ void main() {
 
       await pumpWithL10n(tester, const NewWorldScoringHintsScreen());
       expect(_in('nw-score-end-row', '8th Point card'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('nw-score-bonus-merchants')),
+        findsNothing,
+      );
       expect(_in('nw-score-bonus-pair', '3'), findsNWidgets(2));
       expect(
         tester.getTopLeft(find.text('Game End')).dy,

@@ -95,19 +95,21 @@ class GameCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if (showEdition) ...[
-                                  Text(
-                                    context.l10n.tOr(
-                                      '${game.l10nPrefix}.series',
-                                      '${game.l10nPrefix}.name',
+                                  if (game.showSeriesOnCard) ...[
+                                    Text(
+                                      context.l10n.tOr(
+                                        '${game.l10nPrefix}.series',
+                                        '${game.l10nPrefix}.name',
+                                      ),
+                                      style: seriesStyle?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1.15,
+                                        shadows: BannerStyle.titleShadows,
+                                      ),
                                     ),
-                                    style: seriesStyle?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w800,
-                                      height: 1.15,
-                                      shadows: BannerStyle.titleShadows,
-                                    ),
-                                  ),
-                                  SizedBox(height: compact ? 2 : 4),
+                                    SizedBox(height: compact ? 2 : 4),
+                                  ],
                                   Text(
                                     context.l10n.t(
                                       '${game.l10nPrefix}.edition',

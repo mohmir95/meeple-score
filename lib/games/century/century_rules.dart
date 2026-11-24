@@ -49,3 +49,11 @@ class CenturyRules {
     _ => const {CenturySpice.turmeric: 3, CenturySpice.saffron: 1},
   };
 }
+
+/// Hub tiles of every Century game, in reading order.
+const centuryHubTileOrder = [
+  'hub-setup-hints',
+  'hub-starting-resources',
+  'hub-guide',
+  'hub-scoring-hints',
+];

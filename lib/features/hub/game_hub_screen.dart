@@ -107,7 +107,7 @@ class GameHubScreen extends StatelessWidget {
               _HubBanner(
                 key: const ValueKey('hub-guide'),
                 title: l10n.t(game.guideTitleKey),
-                icon: Icons.workspace_premium_outlined,
+                icon: game.guideIcon,
                 color: game.accentColor,
                 compact: compact,
                 onTap: () {
@@ -327,6 +327,7 @@ class GameHubScreen extends StatelessWidget {
                       },
               ),
           ];
+          _applyTileOrder(tiles, game.hubTileOrder);
 
           final grid = LayoutBuilder(
             builder: (context, gridConstraints) {
@@ -359,6 +360,28 @@ class GameHubScreen extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+/// Rearranges the tiles named in [order] (by their `hub-…` key suffix) into
+/// that order, within the places they already take. Other tiles stay put.
+void _applyTileOrder(List<Widget> tiles, List<String>? order) {
+  if (order == null) {
+    return;
+  }
+  int rank(Widget tile) {
+    final key = tile.key;
+    return key is ValueKey<String> ? order.indexOf(key.value) : -1;
+  }
+
+  final slots = [
+    for (var i = 0; i < tiles.length; i++)
+      if (rank(tiles[i]) >= 0) i,
+  ];
+  final ordered = [for (final i in slots) tiles[i]]
+    ..sort((a, b) => rank(a).compareTo(rank(b)));
+  for (var i = 0; i < slots.length; i++) {
+    tiles[slots[i]] = ordered[i];
   }
 }
 

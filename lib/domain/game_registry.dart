@@ -1,9 +1,13 @@
 import 'board_game.dart';
 import '../games/alchemists/alchemists_game.dart';
 import '../games/castles_of_burgundy/cob_game.dart';
+import '../games/century/century_east_to_west_all_game.dart';
+import '../games/century/century_east_to_west_ew_game.dart';
+import '../games/century/century_east_to_west_game.dart';
 import '../games/century/century_eastern_wonders_game.dart';
 import '../games/century/century_game.dart';
 import '../games/century/century_new_world_game.dart';
+import '../games/century/century_sand_to_sea_game.dart';
 import '../games/great_western_trail/gwt_2e_game.dart';
 import '../games/great_western_trail/gwt_argentina_game.dart';
 import '../games/great_western_trail/gwt_el_paso_game.dart';
@@ -26,16 +30,21 @@ class GameRegistry {
               GreatWesternTrailArgentinaGame(),
               GreatWesternTrailNewZealandGame(),
               GreatWesternTrailElPasoGame(),
+              CenturySpiceRoadGame(),
+              CenturyEasternWondersGame(),
+              CenturyNewWorldGame(),
+              // The combination games come after the three standalones.
+              CenturySandToSeaGame(),
+              CenturyEastToWestGame(),
+              CenturyEastToWestEwGame(),
+              CenturyEastToWestAllGame(),
               LostRuinsOfArnakGame(),
               CastlesOfBurgundySpecialEditionGame(),
               ShelfieStackerGame(),
               TuringMachineGame(),
+              AlchemistsGame(),
               SplendorGame(),
               ProjectLGame(),
-              AlchemistsGame(),
-              CenturySpiceRoadGame(),
-              CenturyEasternWondersGame(),
-              CenturyNewWorldGame(),
             ],
       );
 

@@ -26,6 +26,14 @@ abstract class BoardGame {
 
   String get l10nPrefix => 'game.$id';
 
+  /// Hub tile keys (e.g. 'hub-setup-hints') in the order this game wants
+  /// them. Null keeps the hub's default order.
+  List<String>? get hubTileOrder => null;
+
+  /// False drops the white series name above the edition on the game's card,
+  /// for editions whose name already says what they are.
+  bool get showSeriesOnCard => true;
+
   /// Editions of one game share a series and a single home page banner.
   String? get seriesId => null;
 
@@ -47,6 +55,10 @@ abstract class BoardGame {
 
   /// Optional box art shown on the home screen.
   String? get coverImageAsset => null;
+
+  /// The cover image's width divided by its height. Series banners lay the
+  /// cover out at this shape, so [seriesCoverArt] picks exactly that area.
+  double get coverAspectRatio => 1;
 
   /// The artwork part of the cover as 0–1 fractions, without the title.
   /// Series banners zoom their narrow strip into it. Null shows the whole
@@ -135,6 +147,8 @@ abstract class BoardGame {
   Widget? buildGuide() => null;
 
   String get guideTitleKey => 'hub.guide';
+
+  IconData get guideIcon => Icons.workspace_premium_outlined;
 
   /// Website with more puzzles or play aids. Null hides the hub tile.
   String? get onlineUrl => null;

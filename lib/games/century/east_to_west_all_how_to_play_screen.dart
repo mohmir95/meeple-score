@@ -1,0 +1,190 @@
+import 'package:flutter/material.dart';
+
+import '../../l10n/l10n_scope.dart';
+import 'century_east_to_west_all_rules.dart';
+import 'century_widgets.dart';
+import 'new_world_how_to_play_screen.dart';
+
+/// The From East to West (Spice Road + Eastern Wonders + A New World) rulebook's Taking a Turn
+/// section. Rules shared with the two-game versions reuse their text.
+class EastToWestAllHowToPlayScreen extends StatelessWidget {
+  const EastToWestAllHowToPlayScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    String t(String key, [Map<String, String> args = const {}]) =>
+        l10n.t('centuryEtwAll.play.$key', args);
+    // The Spice Road + A New World and Eastern Wonders + A New World texts.
+    String sr(String key, [Map<String, String> args = const {}]) =>
+        l10n.t('centuryEtw.play.$key', args);
+    String ew(String key, [Map<String, String> args = const {}]) =>
+        l10n.t('centuryEtwEw.play.$key', args);
+
+    return CenturyPage(
+      titleKey: 'hub.howToPlay',
+      style: CenturyStyleData.eastToWestAll,
+      children: [
+        CenturyPanel(
+          key: const ValueKey('etwall-play-different'),
+          title: ew('differentTitle'),
+          children: [
+            CenturyPoint(icon: Icons.layers_outlined, text: t('different.all')),
+            CenturyPoint(
+              icon: Icons.style_outlined,
+              text: t('different.noRoute'),
+            ),
+            CenturyPoint(
+              icon: Icons.workspace_premium_outlined,
+              text: t('different.bonus', {
+                'n': '${EastToWestAllRules.merchantCardsPerBonus}',
+                'spaces': '${EastToWestAllRules.bonusSpaces}',
+              }),
+            ),
+            CenturyPoint(
+              icon: Icons.fort_outlined,
+              text: ew('outpostTrade.forts'),
+            ),
+          ],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-turn'),
+          title: sr('turnTitle'),
+          body: ew('turnBody'),
+          children: [
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                CenturyActionChip(text: sr('work.title')),
+                CenturyActionChip(text: sr('rest.title')),
+              ],
+            ),
+          ],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-work'),
+          title: sr('work.title'),
+          body: sr('work.body'),
+          children: [
+            CenturyCollapsible(
+              key: const ValueKey('nw-locations-collapsible'),
+              title: t('work.note'),
+              children: [NewWorldLocationList(fortBonus: false)],
+            ),
+          ],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-market'),
+          title: sr('market.title'),
+          body: t('market.body'),
+          children: [
+            CenturyNote(text: sr('market.refill')),
+            const SizedBox(height: 8),
+            CenturyNote(
+              icon: Icons.workspace_premium_outlined,
+              text: t('market.bonus', {
+                'n': '${EastToWestAllRules.merchantCardsPerBonus}',
+                'spaces': '${EastToWestAllRules.bonusSpaces}',
+              }),
+            ),
+          ],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-refresh'),
+          title: sr('refresh.title'),
+          body: sr('refresh.body', {
+            'n': '${EastToWestAllRules.marketLocations}',
+          }),
+          children: const [],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-cards'),
+          title: sr('cards.title'),
+          children: [
+            CenturyPoint(
+              icon: Icons.add_box_outlined,
+              title: sr('cards.spiceTitle'),
+              text: sr('cards.spice'),
+            ),
+            CenturyPoint(
+              icon: Icons.upgrade_rounded,
+              title: sr('cards.upgradeTitle'),
+              text: sr('cards.upgrade'),
+            ),
+            CenturyPoint(
+              icon: Icons.swap_vert_rounded,
+              title: sr('cards.tradeTitle'),
+              text: sr('cards.trade'),
+            ),
+          ],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-move'),
+          title: ew('move.title'),
+          body: ew('move.body'),
+          children: [
+            CenturyPoint(icon: Icons.looks_one_outlined, text: ew('move.one')),
+            CenturyPoint(icon: Icons.looks_two_outlined, text: ew('move.two')),
+            CenturyPoint(icon: Icons.public_rounded, text: ew('move.any')),
+          ],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-after'),
+          title: ew('after.title'),
+          body: ew('after.body'),
+          children: [
+            CenturyPoint(
+              icon: Icons.payments_outlined,
+              title: ew('after.payTitle'),
+              text: ew('after.pay', {'n': '${EastToWestAllRules.visitCost}'}),
+            ),
+            CenturyPoint(
+              icon: Icons.house_outlined,
+              title: ew('after.buildTitle'),
+              text: ew('after.build', {
+                'n': '${EastToWestAllRules.outpostCostPerOutpost(3)}',
+                'two': '${EastToWestAllRules.outpostCostPerOutpost(2)}',
+              }),
+            ),
+            CenturyPoint(
+              icon: Icons.view_column_outlined,
+              title: ew('after.columnTitle'),
+              text: ew('after.column'),
+            ),
+            CenturyPoint(
+              icon: Icons.swap_vert_rounded,
+              title: ew('after.tradeTitle'),
+              text: ew('after.trade'),
+            ),
+          ],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-boat-trade'),
+          title: ew('boatTrade.title'),
+          body: ew('boatTrade.body'),
+          children: const [],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-outpost-trade'),
+          title: ew('outpostTrade.title'),
+          body: ew('outpostTrade.body'),
+          children: const [],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-rest'),
+          title: sr('rest.title'),
+          body: ew('rest.body'),
+          children: const [],
+        ),
+        CenturyPanel(
+          key: const ValueKey('etwall-play-storage'),
+          title: sr('storage.title'),
+          body: sr('storage.body', {'n': '${EastToWestAllRules.storageLimit}'}),
+          children: const [],
+        ),
+      ],
+    );
+  }
+}

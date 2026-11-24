@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
-import 'century_new_world_game.dart';
 import 'century_new_world_rules.dart';
+import 'century_east_to_west_ew_rules.dart';
+import 'century_east_to_west_rules.dart';
 import 'century_rules.dart';
 import 'century_widgets.dart';
 
@@ -13,7 +14,22 @@ const _exploration = Color(0xFF8A6A3E);
 /// The A New World rulebook's Game End rules and the overview sheet's Bonus
 /// tile scoring, gathered as scoring hints.
 class NewWorldScoringHintsScreen extends StatelessWidget {
-  const NewWorldScoringHintsScreen({super.key});
+  const NewWorldScoringHintsScreen({
+    super.key,
+    this.style = CenturyStyleData.newWorld,
+    this.merchantBonus = false,
+    this.outposts = false,
+  });
+
+  /// From East to West (Eastern Wonders + A New World): uncovered outpost spaces score, and
+  /// side B of the player board has 4 bonus spaces.
+  final bool outposts;
+
+  /// Also used by From East to West, which scores the same way.
+  final CenturyStyleData style;
+
+  /// Adds From East to West's bonus tile for Merchant cards.
+  final bool merchantBonus;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +61,7 @@ class NewWorldScoringHintsScreen extends StatelessWidget {
 
     return CenturyPage(
       titleKey: 'hub.scoringHints',
-      style: CenturyStyleData.newWorld,
+      style: style,
       children: [
         CenturyPanel(
           key: const ValueKey('nw-score-end'),
@@ -56,11 +72,7 @@ class NewWorldScoringHintsScreen extends StatelessWidget {
           children: [
             CenturyRow(
               key: const ValueKey('nw-score-end-row'),
-              lead: CenturyCard(
-                color: CenturyNewWorldGame.forest,
-                width: tile,
-                faceUp: true,
-              ),
+              lead: CenturyCard(color: style.accent, width: tile, faceUp: true),
               leadWidth: leadWidth,
               label: l10n.t('centuryEw.score.endPlayers'),
               value: l10n.t('centuryNw.score.endCard', {
@@ -81,11 +93,7 @@ class NewWorldScoringHintsScreen extends StatelessWidget {
           children: [
             CenturyRow(
               key: const ValueKey('nw-score-cards'),
-              lead: CenturyCard(
-                color: CenturyNewWorldGame.forest,
-                width: tile,
-                faceUp: true,
-              ),
+              lead: CenturyCard(color: style.accent, width: tile, faceUp: true),
               leadWidth: leadWidth,
               label: l10n.t('century.score.cards'),
               hint: l10n.t('century.score.cardsHint'),
@@ -97,10 +105,24 @@ class NewWorldScoringHintsScreen extends StatelessWidget {
               leadWidth: leadWidth,
               label: l10n.t('centuryNw.score.bonus'),
               hint: l10n.t('centuryNw.score.bonusHint', {
-                'n': '${NewWorldRules.bonusSpaces}',
+                'n':
+                    '${outposts ? EastToWestEwRules.bonusSpaces : NewWorldRules.bonusSpaces}',
               }),
               value: l10n.t('centuryNw.score.seeBelow'),
             ),
+            if (outposts)
+              CenturyRow(
+                key: const ValueKey('nw-score-outposts'),
+                lead: Icon(
+                  Icons.house_outlined,
+                  color: style.accent,
+                  size: tile,
+                ),
+                leadWidth: leadWidth,
+                label: l10n.t('centuryEtwEw.score.outposts'),
+                hint: l10n.t('centuryEtwEw.score.outpostsHint'),
+                value: l10n.t('century.score.printed'),
+              ),
             CenturyRow(
               key: const ValueKey('nw-score-exploration'),
               lead: Container(
@@ -187,6 +209,15 @@ class NewWorldScoringHintsScreen extends StatelessWidget {
               label: l10n.t('centuryNw.score.flat'),
               value: '${NewWorldRules.bonusFlat}',
             ),
+            if (merchantBonus)
+              CenturyRow(
+                key: const ValueKey('nw-score-bonus-merchants'),
+                lead: bonus('C'),
+                leadWidth: leadWidth,
+                label: l10n.t('centuryEtw.score.merchants'),
+                hint: l10n.t('centuryEtw.score.merchantsHint'),
+                value: '${EastToWestRules.merchantBonusVp}',
+              ),
             SizedBox(height: compact ? 10 : 12),
             CenturyNote(text: l10n.t('centuryNw.score.iconsNote')),
           ],

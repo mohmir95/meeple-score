@@ -26,6 +26,19 @@ class GameSeriesCard extends StatelessWidget {
   /// Set when one of the editions has a game in progress.
   final VoidCallback? onResume;
 
+  Widget _art() {
+    final shown = series.bannerGameIds;
+    if (shown == null) {
+      return GameSeriesArt(games: games);
+    }
+    // The banner editions, then a "…" strip showing them again, blurred.
+    final bannerGames = [
+      for (final game in games)
+        if (shown.contains(game.id)) game,
+    ];
+    return GameSeriesArt(games: bannerGames, moreGames: bannerGames);
+  }
+
   @override
   Widget build(BuildContext context) {
     final compact = Breakpoints.isCompact(context);
@@ -73,7 +86,7 @@ class GameSeriesCard extends StatelessWidget {
                                 label: title,
                                 image: true,
                                 excludeSemantics: true,
-                                child: GameSeriesArt(games: games),
+                                child: _art(),
                               ),
                               Positioned(
                                 left: inset,
@@ -82,7 +95,7 @@ class GameSeriesCard extends StatelessWidget {
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    // One line, shrinking on narrow cards.
+                                    // The title's own lines, shrinking on narrow cards.
                                     Expanded(
                                       child: FittedBox(
                                         fit: BoxFit.scaleDown,
@@ -90,7 +103,7 @@ class GameSeriesCard extends StatelessWidget {
                                             AlignmentDirectional.centerStart,
                                         child: Text(
                                           title,
-                                          maxLines: 1,
+                                          maxLines: 2,
                                           softWrap: false,
                                           style: titleStyle?.copyWith(
                                             color: BannerStyle.paleGold,
@@ -139,12 +152,19 @@ class GameSeriesCard extends StatelessWidget {
 /// The series art on its own: the edition covers as slanted strips with
 /// soft white seams, darkening toward the bottom for the title.
 class GameSeriesArt extends StatelessWidget {
-  const GameSeriesArt({super.key, required this.games});
+  const GameSeriesArt({super.key, required this.games, this.moreGames});
 
   final List<BoardGame> games;
 
+  /// Adds a last strip with "…" for editions not shown, over these covers
+  /// blurred. Null shows no such strip.
+  final List<BoardGame>? moreGames;
+
+  bool get more => moreGames != null;
+
   @override
   Widget build(BuildContext context) {
+    final count = games.length + (more ? 1 : 0);
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = constraints.biggest;
@@ -164,7 +184,15 @@ class GameSeriesArt extends StatelessWidget {
                       _Strip(
                         game: games[i],
                         index: i,
-                        count: games.length,
+                        count: count,
+                        size: size,
+                        skew: skew,
+                      ),
+                    if (more)
+                      _MoreStrip(
+                        games: moreGames!,
+                        index: games.length,
+                        count: count,
                         size: size,
                         skew: skew,
                       ),
@@ -187,7 +215,7 @@ class GameSeriesArt extends StatelessWidget {
               ),
               IgnorePointer(
                 child: CustomPaint(
-                  painter: _SeamsPainter(count: games.length, skew: skew),
+                  painter: _SeamsPainter(count: count, skew: skew),
                 ),
               ),
             ],
@@ -251,9 +279,102 @@ class _Strip extends StatelessWidget {
   }
 }
 
+/// The strips of [games] blurred until only their colours show, under a "…"
+/// that stands for the editions grouped behind them.
+class BlurredSeriesArt extends StatelessWidget {
+  const BlurredSeriesArt({super.key, required this.games});
+
+  final List<BoardGame> games;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Scales with the art, so a narrow strip and a full banner both lose
+        // every detail.
+        final sigma = constraints.biggest.longestSide * 0.1;
+        return ClipRect(
+          child: ImageFiltered(
+            imageFilter: ui.ImageFilter.blur(
+              sigmaX: sigma,
+              sigmaY: sigma,
+              tileMode: TileMode.clamp,
+            ),
+            child: GameSeriesArt(games: games),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// The last strip of a banner that shows only some editions: the banner's
+/// covers again, blurred, with "…" saying there are more.
+class _MoreStrip extends StatelessWidget {
+  const _MoreStrip({
+    required this.games,
+    required this.index,
+    required this.count,
+    required this.size,
+    required this.skew,
+  });
+
+  final List<BoardGame> games;
+  final int index;
+  final int count;
+  final Size size;
+  final double skew;
+
+  @override
+  Widget build(BuildContext context) {
+    final stripWidth = size.width / count;
+    final boxWidth = stripWidth + skew;
+    // The visible middle of the slanted strip, a little above centre so the
+    // title below stays clear.
+    final center = stripWidth * (index + 0.5) + skew * 0.1;
+    return Positioned.fill(
+      child: ClipPath(
+        clipper: _StripClipper(index: index, count: count, skew: skew),
+        child: ColoredBox(
+          color: const Color(0xFF1A0F08),
+          child: Stack(
+            children: [
+              Positioned(
+                left: stripWidth * (index + 0.5) - boxWidth / 2,
+                width: boxWidth,
+                top: 0,
+                bottom: 0,
+                child: BlurredSeriesArt(games: games),
+              ),
+              Positioned(
+                left: center - stripWidth / 2,
+                width: stripWidth,
+                top: 0,
+                bottom: size.height * 0.2,
+                child: Center(
+                  child: Text(
+                    '…',
+                    key: const ValueKey('home-series-more'),
+                    style: TextStyle(
+                      color: const Color(0xFFF8E5B0),
+                      fontWeight: FontWeight.w900,
+                      fontSize: stripWidth * 0.55,
+                      height: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// The cover zoomed so its [art] area fills the strip's height, leaving the
-/// title band outside the strip. Covers are square, so the image is laid out
-/// as a square.
+/// title band outside the strip. The cover is laid out at its own shape
+/// ([BoardGame.coverAspectRatio]), so the fractions in [art] are exact.
 class _ArtCrop extends StatelessWidget {
   const _ArtCrop({required this.game, required this.art});
 
@@ -264,15 +385,17 @@ class _ArtCrop extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, box) {
-        final side = box.maxHeight / art.height;
+        // The art fills the strip's height; the cover keeps its own shape.
+        final height = box.maxHeight / art.height;
+        final width = height * game.coverAspectRatio;
         return Stack(
           clipBehavior: Clip.hardEdge,
           children: [
             Positioned(
-              left: box.maxWidth / 2 - side * art.center.dx,
-              top: -side * art.top,
-              width: side,
-              height: side,
+              left: box.maxWidth / 2 - width * art.center.dx,
+              top: -height * art.top,
+              width: width,
+              height: height,
               child: GameCover(game: game),
             ),
           ],

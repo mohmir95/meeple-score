@@ -39,9 +39,10 @@ class GreatWesternTrailSecondEditionGame extends GwtEditionGame {
   @override
   String? get coverImageAsset => coverAsset;
 
-  /// Title band above and name band below the artwork.
+  /// Between the title band above and the name band below, centred on the
+  /// rider and cowboy on the left rather than the empty valley.
   @override
-  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.36, 1, 0.83);
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.34, 0.42, 0.83);
 
   @override
   GwtBuildingArtSet get buildingArtSet => GwtBuildingArtSet.secondEdition;

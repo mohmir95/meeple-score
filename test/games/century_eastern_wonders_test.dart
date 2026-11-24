@@ -1,9 +1,13 @@
 import 'package:board_game_score_sheet/domain/game_registry.dart';
 import 'package:board_game_score_sheet/domain/game_series.dart';
+import 'package:board_game_score_sheet/games/century/century_east_to_west_all_game.dart';
+import 'package:board_game_score_sheet/games/century/century_east_to_west_ew_game.dart';
+import 'package:board_game_score_sheet/games/century/century_east_to_west_game.dart';
 import 'package:board_game_score_sheet/games/century/century_eastern_wonders_game.dart';
 import 'package:board_game_score_sheet/games/century/century_eastern_wonders_rules.dart';
 import 'package:board_game_score_sheet/games/century/century_game.dart';
 import 'package:board_game_score_sheet/games/century/century_new_world_game.dart';
+import 'package:board_game_score_sheet/games/century/century_sand_to_sea_game.dart';
 import 'package:board_game_score_sheet/games/century/century_rules.dart';
 import 'package:board_game_score_sheet/games/century/eastern_wonders_scoring_hints_screen.dart';
 import 'package:board_game_score_sheet/games/century/eastern_wonders_setup_hints_screen.dart';
@@ -45,6 +49,10 @@ void main() {
       CenturySpiceRoadGame.idValue,
       CenturyEasternWondersGame.idValue,
       CenturyNewWorldGame.idValue,
+      CenturySandToSeaGame.idValue,
+      CenturyEastToWestGame.idValue,
+      CenturyEastToWestEwGame.idValue,
+      CenturyEastToWestAllGame.idValue,
     ]);
   });
 
@@ -58,6 +66,10 @@ void main() {
 
       await pumpWithL10n(tester, const EasternWondersSetupHintsScreen());
       expect(find.text('4 market tiles back to the box'), findsOneWidget);
+      // Columns of 4, 5, 6, 5 and 4 tiles.
+      expect(find.byKey(const ValueKey('ew-mini-map-columns')), findsOneWidget);
+      expect(find.text('Create Your Own Maps'), findsOneWidget);
+      expect(find.byKey(const ValueKey('ew-map-shapes')), findsOneWidget);
       expect(find.text('Top 6 of the pile'), findsOneWidget);
       expect(
         find.byKey(const ValueKey('ew-setup-closed-port')),

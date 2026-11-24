@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
 import '../../shared/widgets/app_page.dart';
+import 'century_east_to_west_all_game.dart';
+import 'century_east_to_west_ew_game.dart';
+import 'century_east_to_west_game.dart';
 import 'century_eastern_wonders_game.dart';
 import 'century_game.dart';
 import 'century_new_world_game.dart';
 import 'century_rules.dart';
+import 'century_sand_to_sea_game.dart';
 
 const centuryInk = Color(0xFF3A2430);
 const centuryMuted = Color(0xFF6B5560);
@@ -43,6 +47,39 @@ class CenturyStyleData {
     accent: CenturySpiceRoadGame.plum,
     dark: Color(0xFF4E1F3A),
     paper: Color(0xFFFBF3E8),
+  );
+
+  /// Deep green bands on parchment, like the From East to West rulebook.
+  static const eastToWest = CenturyStyleData(
+    coverAsset: CenturyEastToWestGame.coverAsset,
+    accent: CenturyEastToWestGame.green,
+    dark: Color(0xFF12301F),
+    paper: Color(0xFFF7F1E2),
+  );
+
+  /// Red bands on parchment, like the From East to West (Eastern Wonders + A New World)
+  /// rulebook.
+  static const eastToWestEw = CenturyStyleData(
+    coverAsset: CenturyEastToWestEwGame.coverAsset,
+    accent: CenturyEastToWestEwGame.maroon,
+    dark: Color(0xFF451412),
+    paper: Color(0xFFF7F1E2),
+  );
+
+  /// Deep blue bands on parchment, for the three-game combination.
+  static const eastToWestAll = CenturyStyleData(
+    coverAsset: CenturyEastToWestAllGame.coverAsset,
+    accent: CenturyEastToWestAllGame.navy,
+    dark: Color(0xFF172739),
+    paper: Color(0xFFF7F1E2),
+  );
+
+  /// Purple bands on pale sea green, like the From Sand to Sea rulebook.
+  static const sandToSea = CenturyStyleData(
+    coverAsset: CenturySandToSeaGame.coverAsset,
+    accent: CenturySandToSeaGame.purple,
+    dark: Color(0xFF3E1838),
+    paper: Color(0xFFEEF3EE),
   );
 
   /// Forest-green bands on parchment, like the A New World rulebook.
@@ -122,32 +159,155 @@ class CenturyPage extends StatelessWidget {
   }
 }
 
-class CenturyPlayerPicker extends StatelessWidget {
-  const CenturyPlayerPicker({
+/// One line of a [CenturyCountTable]: what is counted, and how many for
+/// each player count. A zero shows as a dash.
+class CenturyCountRow {
+  const CenturyCountRow({
+    required this.label,
+    required this.value,
+    this.lead,
+    this.hint,
+  });
+
+  final String label;
+
+  /// A smaller line under [label].
+  final String? hint;
+  final Object Function(int players) value;
+  final Widget? lead;
+}
+
+/// Setup numbers for every player count at once: a column per count.
+class CenturyCountTable extends StatelessWidget {
+  const CenturyCountTable({
     super.key,
-    required this.players,
-    required this.onChanged,
+    required this.rows,
     this.counts = CenturyRules.playerCounts,
   });
 
-  final int players;
-  final ValueChanged<int> onChanged;
+  final List<CenturyCountRow> rows;
   final List<int> counts;
 
   @override
   Widget build(BuildContext context) {
-    return SegmentedButton<int>(
-      key: const ValueKey('century-players'),
-      showSelectedIcon: false,
-      segments: [
-        for (final n in counts)
-          ButtonSegment(
-            value: n,
-            label: Text(context.l10n.t('century.players', {'n': '$n'})),
+    final style = CenturyStyle.of(context);
+    final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
+    final textTheme = Theme.of(context).textTheme;
+    final column = compact ? 44.0 : 60.0;
+    final pad = EdgeInsets.symmetric(vertical: compact ? 7 : 8);
+
+    Widget header(int n) => Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+          decoration: BoxDecoration(
+            color: style.accent,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.person, color: Colors.white, size: 13),
+              const SizedBox(width: 1),
+              Text(
+                '$n',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    Widget value(Object v) {
+      final none = v == 0 || v == '';
+      return Padding(
+        padding: pad,
+        child: Text(
+          none ? '–' : '$v',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: none ? centuryMuted : centuryInk,
+            fontWeight: FontWeight.w900,
+            fontSize: compact ? 15 : 17,
+          ),
+        ),
+      );
+    }
+
+    return Table(
+      key: const ValueKey('century-count-table'),
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      columnWidths: {
+        0: const FlexColumnWidth(),
+        for (var i = 0; i < counts.length; i++) i + 1: FixedColumnWidth(column),
+      },
+      border: TableBorder(
+        horizontalInside: BorderSide(
+          color: style.accent.withValues(alpha: 0.15),
+        ),
+      ),
+      children: [
+        TableRow(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                context.l10n.t('century.setup.playersHeader'),
+                style: textTheme.labelMedium?.copyWith(
+                  color: centuryMuted,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            for (final n in counts) header(n),
+          ],
+        ),
+        for (final row in rows)
+          TableRow(
+            children: [
+              Padding(
+                padding: pad,
+                child: Row(
+                  children: [
+                    if (row.lead != null) ...[
+                      row.lead!,
+                      SizedBox(width: compact ? 8 : 10),
+                    ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            row.label,
+                            style: textTheme.titleSmall?.copyWith(
+                              color: centuryInk,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          if (row.hint != null)
+                            Text(
+                              row.hint!,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: centuryMuted,
+                                height: 1.3,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              for (final n in counts) value(row.value(n)),
+            ],
           ),
       ],
-      selected: {players},
-      onSelectionChanged: (s) => onChanged(s.first),
     );
   }
 }
@@ -160,21 +320,33 @@ class CenturyPanel extends StatelessWidget {
     required this.title,
     required this.children,
     this.body,
+    this.optional = false,
   });
 
   final String title;
   final String? body;
   final List<Widget> children;
 
+  /// An optional step rather than an action: an outlined header in the
+  /// accent colour with an "Optional" tag, matching [CenturyActionChip].
+  final bool optional;
+
   @override
   Widget build(BuildContext context) {
     final style = CenturyStyle.of(context);
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
+    final titleStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
+      color: optional ? style.accent : _gold,
+      fontWeight: FontWeight.w800,
+    );
     return DecoratedBox(
       decoration: BoxDecoration(
         color: style.paper,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: style.accent.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: style.accent.withValues(alpha: optional ? 0.7 : 0.35),
+          width: optional ? 1.5 : 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: style.accent.withValues(alpha: 0.1),
@@ -187,24 +359,38 @@ class CenturyPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [style.dark, style.accent, style.dark],
-              ),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(17)),
-            ),
+            decoration: optional
+                ? BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: style.accent.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  )
+                : BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [style.dark, style.accent, style.dark],
+                    ),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(17),
+                    ),
+                  ),
             padding: EdgeInsets.symmetric(
               horizontal: compact ? 14 : 22,
               vertical: compact ? 10 : 12,
             ),
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: _gold,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
+            child: optional
+                ? Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    runSpacing: 4,
+                    children: [
+                      Text(title, style: titleStyle),
+                      CenturyOptionalTag(color: style.accent),
+                    ],
+                  )
+                : Text(title, textAlign: TextAlign.center, style: titleStyle),
           ),
           Padding(
             padding: EdgeInsets.all(compact ? 14 : 22),
@@ -212,8 +398,19 @@ class CenturyPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (body != null) ...[
-                  Text(
-                    body!,
+                  Text.rich(
+                    // `**text**` in a body is shown in bold.
+                    TextSpan(
+                      children: [
+                        for (final (i, part) in body!.split('**').indexed)
+                          TextSpan(
+                            text: part,
+                            style: i.isOdd
+                                ? const TextStyle(fontWeight: FontWeight.w800)
+                                : null,
+                          ),
+                      ],
+                    ),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: centuryInk,
@@ -324,6 +521,100 @@ class CenturyRow extends StatelessWidget {
             )
           else
             valueText,
+        ],
+      ),
+    );
+  }
+}
+
+/// A note-styled box that starts collapsed; tapping the header shows
+/// [children].
+class CenturyCollapsible extends StatefulWidget {
+  const CenturyCollapsible({
+    super.key,
+    required this.title,
+    required this.children,
+    this.icon,
+  });
+
+  final String title;
+  final IconData? icon;
+  final List<Widget> children;
+
+  @override
+  State<CenturyCollapsible> createState() => _CenturyCollapsibleState();
+}
+
+class _CenturyCollapsibleState extends State<CenturyCollapsible> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = CenturyStyle.of(context);
+    final radius = BorderRadius.circular(12);
+    return Container(
+      decoration: BoxDecoration(
+        color: style.accent.withValues(alpha: 0.07),
+        borderRadius: radius,
+        border: Border.all(color: style.accent.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              borderRadius: radius,
+              onTap: () => setState(() => _open = !_open),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      widget.icon ?? Icons.info_outline_rounded,
+                      size: 20,
+                      color: style.accent,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        widget.title,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: centuryMuted,
+                          fontWeight: FontWeight.w600,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    AnimatedRotation(
+                      turns: _open ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(
+                        Icons.expand_more_rounded,
+                        size: 22,
+                        color: style.accent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            alignment: Alignment.topCenter,
+            child: _open
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                    child: Column(children: widget.children),
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
         ],
       ),
     );
@@ -607,30 +898,61 @@ class CenturyCard extends StatelessWidget {
 
 /// A small badge such as "−4 to the box".
 class CenturyBadge extends StatelessWidget {
-  const CenturyBadge({super.key, required this.text, this.error = false});
+  const CenturyBadge({
+    super.key,
+    required this.text,
+    this.error = false,
+    this.icon,
+    this.iconColor = Colors.white,
+  });
 
   final String text;
   final bool error;
+
+  /// Drawn white on a dot of the badge colour, before the text.
+  final IconData? icon;
+
+  /// Colour of [icon]. Any colour but white sits on a white dot instead,
+  /// e.g. a black star.
+  final Color iconColor;
 
   @override
   Widget build(BuildContext context) {
     final style = CenturyStyle.of(context);
     final color = error ? Theme.of(context).colorScheme.error : style.accent;
+    final label = Text(
+      text,
+      style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 12),
+    );
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      padding: EdgeInsetsDirectional.fromSTEB(icon == null ? 10 : 4, 3, 10, 3),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w800,
-          fontSize: 12,
-        ),
-      ),
+      child: icon == null
+          ? label
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 18,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: iconColor == Colors.white ? color : Colors.white,
+                    shape: BoxShape.circle,
+                    border: iconColor == Colors.white
+                        ? null
+                        : Border.all(color: color, width: 1.5),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(icon, color: iconColor, size: 13),
+                ),
+                const SizedBox(width: 5),
+                Flexible(child: label),
+              ],
+            ),
     );
   }
 }
@@ -643,6 +965,7 @@ class HexTile extends StatelessWidget {
     required this.size,
     this.label,
     this.labelColor = Colors.white,
+    this.flatTop = false,
   });
 
   final Color color;
@@ -652,14 +975,22 @@ class HexTile extends StatelessWidget {
   final String? label;
   final Color labelColor;
 
+  /// Flat edges at top and bottom, so tiles stack in straight columns.
+  final bool flatTop;
+
+  /// Height of a tile of width [size].
+  static double heightFor(double size, {bool flatTop = false}) =>
+      size * (flatTop ? 0.866 : 1.1547);
+
   @override
   Widget build(BuildContext context) {
+    final height = heightFor(size, flatTop: flatTop);
     return CustomPaint(
-      size: Size(size, size * 1.1547),
-      painter: _HexPainter(color),
+      size: Size(size, height),
+      painter: _HexPainter(color, flatTop: flatTop),
       child: SizedBox(
         width: size,
-        height: size * 1.1547,
+        height: height,
         child: label == null
             ? null
             : Center(
@@ -679,21 +1010,31 @@ class HexTile extends StatelessWidget {
 }
 
 class _HexPainter extends CustomPainter {
-  const _HexPainter(this.color);
+  const _HexPainter(this.color, {this.flatTop = false});
 
   final Color color;
+  final bool flatTop;
 
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width, h = size.height;
-    final path = Path()
-      ..moveTo(w / 2, 0)
-      ..lineTo(w, h * 0.25)
-      ..lineTo(w, h * 0.75)
-      ..lineTo(w / 2, h)
-      ..lineTo(0, h * 0.75)
-      ..lineTo(0, h * 0.25)
-      ..close();
+    final path = flatTop
+        ? (Path()
+            ..moveTo(w * 0.25, 0)
+            ..lineTo(w * 0.75, 0)
+            ..lineTo(w, h / 2)
+            ..lineTo(w * 0.75, h)
+            ..lineTo(w * 0.25, h)
+            ..lineTo(0, h / 2)
+            ..close())
+        : (Path()
+            ..moveTo(w / 2, 0)
+            ..lineTo(w, h * 0.25)
+            ..lineTo(w, h * 0.75)
+            ..lineTo(w / 2, h)
+            ..lineTo(0, h * 0.75)
+            ..lineTo(0, h * 0.25)
+            ..close());
     canvas.drawShadow(path, Colors.black, 2, false);
     canvas.drawPath(
       path,
@@ -715,7 +1056,8 @@ class _HexPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_HexPainter old) => old.color != color;
+  bool shouldRepaint(_HexPainter old) =>
+      old.color != color || old.flatTop != flatTop;
 }
 
 /// The four spice colours in upgrade order, each with its name from
@@ -775,6 +1117,162 @@ class CenturySpiceOrder extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+/// An icon, an optional bold lead-in and a line of rules text.
+class CenturyPoint extends StatelessWidget {
+  const CenturyPoint({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.title,
+  });
+
+  final IconData icon;
+  final String? title;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
+    final style = Theme.of(
+      context,
+    ).textTheme.bodyMedium?.copyWith(color: centuryInk, height: 1.4);
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: compact ? 5 : 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 22, color: CenturyStyle.of(context).accent),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  if (title != null)
+                    TextSpan(
+                      text: '$title ',
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                  TextSpan(text: text),
+                ],
+              ),
+              style: style,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CenturyActionChip extends StatelessWidget {
+  const CenturyActionChip({
+    super.key,
+    required this.text,
+    this.optional = false,
+  });
+
+  final String text;
+
+  /// An optional step before the action: outlined instead of filled.
+  final bool optional;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = CenturyStyle.of(context).accent;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: optional ? 5 : 6),
+      decoration: BoxDecoration(
+        color: optional ? Colors.transparent : accent,
+        borderRadius: BorderRadius.circular(999),
+        border: optional ? Border.all(color: accent, width: 1.5) : null,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: optional ? accent : Colors.white,
+          fontWeight: FontWeight.w800,
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
+}
+
+/// A small "Optional" tag in the accent colour.
+class CenturyOptionalTag extends StatelessWidget {
+  const CenturyOptionalTag({super.key, required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.6)),
+      ),
+      child: Text(
+        context.l10n.t('century.optional'),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.w700,
+          fontSize: 11,
+        ),
+      ),
+    );
+  }
+}
+
+/// An optional step, an arrow, then the actions to choose from with thin
+/// dividers between them: "Move → Market | Port | Harvest".
+class CenturyTurnFlow extends StatelessWidget {
+  const CenturyTurnFlow({
+    super.key,
+    required this.optionalStep,
+    required this.actions,
+  });
+
+  final String optionalStep;
+  final List<String> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = CenturyStyle.of(context).accent;
+    final divider = Container(
+      width: 1.5,
+      height: 22,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      color: accent.withValues(alpha: 0.45),
+    );
+    return Wrap(
+      key: const ValueKey('century-turn-flow'),
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        CenturyActionChip(text: optionalStep, optional: true),
+        // Points the reading way, so it flips in Persian.
+        Icon(Icons.arrow_forward_rounded, color: accent, size: 22),
+        // The actions stay together on one line, shrinking on narrow phones.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < actions.length; i++) ...[
+                if (i > 0) divider,
+                CenturyActionChip(text: actions[i]),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

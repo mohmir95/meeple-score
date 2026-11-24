@@ -7,7 +7,9 @@ import '../../domain/models/game_state.dart';
 import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
+import 'century_rules.dart';
 import 'century_game.dart';
+import 'eastern_wonders_how_to_play_screen.dart';
 import 'eastern_wonders_scoring_hints_screen.dart';
 import 'eastern_wonders_setup_hints_screen.dart';
 import 'eastern_wonders_starting_resources_screen.dart';
@@ -39,7 +41,11 @@ class CenturyEasternWondersGame extends BoardGame {
   String? get seriesId => CenturySpiceRoadGame.seriesIdValue;
 
   @override
-  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.42, 1, 1);
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0.25, 0.45, 0.65, 1);
+
+  /// The cover is 624×900.
+  @override
+  double get coverAspectRatio => 624 / 900;
 
   @override
   String get description =>
@@ -75,6 +81,18 @@ class CenturyEasternWondersGame extends BoardGame {
 
   @override
   bool get showScoresheet => false;
+
+  @override
+  List<String>? get hubTileOrder => centuryHubTileOrder;
+
+  @override
+  Widget? buildGuide() => const EasternWondersHowToPlayScreen();
+
+  @override
+  String get guideTitleKey => 'hub.howToPlay';
+
+  @override
+  IconData get guideIcon => Icons.menu_book_outlined;
 
   @override
   bool get showSetupHints => true;

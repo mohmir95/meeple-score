@@ -39,16 +39,16 @@ jobs:
       - name: Test
         run: flutter test --concurrency=1
 
-  deploy:
+  # Builds the site and uploads it. Deploying happens in its own job below:
+  # a deploy in the same job as the upload sometimes can't see the artifact
+  # yet ("No artifacts named github-pages were found").
+  build:
     needs: verify
     # Pushes to main deploy; "Run workflow" on main redeploys without a commit.
     if: >-
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
       && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -81,16 +81,20 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v6
 
-      # Re-runs keep earlier attempts' artifacts, so each attempt uploads under
-      # its own name; otherwise deploy finds several "github-pages" and fails.
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: build/web
-          name: github-pages-${{ github.run_attempt }}
 
+  # If this job fails, use "Re-run failed jobs": it deploys the artifact the
+  # build job already uploaded. "Re-run all jobs" would upload a second one.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
-        with:
-          artifact_name: github-pages-${{ github.run_attempt }}

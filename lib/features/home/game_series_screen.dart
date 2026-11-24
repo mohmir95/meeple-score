@@ -77,11 +77,26 @@ class _GameSeriesScreenState extends State<GameSeriesScreen> {
     await _reload();
   }
 
+  Widget _card(BoardGame game) {
+    final session = game.hasScoresheet ? _sessions[game.id] : null;
+    return GameCard(
+      key: ValueKey('series-game-${game.id}'),
+      game: game,
+      session: session,
+      onOpen: () => _open(widget.onOpenGame(game)),
+      onOpenSaved: session == null
+          ? null
+          : () => _open(widget.onOpenSaved(game, session)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final compact = Breakpoints.isCompact(context);
+    final series = widget.series;
     return AppPage(
-      title: context.l10n.t(widget.series.titleKey),
+      // The banner title may break onto two lines; the app bar keeps one.
+      title: context.l10n.t(series.titleKey).replaceAll('\n', ' '),
       body: ListView(
         padding: EdgeInsets.fromLTRB(
           compact ? 12 : 20,
@@ -90,26 +105,7 @@ class _GameSeriesScreenState extends State<GameSeriesScreen> {
           28,
         ),
         children: [
-          GameGrid(
-            children: [
-              for (final game in widget.games)
-                Builder(
-                  builder: (context) {
-                    final session = game.hasScoresheet
-                        ? _sessions[game.id]
-                        : null;
-                    return GameCard(
-                      game: game,
-                      session: session,
-                      onOpen: () => _open(widget.onOpenGame(game)),
-                      onOpenSaved: session == null
-                          ? null
-                          : () => _open(widget.onOpenSaved(game, session)),
-                    );
-                  },
-                ),
-            ],
-          ),
+          GameGrid(children: [for (final game in widget.games) _card(game)]),
         ],
       ),
     );

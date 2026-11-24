@@ -7,6 +7,8 @@ import '../../domain/models/game_state.dart';
 import '../../domain/models/game_status.dart';
 import '../../domain/models/player.dart';
 import '../../domain/models/player_score.dart';
+import 'spice_road_how_to_play_screen.dart';
+import 'century_rules.dart';
 import 'century_scoring_hints_screen.dart';
 import 'century_setup_hints_screen.dart';
 import 'century_starting_resources_screen.dart';
@@ -41,7 +43,11 @@ class CenturySpiceRoadGame extends BoardGame {
   String? get seriesId => seriesIdValue;
 
   @override
-  Rect? get seriesCoverArt => const Rect.fromLTRB(0, 0.4, 1, 1);
+  Rect? get seriesCoverArt => const Rect.fromLTRB(0.1, 0.45, 0.5, 1);
+
+  /// The cover is 568×824.
+  @override
+  double get coverAspectRatio => 568 / 824;
 
   @override
   String get description =>
@@ -77,6 +83,18 @@ class CenturySpiceRoadGame extends BoardGame {
 
   @override
   bool get showScoresheet => false;
+
+  @override
+  List<String>? get hubTileOrder => centuryHubTileOrder;
+
+  @override
+  Widget? buildGuide() => const SpiceRoadHowToPlayScreen();
+
+  @override
+  String get guideTitleKey => 'hub.howToPlay';
+
+  @override
+  IconData get guideIcon => Icons.menu_book_outlined;
 
   @override
   bool get showSetupHints => true;

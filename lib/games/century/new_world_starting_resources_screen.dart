@@ -2,15 +2,27 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/l10n_scope.dart';
 import '../../shared/layout/breakpoints.dart';
-import 'century_new_world_game.dart';
+import 'century_east_to_west_ew_rules.dart';
 import 'century_new_world_rules.dart';
 import 'century_rules.dart';
 import 'century_widgets.dart';
 
 /// What each player starts with: a player board, settlers, and cubes that
-/// depend on the seat. Every seat is listed, up to 4 players.
+/// depend on the seat. The settlers depend on the player count, so they are
+/// shown for every count. Every seat is listed, up to 4 players.
 class NewWorldStartingResourcesScreen extends StatelessWidget {
-  const NewWorldStartingResourcesScreen({super.key});
+  const NewWorldStartingResourcesScreen({
+    super.key,
+    this.style = CenturyStyleData.newWorld,
+    this.easternWonders = false,
+  });
+
+  /// Also used by From East to West, which starts the same way.
+  final CenturyStyleData style;
+
+  /// From East to West (Eastern Wonders + A New World): side B of the player board, plus a
+  /// boat and outposts from Eastern Wonders.
+  final bool easternWonders;
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +30,11 @@ class NewWorldStartingResourcesScreen extends StatelessWidget {
     final compact = MediaQuery.sizeOf(context).width < Breakpoints.compact;
     final icon = compact ? 26.0 : 30.0;
     final cube = compact ? 20.0 : 24.0;
-    const forest = CenturyNewWorldGame.forest;
-    final onBoard = NewWorldRules.settlersOnBoard(4);
-    final onBoardTwo = NewWorldRules.settlersOnBoard(2);
+    final forest = style.accent;
 
     return CenturyPage(
       titleKey: 'hub.startingResources',
-      style: CenturyStyleData.newWorld,
+      style: style,
       children: [
         CenturyPanel(
           key: const ValueKey('nw-start-each'),
@@ -42,30 +52,38 @@ class NewWorldStartingResourcesScreen extends StatelessWidget {
                 ),
               ),
               label: l10n.t('centuryNw.start.board'),
-              hint: l10n.t('centuryNw.start.boardHint'),
+              hint: l10n.t(
+                easternWonders
+                    ? 'centuryEtwEw.start.boardHint'
+                    : 'centuryNw.start.boardHint',
+              ),
               value: '1',
             ),
-            CenturyRow(
-              key: const ValueKey('nw-start-settlers-board'),
-              lead: Icon(Icons.person_rounded, color: forest, size: icon),
-              label: l10n.t('centuryNw.start.settlersBoard'),
-              hint: l10n.t('centuryNw.start.settlersBoardHint', {
-                'n': '$onBoardTwo',
-              }),
-              value: '$onBoard',
-            ),
-            CenturyRow(
-              key: const ValueKey('nw-start-settlers-reserve'),
-              lead: Icon(
-                Icons.person_outline_rounded,
-                color: forest,
-                size: icon,
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: compact ? 6 : 8),
+              child: CenturyCountTable(
+                key: const ValueKey('nw-start-settlers'),
+                counts: NewWorldRules.playerCounts,
+                rows: [
+                  CenturyCountRow(
+                    lead: Icon(Icons.person_rounded, color: forest, size: icon),
+                    label: l10n.t('centuryNw.start.settlersBoard'),
+                    value: NewWorldRules.settlersOnBoard,
+                  ),
+                  CenturyCountRow(
+                    lead: Icon(
+                      Icons.person_outline_rounded,
+                      color: forest,
+                      size: icon,
+                    ),
+                    label: l10n.t('centuryNw.start.settlersReserve'),
+                    hint: l10n.t('centuryNw.start.settlersReserveHint'),
+                    value: (n) =>
+                        NewWorldRules.settlers -
+                        NewWorldRules.settlersOnBoard(n),
+                  ),
+                ],
               ),
-              label: l10n.t('centuryNw.start.settlersReserve'),
-              hint: l10n.t('centuryNw.start.settlersReserveHint', {
-                'n': '${NewWorldRules.settlers - onBoardTwo}',
-              }),
-              value: '${NewWorldRules.settlers - onBoard}',
             ),
             CenturyRow(
               key: const ValueKey('nw-start-storage'),
@@ -74,6 +92,22 @@ class NewWorldStartingResourcesScreen extends StatelessWidget {
               hint: l10n.t('centuryNw.start.storageHint'),
               value: '${NewWorldRules.storageLimit}',
             ),
+            if (easternWonders) ...[
+              CenturyRow(
+                key: const ValueKey('nw-start-boat'),
+                lead: Icon(Icons.sailing_rounded, color: forest, size: icon),
+                label: l10n.t('centuryEw.start.boat'),
+                hint: l10n.t('centuryEtwEw.start.boatHint'),
+                value: '1',
+              ),
+              CenturyRow(
+                key: const ValueKey('nw-start-outposts'),
+                lead: Icon(Icons.house_rounded, color: forest, size: icon),
+                label: l10n.t('centuryEw.start.outposts'),
+                hint: l10n.t('centuryEtwEw.start.outpostsHint'),
+                value: '${EastToWestEwRules.outpostsPerPlayer}',
+              ),
+            ],
           ],
         ),
         CenturyPanel(
@@ -126,7 +160,9 @@ class _SeatBadge extends StatelessWidget {
       height: 32,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: seat == 1 ? const Color(0xFFE2B33C) : CenturyNewWorldGame.forest,
+        color: seat == 1
+            ? const Color(0xFFE2B33C)
+            : CenturyStyle.of(context).accent,
         border: Border.all(color: Colors.white, width: 2),
         boxShadow: const [
           BoxShadow(

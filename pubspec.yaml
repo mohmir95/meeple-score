@@ -89,6 +89,10 @@ flutter:
     - assets/games/century_spice_road/cover.webp
     - assets/games/century_eastern_wonders/cover.webp
     - assets/games/century_a_new_world/cover.webp
+    - assets/games/century_from_sand_to_sea/cover.png
+    - assets/games/century_from_east_to_west/cover.png
+    - assets/games/century_from_east_to_west_ew/cover.png
+    - assets/games/century_from_east_to_west_all/cover.png
     - assets/games/shelfie_stacker/boxes/
     - assets/games/shelfie_stacker/characters/
     - assets/games/castles_of_burgundy/quick_reference_en_front.png

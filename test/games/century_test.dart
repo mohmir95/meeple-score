@@ -61,20 +61,23 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await pumpWithL10n(tester, const CenturySetupHintsScreen());
-      expect(_in('century-setup-gold', '× 8'), findsOneWidget);
-      expect(_in('century-setup-silver', '× 8'), findsOneWidget);
-      expect(find.text('2 starting cards back to the box'), findsOneWidget);
+      expect(find.byKey(const ValueKey('century-players')), findsNothing);
+      expect(find.byKey(const ValueKey('century-setup-gold')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('century-setup-silver')),
+        findsOneWidget,
+      );
+      // Columns for 2-5 players; the header pills show 2, 3, 4 and 5 too.
+      expect(_in('century-setup-coins', '4'), findsNWidgets(2));
+      for (final coins in ['6', '8', '10']) {
+        expect(_in('century-setup-coins', coins), findsOneWidget);
+      }
+      expect(_in('century-setup-to-box', '6'), findsOneWidget);
+      expect(_in('century-setup-to-box', '4'), findsNWidgets(2));
+      expect(_in('century-setup-to-box', '2'), findsNWidgets(2));
+      expect(_in('century-setup-to-box', '–'), findsOneWidget);
+      expect(find.text('Starting cards back to the box'), findsOneWidget);
       expect(find.text('Caravans & First Player'), findsNothing);
-
-      await tester.tap(find.text('5 players'));
-      await pumpFor(tester);
-      expect(_in('century-setup-gold', '× 10'), findsOneWidget);
-      expect(find.byKey(const ValueKey('century-setup-to-box')), findsNothing);
-
-      await tester.tap(find.text('2 players'));
-      await pumpFor(tester);
-      expect(_in('century-setup-silver', '× 4'), findsOneWidget);
-      expect(find.text('6 starting cards back to the box'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
