@@ -26,28 +26,6 @@ class EastToWestAllHowToPlayScreen extends StatelessWidget {
       style: CenturyStyleData.eastToWestAll,
       children: [
         CenturyPanel(
-          key: const ValueKey('etwall-play-different'),
-          title: ew('differentTitle'),
-          children: [
-            CenturyPoint(icon: Icons.layers_outlined, text: t('different.all')),
-            CenturyPoint(
-              icon: Icons.style_outlined,
-              text: t('different.noRoute'),
-            ),
-            CenturyPoint(
-              icon: Icons.workspace_premium_outlined,
-              text: t('different.bonus', {
-                'n': '${EastToWestAllRules.merchantCardsPerBonus}',
-                'spaces': '${EastToWestAllRules.bonusSpaces}',
-              }),
-            ),
-            CenturyPoint(
-              icon: Icons.fort_outlined,
-              text: ew('outpostTrade.forts'),
-            ),
-          ],
-        ),
-        CenturyPanel(
           key: const ValueKey('etwall-play-turn'),
           title: sr('turnTitle'),
           body: ew('turnBody'),
@@ -90,7 +68,6 @@ class EastToWestAllHowToPlayScreen extends StatelessWidget {
                   CenturyNote(
                     icon: Icons.workspace_premium_outlined,
                     text: t('market.bonus', {
-                      'n': '${EastToWestAllRules.merchantCardsPerBonus}',
                       'spaces': '${EastToWestAllRules.bonusSpaces}',
                     }),
                   ),
@@ -124,42 +101,49 @@ class EastToWestAllHowToPlayScreen extends StatelessWidget {
                 'n': '${EastToWestAllRules.marketLocations}',
               }),
             ),
-            CenturyPoint(
-              key: const ValueKey('etwall-play-move'),
-              icon: Icons.sailing_outlined,
-              title: '${ew('move.title')}:',
-              text: ew('move.body'),
-            ),
-            Padding(
-              padding: const EdgeInsetsDirectional.only(start: 28),
-              child: Column(
-                children: [
-                  CenturyPoint(
-                    icon: Icons.looks_one_outlined,
-                    text: ew('move.one'),
+            const SizedBox(height: 8),
+            CenturyCollapsible(
+              key: const ValueKey('ew-locations-collapsible'),
+              title: t('work.ewNote'),
+              children: [
+                CenturyPoint(
+                  key: const ValueKey('etwall-play-move'),
+                  icon: Icons.sailing_outlined,
+                  title: '${ew('move.title')}:',
+                  text: ew('move.body'),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 28),
+                  child: Column(
+                    children: [
+                      CenturyPoint(
+                        icon: Icons.looks_one_outlined,
+                        text: ew('move.one'),
+                      ),
+                      CenturyPoint(
+                        icon: Icons.looks_two_outlined,
+                        text: ew('move.two'),
+                      ),
+                      CenturyPoint(
+                        icon: Icons.disabled_by_default_outlined,
+                        text: ew('move.any'),
+                      ),
+                    ],
                   ),
-                  CenturyPoint(
-                    icon: Icons.looks_two_outlined,
-                    text: ew('move.two'),
-                  ),
-                  CenturyPoint(
-                    icon: Icons.public_rounded,
-                    text: ew('move.any'),
-                  ),
-                ],
-              ),
-            ),
-            CenturyPoint(
-              key: const ValueKey('etwall-play-boat-trade'),
-              icon: Icons.directions_boat_outlined,
-              title: '${ew('boatTrade.title')}:',
-              text: ew('boatTrade.body'),
-            ),
-            CenturyPoint(
-              key: const ValueKey('etwall-play-outpost-trade'),
-              icon: Icons.house_outlined,
-              title: '${ew('outpostTrade.title')}:',
-              text: ew('outpostTrade.body'),
+                ),
+                CenturyPoint(
+                  key: const ValueKey('etwall-play-boat-trade'),
+                  icon: Icons.directions_boat_outlined,
+                  title: '${ew('boatTrade.title')}:',
+                  text: ew('boatTrade.body'),
+                ),
+                CenturyPoint(
+                  key: const ValueKey('etwall-play-outpost-trade'),
+                  icon: Icons.house_outlined,
+                  title: '${ew('outpostTrade.title')}:',
+                  text: ew('outpostTrade.body'),
+                ),
+              ],
             ),
           ],
         ),

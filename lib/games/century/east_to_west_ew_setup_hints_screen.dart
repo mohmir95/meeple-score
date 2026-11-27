@@ -119,7 +119,14 @@ class EastToWestEwSetupHintsScreen extends StatelessWidget {
             'per': '${EastToWestEwRules.marketTilesPerSymbol}',
             'n': '${EastToWestEwRules.marketTiles}',
           }),
-          children: [Center(child: _IslandMap(hex: compact ? 32.0 : 40.0))],
+          children: [
+            Center(
+              child: EtwIslandMap(
+                key: const ValueKey('etwew-setup-island-map'),
+                hex: compact ? 32.0 : 40.0,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -170,49 +177,56 @@ class _BoardGrid extends StatelessWidget {
 }
 
 /// 12 market tiles around the Sea tile, where every boat starts.
-class _IslandMap extends StatelessWidget {
-  const _IslandMap({required this.hex});
+/// The From East to West island: Parts II and III share it.
+class EtwIslandMap extends StatelessWidget {
+  const EtwIslandMap({super.key, required this.hex});
 
   final double hex;
 
-  /// Rows as (offset in tiles, tiles); true is the Sea tile.
-  static const _rows = [
-    (1.0, [false, false]),
-    (0.5, [false, false, false]),
-    (0.0, [false, false, true, false]),
-    (0.5, [false, false, false]),
-    (1.0, [false]),
+  /// The rulebook's island, left to right in columns of flat-topped tiles,
+  /// each column centred: false is a market tile, true the Sea tile, and
+  /// null an empty space.
+  static const _columns = [
+    [false, false],
+    [false, false, false],
+    [null, false, true, false],
+    [false, false, false],
+    [false, false],
   ];
 
   @override
   Widget build(BuildContext context) {
-    final h = hex * 1.1547;
-    final step = hex * 1.06;
+    final h = HexTile.heightFor(hex, flatTop: true);
+    final gap = hex * 0.06;
+    final stepX = hex * 0.75 + gap;
+    final stepY = h + gap;
+    final tallest = _columns.fold(0, (n, c) => c.length > n ? c.length : n);
     return SizedBox(
-      key: const ValueKey('etwew-setup-island-map'),
-      width: 4 * step,
-      height: (_rows.length - 1) * h * 0.75 + h,
+      width: (_columns.length - 1) * stepX + hex,
+      height: tallest * stepY - gap,
       child: Stack(
         children: [
-          for (var r = 0; r < _rows.length; r++)
-            for (var i = 0; i < _rows[r].$2.length; i++)
-              Positioned(
-                left: (_rows[r].$1 + i) * step,
-                top: r * h * 0.75,
-                child: _rows[r].$2[i]
-                    ? Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          HexTile(color: _sea, size: hex),
-                          Icon(
-                            Icons.sailing_rounded,
-                            color: Colors.white,
-                            size: hex * 0.5,
-                          ),
-                        ],
-                      )
-                    : HexTile(color: _market, size: hex),
-              ),
+          for (var c = 0; c < _columns.length; c++)
+            for (var i = 0; i < _columns[c].length; i++)
+              if (_columns[c][i] case final sea?)
+                Positioned(
+                  left: c * stepX,
+                  top: ((tallest - _columns[c].length) / 2 + i) * stepY,
+                  child: sea
+                      ? Stack(
+                          key: const ValueKey('etw-island-sea'),
+                          alignment: Alignment.center,
+                          children: [
+                            HexTile(color: _sea, size: hex, flatTop: true),
+                            Icon(
+                              Icons.sailing_rounded,
+                              color: Colors.white,
+                              size: hex * 0.5,
+                            ),
+                          ],
+                        )
+                      : HexTile(color: _market, size: hex, flatTop: true),
+                ),
         ],
       ),
     );

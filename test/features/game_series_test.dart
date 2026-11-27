@@ -1,3 +1,4 @@
+import 'package:board_game_score_sheet/domain/board_game.dart';
 import 'package:board_game_score_sheet/domain/game_registry.dart';
 import 'package:board_game_score_sheet/domain/game_series.dart';
 import 'package:board_game_score_sheet/domain/models/game_session.dart';
@@ -5,12 +6,13 @@ import 'package:board_game_score_sheet/domain/models/game_status.dart';
 import 'package:board_game_score_sheet/domain/models/player.dart';
 import 'package:board_game_score_sheet/features/home/game_card.dart';
 import 'package:board_game_score_sheet/features/home/game_series_screen.dart';
-import 'package:board_game_score_sheet/features/hub/game_hub_screen.dart';
 import 'package:board_game_score_sheet/features/play/play_screen.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_config.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_player_line.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_state.dart';
+import 'package:board_game_score_sheet/games/splendor/splendor_game.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,6 +21,7 @@ import '../helpers/memory_session_repository.dart';
 
 void main() {
   _centuryPageTest();
+  _comingSoonTest();
 
   testWidgets('the Century banner shows the standalone games and a more '
       'strip', (tester) async {
@@ -134,25 +137,55 @@ void _centuryPageTest() {
       ),
       findsNWidgets(3),
     );
-    // Parts II and III are Coming Soon: grayscale and closed.
-    for (final id in const [
-      'century_from_east_to_west_ew',
-      'century_from_east_to_west_all',
-    ]) {
-      final card = find.byKey(ValueKey('series-game-$id'));
-      expect(
-        find.descendant(of: card, matching: find.byType(ColorFiltered)),
-        findsOneWidget,
-      );
-      expect(
-        find.descendant(of: card, matching: find.text('Coming Soon')),
-        findsOneWidget,
-      );
-      await tester.tap(card);
-      await pumpFor(tester, duration: const Duration(milliseconds: 800));
-      expect(find.byType(GameHubScreen), findsNothing);
-    }
-    expect(find.text('Coming Soon'), findsNWidgets(2));
+    // Every game is available: no grayscale covers, no Coming Soon.
+    expect(
+      find.descendant(
+        of: find.byType(GameSeriesScreen),
+        matching: find.byType(ColorFiltered),
+      ),
+      findsNothing,
+    );
+    expect(find.text('Coming Soon'), findsNothing);
     expect(tester.takeException(), isNull);
   });
+}
+
+/// A stand-in for a game that isn't available yet.
+class _SoonGame extends SplendorGame {
+  const _SoonGame();
+
+  @override
+  bool get isAvailable => false;
+}
+
+void _comingSoonTest() {
+  for (final debug in const [false, true]) {
+    testWidgets('a Coming Soon game is grayscale and opens only in debug '
+        '(debug: $debug)', (tester) async {
+      BoardGame.openUnavailableGames = debug;
+      addTearDown(() => BoardGame.openUnavailableGames = kDebugMode);
+      var opened = 0;
+      await pumpWithL10n(
+        tester,
+        Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 300,
+              child: GameCard(
+                game: const _SoonGame(),
+                session: null,
+                onOpen: () => opened++,
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(find.byType(ColorFiltered), findsOneWidget);
+      expect(find.text('Coming Soon'), findsOneWidget);
+      await tester.tap(find.byType(GameCard));
+      await tester.pump();
+      expect(opened, debug ? 1 : 0);
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

@@ -5,11 +5,10 @@ import '../../shared/layout/breakpoints.dart';
 import 'century_east_to_west_all_rules.dart';
 import 'century_new_world_rules.dart';
 import 'century_widgets.dart';
+import 'east_to_west_ew_setup_hints_screen.dart';
 
 const _board = Color(0xFF7A8F4E);
 const _exploration = Color(0xFF8A6A3E);
-const _market = Color(0xFF7FA66B);
-const _sea = Color(0xFF7CC4D6);
 
 /// The From East to West (Spice Road + Eastern Wonders + A New World) rulebook's Game Setup steps:
 /// the A New World board, Spice Road Merchant cards and an island map.
@@ -121,7 +120,14 @@ class EastToWestAllSetupHintsScreen extends StatelessWidget {
             'per': '${EastToWestAllRules.marketTilesPerSymbol}',
             'n': '${EastToWestAllRules.marketTiles}',
           }),
-          children: [Center(child: _IslandMap(hex: compact ? 32.0 : 40.0))],
+          children: [
+            Center(
+              child: EtwIslandMap(
+                key: const ValueKey('etwall-setup-island-map'),
+                hex: compact ? 32.0 : 40.0,
+              ),
+            ),
+          ],
         ),
         CenturyPanel(
           key: const ValueKey('etwall-setup-merchants'),
@@ -215,55 +221,6 @@ class _BoardGrid extends StatelessWidget {
 }
 
 /// 12 market tiles around the Sea tile, where every boat starts.
-class _IslandMap extends StatelessWidget {
-  const _IslandMap({required this.hex});
-
-  final double hex;
-
-  /// Rows as (offset in tiles, tiles); true is the Sea tile.
-  static const _rows = [
-    (1.0, [false, false]),
-    (0.5, [false, false, false]),
-    (0.0, [false, false, true, false]),
-    (0.5, [false, false, false]),
-    (1.0, [false]),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final h = hex * 1.1547;
-    final step = hex * 1.06;
-    return SizedBox(
-      key: const ValueKey('etwall-setup-island-map'),
-      width: 4 * step,
-      height: (_rows.length - 1) * h * 0.75 + h,
-      child: Stack(
-        children: [
-          for (var r = 0; r < _rows.length; r++)
-            for (var i = 0; i < _rows[r].$2.length; i++)
-              Positioned(
-                left: (_rows[r].$1 + i) * step,
-                top: r * h * 0.75,
-                child: _rows[r].$2[i]
-                    ? Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          HexTile(color: _sea, size: hex),
-                          Icon(
-                            Icons.sailing_rounded,
-                            color: Colors.white,
-                            size: hex * 0.5,
-                          ),
-                        ],
-                      )
-                    : HexTile(color: _market, size: hex),
-              ),
-        ],
-      ),
-    );
-  }
-}
-
 class _ExplorationTile extends StatelessWidget {
   const _ExplorationTile({required this.size, this.label});
 

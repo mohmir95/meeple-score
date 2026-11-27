@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final game = widget.registry.tryLookup(activeId);
     if (session == null ||
         game == null ||
-        !game.isAvailable ||
+        !game.canOpen ||
         !game.hasScoresheet ||
         !mounted) {
       return;

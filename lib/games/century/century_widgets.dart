@@ -399,18 +399,7 @@ class CenturyPanel extends StatelessWidget {
               children: [
                 if (body != null) ...[
                   Text.rich(
-                    // `**text**` in a body is shown in bold.
-                    TextSpan(
-                      children: [
-                        for (final (i, part) in body!.split('**').indexed)
-                          TextSpan(
-                            text: part,
-                            style: i.isOdd
-                                ? const TextStyle(fontWeight: FontWeight.w800)
-                                : null,
-                          ),
-                      ],
-                    ),
+                    centuryBoldSpans(body!),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: centuryInk,
@@ -645,6 +634,19 @@ class _CenturyCollapsibleState extends State<CenturyCollapsible> {
   }
 }
 
+/// [text] with each `**part**` in bold, optionally in [boldColor].
+TextSpan centuryBoldSpans(String text, {Color? boldColor}) => TextSpan(
+  children: [
+    for (final (i, part) in text.split('**').indexed)
+      TextSpan(
+        text: part,
+        style: i.isOdd
+            ? TextStyle(fontWeight: FontWeight.w800, color: boldColor)
+            : null,
+      ),
+  ],
+);
+
 class CenturyNote extends StatelessWidget {
   const CenturyNote({super.key, required this.text, this.icon});
 
@@ -671,8 +673,8 @@ class CenturyNote extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              text,
+            child: Text.rich(
+              centuryBoldSpans(text, boldColor: centuryInk),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: centuryMuted,
                 fontWeight: FontWeight.w600,

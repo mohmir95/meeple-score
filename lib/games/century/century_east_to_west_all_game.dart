@@ -38,10 +38,6 @@ class CenturyEastToWestAllGame extends BoardGame {
   @override
   bool get showSeriesOnCard => false;
 
-  /// Hidden behind Coming Soon until its guides are reviewed.
-  @override
-  bool get isAvailable => false;
-
   @override
   String? get editionLabel => 'Spice Road + Eastern Wonders + A New World';
 

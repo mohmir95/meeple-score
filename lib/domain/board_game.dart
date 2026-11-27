@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'models/game_config.dart';
@@ -27,6 +28,13 @@ abstract class BoardGame {
   /// False shows the game as Coming Soon on the home page: a grayscale
   /// cover that can't be opened.
   bool get isAvailable => true;
+
+  /// Debug builds still open games that aren't available yet, so they can
+  /// be worked on; they keep their Coming Soon look. Tests can switch it off.
+  static bool openUnavailableGames = kDebugMode;
+
+  /// Whether the home page lets you open this game.
+  bool get canOpen => isAvailable || openUnavailableGames;
 
   String get l10nPrefix => 'game.$id';
 

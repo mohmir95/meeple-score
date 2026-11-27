@@ -20,37 +20,6 @@ class SandToSeaHowToPlayScreen extends StatelessWidget {
       style: CenturyStyleData.sandToSea,
       children: [
         CenturyPanel(
-          key: const ValueKey('fs-play-different'),
-          title: t('differentTitle'),
-          children: [
-            CenturyPoint(
-              icon: Icons.style_outlined,
-              text: t('different.cards'),
-            ),
-            CenturyPoint(
-              icon: Icons.directions_boat_outlined,
-              text: t('different.firstMove'),
-            ),
-            CenturyPoint(
-              icon: Icons.payments_outlined,
-              text: t('different.visit', {'n': '${SandToSeaRules.visitCost}'}),
-            ),
-            CenturyPoint(
-              icon: Icons.waves_rounded,
-              text: t('different.map', {
-                'n': '${SandToSeaRules.marketTilesRemovedPerSymbol}',
-                'sea': '${SandToSeaRules.seaTiles}',
-              }),
-            ),
-            CenturyPoint(
-              icon: Icons.house_outlined,
-              text: t('different.outposts', {
-                'n': '${SandToSeaRules.outpostsPerPlayer}',
-              }),
-            ),
-          ],
-        ),
-        CenturyPanel(
           key: const ValueKey('fs-play-turn'),
           title: t('turnTitle'),
           body: t('turnBody'),

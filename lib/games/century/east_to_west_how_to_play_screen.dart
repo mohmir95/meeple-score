@@ -21,30 +21,6 @@ class EastToWestHowToPlayScreen extends StatelessWidget {
       style: CenturyStyleData.eastToWest,
       children: [
         CenturyPanel(
-          key: const ValueKey('etw-play-different'),
-          title: t('differentTitle'),
-          children: [
-            CenturyPoint(
-              icon: Icons.style_outlined,
-              text: t('different.cards'),
-            ),
-            CenturyPoint(
-              icon: Icons.route_outlined,
-              text: t('different.route', {
-                'n': '${EastToWestRules.tradeRouteLimit}',
-              }),
-            ),
-            CenturyPoint(
-              icon: Icons.storefront_outlined,
-              text: t('different.locations'),
-            ),
-            CenturyPoint(
-              icon: Icons.explore_outlined,
-              text: t('different.exploration'),
-            ),
-          ],
-        ),
-        CenturyPanel(
           key: const ValueKey('etw-play-turn'),
           title: t('turnTitle'),
           body: t('turnBody'),

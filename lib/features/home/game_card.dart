@@ -68,7 +68,7 @@ class GameCard extends StatelessWidget {
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: game.isAvailable ? onOpen : null,
+                      onTap: game.canOpen ? onOpen : null,
                       child: Stack(
                         fit: StackFit.expand,
                         children: [

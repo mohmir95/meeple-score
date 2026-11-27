@@ -1,5 +1,6 @@
 import 'package:board_game_score_sheet/games/century/century_east_to_west_all_game.dart';
 import 'package:board_game_score_sheet/games/century/century_east_to_west_all_rules.dart';
+import 'package:board_game_score_sheet/games/century/century_widgets.dart';
 import 'package:board_game_score_sheet/games/century/east_to_west_all_how_to_play_screen.dart';
 import 'package:board_game_score_sheet/games/century/east_to_west_all_setup_hints_screen.dart';
 import 'package:flutter/material.dart';
@@ -49,9 +50,13 @@ void main() {
       expect(find.text('D2'), findsOneWidget);
       expect(find.text('Cards with a black star'), findsOneWidget);
       expect(find.textContaining('Shuffle all 25 bonus tiles'), findsOneWidget);
+      // The same island as Eastern Wonders + A New World: 12 market tiles
+      // and the Sea tile.
+      final island = find.byKey(const ValueKey('etwall-setup-island-map'));
+      expect(island, findsOneWidget);
       expect(
-        find.byKey(const ValueKey('etwall-setup-island-map')),
-        findsOneWidget,
+        find.descendant(of: island, matching: find.byType(HexTile)),
+        findsNWidgets(EastToWestAllRules.marketTiles + 1),
       );
       expect(
         find.text('All purple starting cards back to the box'),
@@ -96,9 +101,6 @@ void main() {
         'etwall-play-market',
         'etwall-play-cards',
         'etwall-play-refresh',
-        'etwall-play-move',
-        'etwall-play-boat-trade',
-        'etwall-play-outpost-trade',
       ]) {
         expect(
           find.descendant(
@@ -122,7 +124,28 @@ void main() {
         ),
         findsNothing,
       );
+      // The Eastern Wonders locations start collapsed too.
+      const ewKeys = [
+        'etwall-play-move',
+        'etwall-play-boat-trade',
+        'etwall-play-outpost-trade',
+      ];
+      final ewBox = find.byKey(const ValueKey('ew-locations-collapsible'));
+      expect(find.byKey(const ValueKey('etwall-play-move')), findsNothing);
+      await tester.ensureVisible(ewBox);
+      await tester.tap(ewBox);
+      await tester.pumpAndSettle();
+      for (final key in ewKeys) {
+        expect(
+          find.descendant(of: ewBox, matching: find.byKey(ValueKey(key))),
+          findsOneWidget,
+        );
+      }
       expect(find.textContaining('board D2 (not B2 or F2)'), findsOneWidget);
+      expect(
+        find.textContaining('For every fourth Merchant card you take'),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     });
   }

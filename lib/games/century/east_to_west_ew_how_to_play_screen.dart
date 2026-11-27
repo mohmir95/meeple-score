@@ -21,32 +21,6 @@ class EastToWestEwHowToPlayScreen extends StatelessWidget {
       style: CenturyStyleData.eastToWestEw,
       children: [
         CenturyPanel(
-          key: const ValueKey('etwew-play-different'),
-          title: t('differentTitle'),
-          children: [
-            CenturyPoint(
-              icon: Icons.sailing_outlined,
-              text: t('different.map'),
-            ),
-            CenturyPoint(
-              icon: Icons.house_outlined,
-              text: t('different.outposts', {
-                'n': '${EastToWestEwRules.outpostsPerPlayer}',
-              }),
-            ),
-            CenturyPoint(
-              icon: Icons.workspace_premium_outlined,
-              text: t('different.bonus', {
-                'n': '${EastToWestEwRules.bonusSpaces}',
-              }),
-            ),
-            CenturyPoint(
-              icon: Icons.storefront_outlined,
-              text: t('different.locations'),
-            ),
-          ],
-        ),
-        CenturyPanel(
           key: const ValueKey('etwew-play-turn'),
           title: l10n.t('centuryEtw.play.turnTitle'),
           body: t('turnBody'),
@@ -98,7 +72,10 @@ class EastToWestEwHowToPlayScreen extends StatelessWidget {
                     icon: Icons.looks_two_outlined,
                     text: t('move.two'),
                   ),
-                  CenturyPoint(icon: Icons.public_rounded, text: t('move.any')),
+                  CenturyPoint(
+                    icon: Icons.disabled_by_default_outlined,
+                    text: t('move.any'),
+                  ),
                 ],
               ),
             ),

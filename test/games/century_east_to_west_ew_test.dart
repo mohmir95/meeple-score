@@ -1,6 +1,7 @@
 import 'package:board_game_score_sheet/games/century/century_east_to_west_ew_game.dart';
 import 'package:board_game_score_sheet/games/century/century_east_to_west_ew_rules.dart';
 import 'package:board_game_score_sheet/games/century/east_to_west_ew_how_to_play_screen.dart';
+import 'package:board_game_score_sheet/games/century/century_widgets.dart';
 import 'package:board_game_score_sheet/games/century/east_to_west_ew_setup_hints_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -56,8 +57,19 @@ void main() {
       expect(_in('etwew-setup-exploration-table', '2'), findsNWidgets(3));
       expect(_in('etwew-setup-exploration-table', '1'), findsNWidgets(2));
       expect(_in('etwew-setup-exploration-table', '3'), findsNWidgets(2));
+      // Columns of 2, 3, 4 (top one empty), 3 and 2: 12 market tiles and
+      // the Sea tile.
+      final island = find.byKey(const ValueKey('etwew-setup-island-map'));
+      expect(island, findsOneWidget);
       expect(
-        find.byKey(const ValueKey('etwew-setup-island-map')),
+        find.descendant(of: island, matching: find.byType(HexTile)),
+        findsNWidgets(EastToWestEwRules.marketTiles + 1),
+      );
+      expect(
+        find.descendant(
+          of: island,
+          matching: find.byKey(const ValueKey('etw-island-sea')),
+        ),
         findsOneWidget,
       );
       expect(find.byKey(const ValueKey('century-players')), findsNothing);
