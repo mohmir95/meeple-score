@@ -196,7 +196,7 @@ void main() {
     await pumpUntilFound(tester, find.text('Great Western Trail\nGames'));
 
     final cards = _homeBanners;
-    expect(cards, findsNWidgets(9));
+    expect(cards, findsNWidgets(10));
     final first = tester.getRect(cards.first);
     final rowStart = tester.getRect(cards.at(3));
     expect(rowStart.top, greaterThan(first.bottom));

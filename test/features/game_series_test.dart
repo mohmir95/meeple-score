@@ -5,6 +5,7 @@ import 'package:board_game_score_sheet/domain/models/game_status.dart';
 import 'package:board_game_score_sheet/domain/models/player.dart';
 import 'package:board_game_score_sheet/features/home/game_card.dart';
 import 'package:board_game_score_sheet/features/home/game_series_screen.dart';
+import 'package:board_game_score_sheet/features/hub/game_hub_screen.dart';
 import 'package:board_game_score_sheet/features/play/play_screen.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_2e_game.dart';
 import 'package:board_game_score_sheet/games/great_western_trail/gwt_config.dart';
@@ -36,7 +37,7 @@ void main() {
 
   test('home groups every GWT edition into one entry, in place', () {
     final entries = HomeEntry.group(GameRegistry().games);
-    expect(entries, hasLength(9));
+    expect(entries, hasLength(10));
 
     final gwt = entries.first as SeriesEntry;
     expect(gwt.series, GameSeries.greatWesternTrail);
@@ -133,6 +134,25 @@ void _centuryPageTest() {
       ),
       findsNWidgets(3),
     );
+    // Parts II and III are Coming Soon: grayscale and closed.
+    for (final id in const [
+      'century_from_east_to_west_ew',
+      'century_from_east_to_west_all',
+    ]) {
+      final card = find.byKey(ValueKey('series-game-$id'));
+      expect(
+        find.descendant(of: card, matching: find.byType(ColorFiltered)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: card, matching: find.text('Coming Soon')),
+        findsOneWidget,
+      );
+      await tester.tap(card);
+      await pumpFor(tester, duration: const Duration(milliseconds: 800));
+      expect(find.byType(GameHubScreen), findsNothing);
+    }
+    expect(find.text('Coming Soon'), findsNWidgets(2));
     expect(tester.takeException(), isNull);
   });
 }

@@ -121,19 +121,10 @@ class EastToWestHowToPlayScreen extends StatelessWidget {
           body: t('route.body'),
           children: [
             CenturyNote(icon: Icons.groups_outlined, text: t('route.example')),
-            const SizedBox(height: 12),
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Text(
-                t('route.actions'),
-                key: const ValueKey('etw-play-route-actions'),
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: centuryInk,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+            CenturySubheading(
+              key: const ValueKey('etw-play-route-actions'),
+              text: t('route.actions'),
             ),
-            const SizedBox(height: 4),
             CenturyPoint(
               icon: Icons.add_box_outlined,
               title: t('cards.spiceTitle'),

@@ -68,7 +68,7 @@ class GameCard extends StatelessWidget {
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: onOpen,
+                      onTap: game.isAvailable ? onOpen : null,
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
@@ -150,6 +150,7 @@ class GameCard extends StatelessWidget {
                     key: ValueKey('home-saved-${game.id}'),
                     inProgress: inProgress,
                     finished: finished,
+                    comingSoon: !game.isAvailable,
                     onTap: onOpenSaved,
                   ),
                 ),
@@ -201,8 +202,24 @@ class GameCover extends StatelessWidget {
 
   final BoardGame game;
 
+  /// Luminance weights: drops the colour, keeps the brightness.
+  static const _grayscale = ColorFilter.matrix([
+    0.2126, 0.7152, 0.0722, 0, 0, //
+    0.2126, 0.7152, 0.0722, 0, 0, //
+    0.2126, 0.7152, 0.0722, 0, 0, //
+    0, 0, 0, 1, 0, //
+  ]);
+
   @override
   Widget build(BuildContext context) {
+    final cover = _cover(context);
+    // Games not available yet show in grayscale.
+    return game.isAvailable
+        ? cover
+        : ColorFiltered(colorFilter: _grayscale, child: cover);
+  }
+
+  Widget _cover(BuildContext context) {
     if (game.coverImageAsset == null) {
       return ColoredBox(
         color: game.accentColor,
@@ -229,30 +246,49 @@ class GameStatusPill extends StatelessWidget {
     super.key,
     required this.inProgress,
     required this.finished,
+    this.comingSoon = false,
     this.onTap,
   });
 
   final bool inProgress;
   final bool finished;
+
+  /// Wins over the other states: the game can't be opened yet.
+  final bool comingSoon;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    if (!inProgress && !finished) {
+    if (!comingSoon && !inProgress && !finished) {
       return const SizedBox.shrink();
     }
     final compact = Breakpoints.isCompact(context);
     final scheme = Theme.of(context).colorScheme;
-    final color = inProgress ? scheme.primary : scheme.tertiary;
-    final foreground = inProgress ? scheme.onPrimary : scheme.onTertiary;
     final l10n = context.l10n;
-    final label = inProgress ? l10n.t('home.resume') : l10n.t('home.lastGame');
-    final icon = inProgress ? Icons.play_arrow_rounded : Icons.emoji_events;
+    final Color color, foreground;
+    final String label;
+    final IconData icon;
+    if (comingSoon) {
+      color = const Color(0xFF5F5F5F);
+      foreground = Colors.white;
+      label = l10n.t('hub.comingSoon');
+      icon = Icons.schedule_rounded;
+    } else if (inProgress) {
+      color = scheme.primary;
+      foreground = scheme.onPrimary;
+      label = l10n.t('home.resume');
+      icon = Icons.play_arrow_rounded;
+    } else {
+      color = scheme.tertiary;
+      foreground = scheme.onTertiary;
+      label = l10n.t('home.lastGame');
+      icon = Icons.emoji_events;
+    }
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: comingSoon ? null : onTap,
         borderRadius: BorderRadius.circular(999),
         child: DecoratedBox(
           decoration: BoxDecoration(

@@ -70,18 +70,50 @@ class EastToWestEwHowToPlayScreen extends StatelessWidget {
             CenturyCollapsible(
               key: const ValueKey('nw-locations-collapsible'),
               title: t('work.note'),
-              children: [NewWorldLocationList()],
+              children: [
+                const NewWorldLocationList(fortBonus: false),
+                const SizedBox(height: 4),
+                CenturyNote(
+                  icon: Icons.warning_amber_rounded,
+                  text: t('outpostTrade.forts'),
+                ),
+              ],
             ),
-          ],
-        ),
-        CenturyPanel(
-          key: const ValueKey('etwew-play-move'),
-          title: t('move.title'),
-          body: t('move.body'),
-          children: [
-            CenturyPoint(icon: Icons.looks_one_outlined, text: t('move.one')),
-            CenturyPoint(icon: Icons.looks_two_outlined, text: t('move.two')),
-            CenturyPoint(icon: Icons.public_rounded, text: t('move.any')),
+            const SizedBox(height: 8),
+            CenturyPoint(
+              key: const ValueKey('etwew-play-move'),
+              icon: Icons.sailing_outlined,
+              title: '${t('move.title')}:',
+              text: t('move.body'),
+            ),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(start: 28),
+              child: Column(
+                children: [
+                  CenturyPoint(
+                    icon: Icons.looks_one_outlined,
+                    text: t('move.one'),
+                  ),
+                  CenturyPoint(
+                    icon: Icons.looks_two_outlined,
+                    text: t('move.two'),
+                  ),
+                  CenturyPoint(icon: Icons.public_rounded, text: t('move.any')),
+                ],
+              ),
+            ),
+            CenturyPoint(
+              key: const ValueKey('etwew-play-boat-trade'),
+              icon: Icons.directions_boat_outlined,
+              title: '${t('boatTrade.title')}:',
+              text: t('boatTrade.body'),
+            ),
+            CenturyPoint(
+              key: const ValueKey('etwew-play-outpost-trade'),
+              icon: Icons.house_outlined,
+              title: '${t('outpostTrade.title')}:',
+              text: t('outpostTrade.body'),
+            ),
           ],
         ),
         CenturyPanel(
@@ -111,23 +143,6 @@ class EastToWestEwHowToPlayScreen extends StatelessWidget {
               icon: Icons.swap_vert_rounded,
               title: t('after.tradeTitle'),
               text: t('after.trade'),
-            ),
-          ],
-        ),
-        CenturyPanel(
-          key: const ValueKey('etwew-play-boat-trade'),
-          title: t('boatTrade.title'),
-          body: t('boatTrade.body'),
-          children: const [],
-        ),
-        CenturyPanel(
-          key: const ValueKey('etwew-play-outpost-trade'),
-          title: t('outpostTrade.title'),
-          body: t('outpostTrade.body'),
-          children: [
-            CenturyNote(
-              icon: Icons.warning_amber_rounded,
-              text: t('outpostTrade.forts'),
             ),
           ],
         ),

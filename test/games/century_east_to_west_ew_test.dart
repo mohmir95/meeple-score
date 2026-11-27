@@ -96,9 +96,31 @@ void main() {
       await pumpWithL10n(tester, const EastToWestEwHowToPlayScreen());
       expect(find.text('Work'), findsNWidgets(2));
       expect(find.text('Rest'), findsNWidgets(2));
-      expect(find.text('Move Boat Locations'), findsOneWidget);
-      expect(find.text('Boat Trade Location'), findsOneWidget);
-      expect(find.text('Outpost Trade Location'), findsOneWidget);
+      // The new locations sit inside the Work panel.
+      for (final key in const [
+        'etwew-play-move',
+        'etwew-play-boat-trade',
+        'etwew-play-outpost-trade',
+      ]) {
+        expect(
+          find.descendant(
+            of: find.byKey(const ValueKey('etwew-play-work')),
+            matching: find.byKey(ValueKey(key)),
+          ),
+          findsOneWidget,
+        );
+      }
+      // Forts give no Bonus tiles in this game.
+      await tester.tap(find.byKey(const ValueKey('nw-locations-collapsible')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('nw-play-fort')), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('nw-locations-collapsible')),
+          matching: find.byIcon(Icons.workspace_premium_outlined),
+        ),
+        findsNothing,
+      );
       expect(tester.takeException(), isNull);
     });
   }

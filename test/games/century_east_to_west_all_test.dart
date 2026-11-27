@@ -91,8 +91,23 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await pumpWithL10n(tester, const EastToWestAllHowToPlayScreen());
-      expect(find.text('Market Location'), findsOneWidget);
-      expect(find.text('Refresh Market Location'), findsOneWidget);
+      // The new locations and the card actions sit inside the Work panel.
+      for (final key in const [
+        'etwall-play-market',
+        'etwall-play-cards',
+        'etwall-play-refresh',
+        'etwall-play-move',
+        'etwall-play-boat-trade',
+        'etwall-play-outpost-trade',
+      ]) {
+        expect(
+          find.descendant(
+            of: find.byKey(const ValueKey('etwall-play-work')),
+            matching: find.byKey(ValueKey(key)),
+          ),
+          findsOneWidget,
+        );
+      }
       expect(find.text('Adjust Trade Route Location'), findsNothing);
       // The A New World location list starts collapsed; no Bonus tiles here.
       final fort = find.byKey(const ValueKey('nw-play-fort'));
@@ -107,8 +122,6 @@ void main() {
         ),
         findsNothing,
       );
-      expect(find.text('Move Boat Locations'), findsOneWidget);
-      expect(find.text('Outpost Trade Location'), findsOneWidget);
       expect(find.textContaining('board D2 (not B2 or F2)'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

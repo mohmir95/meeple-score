@@ -17,6 +17,7 @@ import '../games/lost_ruins_of_arnak/arnak_game.dart';
 import '../games/project_l/project_l_game.dart';
 import '../games/shelfie_stacker/shelfie_game.dart';
 import '../games/splendor/splendor_game.dart';
+import '../games/takenoko/takenoko_game.dart';
 import '../games/turing_machine/turing_game.dart';
 
 /// Single registration point for available board games.
@@ -40,6 +41,7 @@ class GameRegistry {
               CenturyEastToWestAllGame(),
               LostRuinsOfArnakGame(),
               CastlesOfBurgundySpecialEditionGame(),
+              TakenokoGame(),
               ShelfieStackerGame(),
               TuringMachineGame(),
               AlchemistsGame(),

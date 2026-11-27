@@ -68,7 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     final session = sessions[activeId];
     final game = widget.registry.tryLookup(activeId);
-    if (session == null || game == null || !game.hasScoresheet || !mounted) {
+    if (session == null ||
+        game == null ||
+        !game.isAvailable ||
+        !game.hasScoresheet ||
+        !mounted) {
       return;
     }
     await _openSaved(game, session);

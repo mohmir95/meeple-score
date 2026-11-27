@@ -71,63 +71,96 @@ class EastToWestAllHowToPlayScreen extends StatelessWidget {
             CenturyCollapsible(
               key: const ValueKey('nw-locations-collapsible'),
               title: t('work.note'),
-              children: [NewWorldLocationList(fortBonus: false)],
+              children: const [NewWorldLocationList(fortBonus: false)],
             ),
-          ],
-        ),
-        CenturyPanel(
-          key: const ValueKey('etwall-play-market'),
-          title: sr('market.title'),
-          body: t('market.body'),
-          children: [
-            CenturyNote(text: sr('market.refill')),
             const SizedBox(height: 8),
-            CenturyNote(
-              icon: Icons.workspace_premium_outlined,
-              text: t('market.bonus', {
-                'n': '${EastToWestAllRules.merchantCardsPerBonus}',
-                'spaces': '${EastToWestAllRules.bonusSpaces}',
+            CenturyPoint(
+              key: const ValueKey('etwall-play-market'),
+              icon: Icons.storefront_outlined,
+              title: '${sr('market.title')}:',
+              text: t('market.body'),
+            ),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(start: 28),
+              child: Column(
+                children: [
+                  const SizedBox(height: 4),
+                  CenturyNote(text: sr('market.refill')),
+                  const SizedBox(height: 8),
+                  CenturyNote(
+                    icon: Icons.workspace_premium_outlined,
+                    text: t('market.bonus', {
+                      'n': '${EastToWestAllRules.merchantCardsPerBonus}',
+                      'spaces': '${EastToWestAllRules.bonusSpaces}',
+                    }),
+                  ),
+                  CenturySubheading(
+                    key: const ValueKey('etwall-play-cards'),
+                    text: sr('route.actions'),
+                  ),
+                  CenturyPoint(
+                    icon: Icons.add_box_outlined,
+                    title: sr('cards.spiceTitle'),
+                    text: sr('cards.spice'),
+                  ),
+                  CenturyPoint(
+                    icon: Icons.upgrade_rounded,
+                    title: sr('cards.upgradeTitle'),
+                    text: sr('cards.upgrade'),
+                  ),
+                  CenturyPoint(
+                    icon: Icons.swap_vert_rounded,
+                    title: sr('cards.tradeTitle'),
+                    text: sr('cards.trade'),
+                  ),
+                ],
+              ),
+            ),
+            CenturyPoint(
+              key: const ValueKey('etwall-play-refresh'),
+              icon: Icons.refresh_rounded,
+              title: '${sr('refresh.title')}:',
+              text: sr('refresh.body', {
+                'n': '${EastToWestAllRules.marketLocations}',
               }),
             ),
-          ],
-        ),
-        CenturyPanel(
-          key: const ValueKey('etwall-play-refresh'),
-          title: sr('refresh.title'),
-          body: sr('refresh.body', {
-            'n': '${EastToWestAllRules.marketLocations}',
-          }),
-          children: const [],
-        ),
-        CenturyPanel(
-          key: const ValueKey('etwall-play-cards'),
-          title: sr('cards.title'),
-          children: [
             CenturyPoint(
-              icon: Icons.add_box_outlined,
-              title: sr('cards.spiceTitle'),
-              text: sr('cards.spice'),
+              key: const ValueKey('etwall-play-move'),
+              icon: Icons.sailing_outlined,
+              title: '${ew('move.title')}:',
+              text: ew('move.body'),
+            ),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(start: 28),
+              child: Column(
+                children: [
+                  CenturyPoint(
+                    icon: Icons.looks_one_outlined,
+                    text: ew('move.one'),
+                  ),
+                  CenturyPoint(
+                    icon: Icons.looks_two_outlined,
+                    text: ew('move.two'),
+                  ),
+                  CenturyPoint(
+                    icon: Icons.public_rounded,
+                    text: ew('move.any'),
+                  ),
+                ],
+              ),
             ),
             CenturyPoint(
-              icon: Icons.upgrade_rounded,
-              title: sr('cards.upgradeTitle'),
-              text: sr('cards.upgrade'),
+              key: const ValueKey('etwall-play-boat-trade'),
+              icon: Icons.directions_boat_outlined,
+              title: '${ew('boatTrade.title')}:',
+              text: ew('boatTrade.body'),
             ),
             CenturyPoint(
-              icon: Icons.swap_vert_rounded,
-              title: sr('cards.tradeTitle'),
-              text: sr('cards.trade'),
+              key: const ValueKey('etwall-play-outpost-trade'),
+              icon: Icons.house_outlined,
+              title: '${ew('outpostTrade.title')}:',
+              text: ew('outpostTrade.body'),
             ),
-          ],
-        ),
-        CenturyPanel(
-          key: const ValueKey('etwall-play-move'),
-          title: ew('move.title'),
-          body: ew('move.body'),
-          children: [
-            CenturyPoint(icon: Icons.looks_one_outlined, text: ew('move.one')),
-            CenturyPoint(icon: Icons.looks_two_outlined, text: ew('move.two')),
-            CenturyPoint(icon: Icons.public_rounded, text: ew('move.any')),
           ],
         ),
         CenturyPanel(
@@ -159,18 +192,6 @@ class EastToWestAllHowToPlayScreen extends StatelessWidget {
               text: ew('after.trade'),
             ),
           ],
-        ),
-        CenturyPanel(
-          key: const ValueKey('etwall-play-boat-trade'),
-          title: ew('boatTrade.title'),
-          body: ew('boatTrade.body'),
-          children: const [],
-        ),
-        CenturyPanel(
-          key: const ValueKey('etwall-play-outpost-trade'),
-          title: ew('outpostTrade.title'),
-          body: ew('outpostTrade.body'),
-          children: const [],
         ),
         CenturyPanel(
           key: const ValueKey('etwall-play-rest'),

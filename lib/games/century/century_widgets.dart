@@ -527,6 +527,30 @@ class CenturyRow extends StatelessWidget {
   }
 }
 
+/// A bold lead-in line inside a panel, introducing the points below it.
+class CenturySubheading extends StatelessWidget {
+  const CenturySubheading({super.key, required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 4),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            color: centuryInk,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// A note-styled box that starts collapsed; tapping the header shows
 /// [children].
 class CenturyCollapsible extends StatefulWidget {

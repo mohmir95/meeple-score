@@ -24,6 +24,10 @@ abstract class BoardGame {
   /// Shown on setup, e.g. "First Edition".
   String? get editionLabel => null;
 
+  /// False shows the game as Coming Soon on the home page: a grayscale
+  /// cover that can't be opened.
+  bool get isAvailable => true;
+
   String get l10nPrefix => 'game.$id';
 
   /// Hub tile keys (e.g. 'hub-setup-hints') in the order this game wants
