@@ -15,6 +15,7 @@ void main() {
     expect(game.buildSetupHints(), isNotNull);
     expect(game.hubTileOrder, [
       'hub-setup-hints',
+      'hub-starting-resources',
       'hub-guide',
       'hub-quick-reference',
       'hub-scoring-hints',
@@ -35,14 +36,8 @@ void main() {
         expect(_in('takenoko-setup-plots', '× 27'), findsOneWidget);
         expect(_in('takenoko-setup-irrigation', '× 20'), findsOneWidget);
         expect(_in('takenoko-setup-improvements', '× 9'), findsOneWidget);
-        expect(_in('takenoko-setup-tokens', '× 2'), findsOneWidget);
-        expect(_in('takenoko-setup-hand', '× 3'), findsOneWidget);
         expect(_in('takenoko-setup-emperor', 'Set aside'), findsOneWidget);
         expect(find.text('Face down'), findsNWidgets(3));
-        expect(
-          find.text('The tallest player starts. Play goes clockwise.'),
-          findsOneWidget,
-        );
         expect(tester.takeException(), isNull);
       },
     );

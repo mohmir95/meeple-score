@@ -12,6 +12,7 @@ import 'takenoko_how_to_play_screen.dart';
 import 'takenoko_scoring_hints_screen.dart';
 import 'takenoko_second_edition_screen.dart';
 import 'takenoko_setup_hints_screen.dart';
+import 'takenoko_starting_resources_screen.dart';
 
 /// Takenoko offers setup, rules and scoring help, so the hub has no score
 /// sheet.
@@ -94,6 +95,7 @@ class TakenokoGame extends BoardGame {
   @override
   List<String>? get hubTileOrder => const [
     'hub-setup-hints',
+    'hub-starting-resources',
     'hub-guide',
     'hub-quick-reference',
     'hub-scoring-hints',
@@ -113,6 +115,12 @@ class TakenokoGame extends BoardGame {
 
   @override
   Widget? buildSetupHints() => const TakenokoSetupHintsScreen();
+
+  @override
+  bool get showStartingResources => true;
+
+  @override
+  Widget? buildStartingResources() => const TakenokoStartingResourcesScreen();
 
   @override
   bool get showScoringHints => true;

@@ -12,6 +12,7 @@ void main() {
     expect(game.guideTitleKey, 'hub.howToPlay');
     expect(game.hubTileOrder, [
       'hub-setup-hints',
+      'hub-starting-resources',
       'hub-guide',
       'hub-quick-reference',
       'hub-scoring-hints',

@@ -30,19 +30,6 @@ class TakenokoSetupHintsScreen extends StatelessWidget {
     Widget icon(IconData data) =>
         Icon(data, color: TakenokoGame.bamboo, size: compact ? 26 : 30);
 
-    Widget objectiveCards() => Directionality(
-      textDirection: TextDirection.ltr,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final (i, objective) in TakenokoObjective.values.indexed) ...[
-            if (i > 0) const SizedBox(width: 3),
-            CenturyCard(color: objective.color, width: card * 0.8),
-          ],
-        ],
-      ),
-    );
-
     return CenturyPage(
       titleKey: 'hub.setupHints',
       style: TakenokoGame.style,
@@ -168,53 +155,6 @@ class TakenokoSetupHintsScreen extends StatelessWidget {
               label: l10n.t('takenoko.score.emperor'),
               hint: l10n.t('takenoko.setup.emperorHint'),
               value: l10n.t('takenoko.setup.setAside'),
-            ),
-          ],
-        ),
-        CenturyPanel(
-          key: const ValueKey('takenoko-setup-player'),
-          title: l10n.t('takenoko.setup.playerTitle'),
-          body: l10n.t('takenoko.setup.playerBody'),
-          children: [
-            CenturyRow(
-              key: const ValueKey('takenoko-setup-board'),
-              lead: icon(Icons.dashboard_outlined),
-              leadWidth: wide,
-              label: l10n.t('takenoko.setup.board'),
-              value: times(1),
-            ),
-            CenturyRow(
-              key: const ValueKey('takenoko-setup-tokens'),
-              lead: icon(Icons.radio_button_checked_rounded),
-              leadWidth: wide,
-              label: l10n.t('takenoko.setup.tokens'),
-              value: times(TakenokoRules.actionTokensPerPlayer),
-            ),
-            CenturyRow(
-              key: const ValueKey('takenoko-setup-hand'),
-              lead: objectiveCards(),
-              leadWidth: wide,
-              label: l10n.t('takenoko.setup.hand'),
-              hint: l10n.t('takenoko.setup.handHint'),
-              value: times(TakenokoObjective.values.length),
-            ),
-          ],
-        ),
-        CenturyPanel(
-          key: const ValueKey('takenoko-setup-first'),
-          title: l10n.t('takenoko.setup.firstTitle'),
-          body: l10n.t('takenoko.setup.firstBody'),
-          children: [
-            CenturyNote(
-              key: const ValueKey('takenoko-setup-weather'),
-              icon: Icons.wb_sunny_outlined,
-              text: l10n.t('takenoko.setup.weather'),
-            ),
-            SizedBox(height: compact ? 8 : 10),
-            CenturyNote(
-              key: const ValueKey('takenoko-setup-tip'),
-              icon: Icons.tips_and_updates_outlined,
-              text: l10n.t('takenoko.setup.tip'),
             ),
           ],
         ),

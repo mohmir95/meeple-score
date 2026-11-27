@@ -1182,7 +1182,7 @@ class CenturyPoint extends StatelessWidget {
                       text: '$title ',
                       style: const TextStyle(fontWeight: FontWeight.w800),
                     ),
-                  TextSpan(text: text),
+                  centuryBoldSpans(text),
                 ],
               ),
               style: style,
